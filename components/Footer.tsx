@@ -1,11 +1,14 @@
 import React from 'react';
-import from './footer.module.css';
+import {footerStyles, footerContentStyles, footerLinkStyles} from './footer.styles';
+import Demo from './demo';
 
 const Footer: React.FC = () => {
   return (
+    <>
+    <Demo/>
     <footer style={footerStyles}>
       <div style={footerContentStyles}>
-        <p>&copy; 2025 ZodSoft ERP. Всички права запазени.</p>
+        <p>&copy; 2025 CortanaSoft ERP. Всички права запазени.</p>
         <div>
           <a href="#privacy" style={footerLinkStyles}>Политика за поверителност</a>
           <a href="#terms" style={footerLinkStyles}>Условия за ползване</a>
@@ -13,6 +16,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
     </footer>
+    </>
   );
 };
 

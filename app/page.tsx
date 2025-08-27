@@ -1,13 +1,10 @@
 'use client'
+import Demo from '@/components/demo';
+import Intro from '@/components/Intro';
+import ModulesOptions from '@/components/modulesOptions';
+import WhyChoose from '@/components/whyChoose';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-// import Header from '../header';
-// import Footer from '../Footer';
-// import Intro from '../Intro';
-// import { subscribeMutate } from './hooks';
-// import WhyChoose from '../whyChoose';
-// import DemoRequest from '../demo';
-// import ModulesOptions from '../modulesOptions';
 
 const HomeContainer = styled.div`
   max-width: 1200px;
@@ -60,20 +57,18 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <Header />
       <Intro />
       <HomeContainer>
         <Title>
-          <span>ZodSoft</span> ERP Системи
+          <span>CortanaSoft</span> ERP Системи
         </Title>
         <Subtitle>Иновативна защита за вашите велосипеди, мотори и коли!</Subtitle>
         
         <WhyChoose />
-        <DemoRequest/>
+        
         <ModulesOptions />
     
       </HomeContainer>
-      <Footer />
     </>
   );
 };

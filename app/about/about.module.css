@@ -1,0 +1,58 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+    color: #2d3748;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #0dcaf0; /* Твоят основен цвят */
+  }
+  
+  .description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding: 0 10px;
+  }
+  
+  .contact {
+    margin-top: 30px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .contact p {
+    margin: 5px 0;
+    font-size: 1rem;
+  }
+  
+  .contactLink {
+    color: #0dcaf0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .contactLink:hover {
+    color: #09b4d0;
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .title {
+      font-size: 2rem;
+    }
+  
+    .description {
+      font-size: 1rem;
+    }
+  
+    .contact {
+      padding: 15px;
+    }
+  }
