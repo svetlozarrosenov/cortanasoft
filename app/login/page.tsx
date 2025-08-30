@@ -1,91 +1,122 @@
-'use client';
-import React, { useState } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import styles from './login.module.css';
+'use client'
+import React, { useState, type FormEvent, type ChangeEvent } from 'react';
+import { useAuth } from './hooks';
+import { styles } from './styles';
+import { useRouter } from "next/navigation";
+// import { requestNotificationPermission } from '../../notifications';
 
 const Login: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [status, setStatus] = useState('');
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus('Изпращане...');
-
+    setError('');
+    setIsLoading(true);
+    
     try {
-      // Пример за API извикване (заменете с вашия endpoint)
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (res.ok) {
-        setStatus('Вход успешен! Пренасочване...');
-        // Добавете пренасочване или логика след успешен вход
-      } else {
-        setStatus('Грешка при вход. Моля, проверете данните.');
-      }
-    } catch (error) {
-      setStatus('Грешка при вход. Моля, опитайте отново.');
+      // const token = await requestNotificationPermission();
+      await login({ email, password, firebaseId: 'token' });
+      router.push('dashboard')
+    } catch (err) {
+      setError('Неуспешен опит за вход. Моля, проверете вашите данни.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>, setter: (value: string) => void) => {
+    setter(e.target.value);
+  };
+
+  const activeColor = '#a777e3';
+  const defaultColor = '#6e8efb';
+
   return (
-    <>
-      <Head>
-        <title>Вход - CortanaSoft ERP</title>
-        <meta name="description" content="Влезте в системата на CortanaSoft ERP за достъп до вашите бизнес инструменти." />
-      </Head>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Вход в системата</h1>
-        <p className={styles.description}>
-          Моля, въведете вашите данни за вход. Ако имате проблеми, <Link href="/contacts" className={styles.contactLink}>свържете се с нас</Link>.
-        </p>
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className={styles.input}
-            />
+    <div style={styles.appContainer as React.CSSProperties}>
+      <div style={styles.pageContainer as React.CSSProperties}>
+        <div style={styles.loginContainer}>
+          <div style={styles.logoContainer}>
+            <img src="/logo.svg" alt="Sentinel Logo" style={styles.logo} />
           </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Парола</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className={styles.input}
-            />
-          </div>
-          <button type="submit" className={styles.submitButton}>
-            Вход
-          </button>
-          {status && <p className={styles.status}>{status}</p>}
-        </form>
-        <div className={styles.contact}>
-          <p>Нямате акаунт? <Link href="/contacts" className={styles.contactLink}>Свържете се за регистрация</Link></p>
+          
+          <h2 style={styles.title}>
+            Вход в <span style={styles.titleGradient}>Sentinel</span>
+          </h2>
+          
+          <form onSubmit={handleSubmit} style={styles.loginForm as React.CSSProperties}>
+            <div style={styles.inputGroup as React.CSSProperties}>
+              <label htmlFor="email" style={styles.inputLabel}>
+                Имейл адрес
+              </label>
+              <input
+                id="email"
+                type="email"
+                style={styles.inputField}
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => handleInputChange(e, setEmail)}
+                required
+              />
+            </div>
+
+            <div style={styles.inputGroup as React.CSSProperties}>
+              <label htmlFor="password" style={styles.inputLabel}>
+                Парола
+              </label>
+              <input
+                id="password"
+                type="password"
+                style={styles.inputField}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => handleInputChange(e, setPassword)}
+                required
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              style={{
+                ...styles.submitButton,
+                ...(isLoading ? styles.submitButtonDisabled : {})
+              }}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Влизане...' : 'Влез'}
+            </button>
+          </form>
+
+          {error && <div style={styles.errorMessage}>{error}</div>}
+          
+          <a 
+            href="/forgot-password" 
+            style={{
+              ...styles.forgotPassword,
+              color: defaultColor,
+            }}
+            onTouchStart={() => {
+              const link = document.querySelector('a[href="/forgot-password"]');
+              if (link) {
+                (link as HTMLElement).style.color = activeColor;
+              }
+            }}
+            onTouchEnd={() => {
+              const link = document.querySelector('a[href="/forgot-password"]');
+              if (link) {
+                (link as HTMLElement).style.color = defaultColor;
+              }
+            }}
+          >
+            Забравена парола?
+          </a>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

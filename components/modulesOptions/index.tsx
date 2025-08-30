@@ -16,7 +16,7 @@ const ModulesOptions: React.FC = () => {
     );
   };
 
-  const totalPrice = basePrice + selectedOptions.reduce((sum, option) => sum + (optionPrices[option] || 0), 0);
+  // const totalPrice = basePrice + selectedOptions.reduce((sum, option) => sum + (optionPrices[option] || 0), 0);
 
   return (
     <section style={sectionStyles}>
@@ -46,7 +46,7 @@ const ModulesOptions: React.FC = () => {
             /> Анализи (+90 лв)
           </label>
         </div>
-        <p style={totalStyles}>Обща цена: {totalPrice} лв</p>
+        <p style={totalStyles}>Обща цена: {67677} лв</p>
       </div>
     </section>
   );

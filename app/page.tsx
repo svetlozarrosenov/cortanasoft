@@ -1,8 +1,9 @@
 'use client'
 import Demo from '@/components/demo';
+// import Demo from '@/components/demo';
 import Intro from '@/components/Intro';
-import ModulesOptions from '@/components/modulesOptions';
-import WhyChoose from '@/components/whyChoose';
+// import ModulesOptions from '@/components/modulesOptions';
+// import WhyChoose from '@/components/whyChoose';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -53,22 +54,13 @@ const Subtitle = styled.h2`
 `;
 
 const Home: React.FC = () => {
-  const [email, setEmail] = useState('');
-
   return (
     <>
-      <Intro />
-      <HomeContainer>
+   
         <Title>
           <span>CortanaSoft</span> ERP Системи
         </Title>
-        <Subtitle>Иновативна защита за вашите велосипеди, мотори и коли!</Subtitle>
-        
-        <WhyChoose />
-        
-        <ModulesOptions />
-    
-      </HomeContainer>
+        <Demo/>
     </>
   );
 };

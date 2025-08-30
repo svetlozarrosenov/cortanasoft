@@ -4,8 +4,6 @@ import Demo from './demo';
 
 const Footer: React.FC = () => {
   return (
-    <>
-    <Demo/>
     <footer style={footerStyles}>
       <div style={footerContentStyles}>
         <p>&copy; 2025 CortanaSoft ERP. Всички права запазени.</p>
@@ -16,7 +14,6 @@ const Footer: React.FC = () => {
         </div>
       </div>
     </footer>
-    </>
   );
 };
 
