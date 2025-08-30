@@ -5,6 +5,7 @@ import styles from '../dashboard.module.css';
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
+import { createClient, useClients } from './hooks';
 
 // Регистриране на AG Grid модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -13,30 +14,29 @@ interface Client {
   id: number;
   name: string;
   email: string;
-  status: string;
+  phone: string;
+  city: string;
 }
 
 export default function ClientsPage() {
-  // Състояние за колоните на AG Grid
-  const [rowData, setRowData] = useState([
-    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-    { make: "Ford", model: "F-Series", price: 33850, electric: false },
-    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-]);
+  const {clients: rowData, mutate} = useClients();
 
 // Column Definitions: Defines the columns to be displayed.
 const [colDefs, setColDefs] = useState([
-    { field: "make" },
-    { field: "model" },
-    { field: "price" },
-    { field: "electric" }
+    { field: "firstName" },
+    { field: "middleName" },
+    { field: "lastName" },
+    { field: "phone" },
+    { field: "email" },
+    { field: "country" },
+    { field: "city" }
 ]);
 
   // Състояние за данните на редовете
 
   // Състояние за модала
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', status: 'Активен' });
+  const [formData, setFormData] = useState({ firstName: '', middleName: '', lastName: '', email: '', phone: '', city: '', country: '', });
   const [formErrors, setFormErrors] = useState({ name: '', email: '' });
 
   // Функция за отваряне/затваряне на модала
@@ -47,7 +47,7 @@ const [colDefs, setColDefs] = useState([
   // Функция за затваряне на модала
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormData({ name: '', email: '', status: 'Активен' });
+    setFormData({ firstName: '', middleName: '', lastName: '', country: '', email: '', phone: '', city: '' });
     setFormErrors({ name: '', email: '' });
   };
 
@@ -62,8 +62,8 @@ const [colDefs, setColDefs] = useState([
   const validateForm = () => {
     const errors = { name: '', email: '' };
     let isValid = true;
-
-    if (!formData.name.trim()) {
+    console.log('crb_formData', formData)
+    if (!formData.firstName.trim()) {
       errors.name = 'Името е задължително';
       isValid = false;
     }
@@ -74,28 +74,17 @@ const [colDefs, setColDefs] = useState([
     }
 
     setFormErrors(errors);
-_vm: return isValid;
+   return isValid;
   };
 
   // Функция за изпращане на формата
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
     try {
-      // Примерна заявка към NestJS API
-      const response = await fetch('/api/clients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const newClient = await response.json();
-        closeModal();
-      } else {
-        console.error('Грешка при добавяне на клиент');
-      }
+      await createClient(formData);
+      mutate();
+      closeModal();
     } catch (error) {
       console.error('Грешка при изпращане на заявката:', error);
     }
@@ -133,8 +122,38 @@ _vm: return isValid;
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                {formErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                )}
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Бащино име
+                </label>
+                <input
+                  type="text"
+                  name="middleName"
+                  value={formData.middleName}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                {formErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                )}
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Фамилно име
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
@@ -157,20 +176,56 @@ _vm: return isValid;
                   <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
                 )}
               </div>
+              
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Статус
+                  Държава
                 </label>
-                <select
-                  name="status"
-                  value={formData.status}
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  <option value="Активен">Активен</option>
-                  <option value="Неактивен">Неактивен</option>
-                </select>
+                />
+                {formErrors.email && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                )}
               </div>
+
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Град
+                </label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                {formErrors.email && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                )}
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Телефон
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                {formErrors.email && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                )}
+              </div>
+
               <div className="flex justify-end gap-2">
                 <button
                   type="button"

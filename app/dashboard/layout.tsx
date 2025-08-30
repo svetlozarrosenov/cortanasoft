@@ -28,37 +28,37 @@ export default function DashboardLayout({
               </Link>
             </li>
             <li>
-              <Link href="/clients" className={styles.navLink}>
+              <Link href="/dashboard/clients" className={styles.navLink}>
                 <Users className={styles.icon} />
                 Клиенти
               </Link>
             </li>
             <li>
-              <Link href="/orders" className={styles.navLink}>
+              <Link href="/dashboard/orders" className={styles.navLink}>
                 <ShoppingCart className={styles.icon} />
                 Поръчки
               </Link>
             </li>
             <li>
-              <Link href="/inventory" className={styles.navLink}>
+              <Link href="/dashboard/inventory" className={styles.navLink}>
                 <Package className={styles.icon} />
                 Складова наличност
               </Link>
             </li>
             <li>
-              <Link href="/reports" className={styles.navLink}>
+              <Link href="/dashboard/reports" className={styles.navLink}>
                 <BarChart className={styles.icon} />
                 Репорти
               </Link>
             </li>
             <li>
-              <Link href="/settings" className={styles.navLink}>
+              <Link href="/dashboard/settings" className={styles.navLink}>
                 <Settings className={styles.icon} />
                 Насртройки
               </Link>
             </li>
             <li>
-              <Link href="/users" className={styles.navLink}>
+              <Link href="/dashboard/users" className={styles.navLink}>
                 <Users className={styles.icon} />
                 Потребители
               </Link>
@@ -99,25 +99,25 @@ export default function DashboardLayout({
                 </Link>
               </li>
               <li>
-                <Link href="/clients" className={styles.navLink}>
+                <Link href="/dashboard/clients" className={styles.navLink}>
                   <Users className={styles.icon} />
                   Клиенти
                 </Link>
               </li>
               <li>
-                <Link href="/orders" className={styles.navLink}>
+                <Link href="/dashboard/orders" className={styles.navLink}>
                   <ShoppingCart className={styles.icon} />
                   Поръчки
                 </Link>
               </li>
               <li>
-                <Link href="/inventory" className={styles.navLink}>
+                <Link href="/dashboard/inventory" className={styles.navLink}>
                   <Package className={styles.icon} />
                   Складова наличност
                 </Link>
               </li>
               <li>
-                <Link href="/reports" className={styles.navLink}>
+                <Link href="/dashboard/reports" className={styles.navLink}>
                   <BarChart className={styles.icon} />
                   Репорти
                 </Link>
