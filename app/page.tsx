@@ -2,6 +2,8 @@
 import Demo from '@/components/demo';
 // import Demo from '@/components/demo';
 import Intro from '@/components/Intro';
+import ModulesOptions from '@/components/modulesOptions';
+import WhyChoose from '@/components/whyChoose';
 // import ModulesOptions from '@/components/modulesOptions';
 // import WhyChoose from '@/components/whyChoose';
 import React, { useState } from 'react';
@@ -56,10 +58,16 @@ const Subtitle = styled.h2`
 const Home: React.FC = () => {
   return (
     <>
-   
         <Title>
           <span>CortanaSoft</span> ERP Системи
         </Title>
+
+        <Intro/>
+
+        <WhyChoose/>
+
+        <ModulesOptions/>
+        
         <Demo/>
     </>
   );

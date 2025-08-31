@@ -27,7 +27,7 @@ const Navigation: React.FC = () => {
         </li>}
 
         {user && <li className={styles.navItem}>
-          {user.firstName} {user.lastName}
+          Здравейте {user.firstName}
         </li>}
       </ul>
     </nav>

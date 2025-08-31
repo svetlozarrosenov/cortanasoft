@@ -40,27 +40,9 @@ export default function DashboardLayout({
               </Link>
             </li>
             <li>
-              <Link href="/dashboard/inventory" className={styles.navLink}>
+              <Link href="/dashboard/products" className={styles.navLink}>
                 <Package className={styles.icon} />
-                Складова наличност
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/reports" className={styles.navLink}>
-                <BarChart className={styles.icon} />
-                Репорти
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/settings" className={styles.navLink}>
-                <Settings className={styles.icon} />
-                Насртройки
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/users" className={styles.navLink}>
-                <Users className={styles.icon} />
-                Потребители
+                Продукти
               </Link>
             </li>
             <li>
@@ -111,9 +93,9 @@ export default function DashboardLayout({
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard/inventory" className={styles.navLink}>
+                <Link href="/dashboard/products" className={styles.navLink}>
                   <Package className={styles.icon} />
-                  Складова наличност
+                  Продукти
                 </Link>
               </li>
               <li>

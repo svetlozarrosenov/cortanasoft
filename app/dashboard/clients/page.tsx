@@ -23,13 +23,13 @@ export default function ClientsPage() {
 
 // Column Definitions: Defines the columns to be displayed.
 const [colDefs, setColDefs] = useState([
-    { field: "firstName" },
-    { field: "middleName" },
-    { field: "lastName" },
-    { field: "phone" },
-    { field: "email" },
-    { field: "country" },
-    { field: "city" }
+    { field: "firstName", filter: true },
+    { field: "middleName", filter: true },
+    { field: "lastName", filter: true },
+    { field: "phone", filter: true },
+    { field: "email", filter: true },
+    { field: "country", filter: true },
+    { field: "city", filter: true }
 ]);
 
   // Състояние за данните на редовете
