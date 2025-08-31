@@ -33,7 +33,7 @@ const Login: React.FC = () => {
     setter(e.target.value);
   };
 
-  const activeColor = '#a777e3';
+  const activeColor = '#0dcaf0';
   const defaultColor = '#6e8efb';
 
   return (
@@ -45,7 +45,7 @@ const Login: React.FC = () => {
           </div>
           
           <h2 style={styles.title}>
-            Вход в <span style={styles.titleGradient}>Sentinel</span>
+            Вход в Cortana
           </h2>
           
           <form onSubmit={handleSubmit} style={styles.loginForm as React.CSSProperties}>

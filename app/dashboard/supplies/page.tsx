@@ -6,20 +6,22 @@ import type { ColDef } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import Select from 'react-select';
-import { useClients } from '../clients/hooks';
 import { useProducts } from '../products/hooks';
-import { useOrders, createOrder } from './hooks';
+import { useSuppliers } from '../suppliers/hooks';
+import { useSupplies, createSupply } from './hooks';
 
 // Регистриране на AG Grid модули
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-interface Client {
+interface Supplier {
   _id: string;
-  firstName: string;
-  lastName: string;
+  companyName: string;
+  responsiblePerson: string;
   email: string;
   phone: string;
+  address: string;
   city: string;
+  country: string;
 }
 
 interface Product {
@@ -29,40 +31,41 @@ interface Product {
   quantity: number;
 }
 
-interface OrderProduct {
+interface SupplyProduct {
   productId: string;
   quantity: number;
   productName: string;
   productPrice: number;
 }
 
-interface Order {
+interface Supply {
   _id: string;
-  clientId: string;
-  clientName: string;
-  products: OrderProduct[];
+  supplierId: string;
+  supplierName: string;
+  products: SupplyProduct[];
   totalPrice: number;
-  status: string, 
-  annexedAt: string;
+  price: number;
+  status: string;
+  deliveryDate: string;
+  currency: 'EUR' | 'BGN'; // Ново поле за валута
   updatedAt: string;
-  client: Client;
 }
 
-// Функция за форматиране на цена в евро
-const formatPrice = (price: number) => {
-  return price?.toLocaleString('bg-BG', { style: 'currency', currency: 'EUR' });
+// Функция за форматиране на цена с избрана валута
+const formatPrice = (price: number, currency: 'EUR' | 'BGN') => {
+  return price?.toLocaleString('bg-BG', { style: 'currency', currency });
 };
 
-export default function OrdersPage() {
-  const { clients } = useClients();
+export default function SuppliesPage() {
+  const { suppliers } = useSuppliers();
   const { products } = useProducts();
-  const { orders: rowData, mutate } = useOrders();
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const { supplies: rowData, mutate } = useSupplies();
+  const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
 
-  // Опции за react-select за клиенти
-  const clientOptions = clients?.map((client) => ({
-    value: client._id,
-    label: `${client.firstName} ${client.lastName || ''}`,
+  // Опции за react-select за доставчици
+  const supplierOptions = suppliers?.map((supplier) => ({
+    value: supplier._id,
+    label: supplier.companyName,
   })) || [];
 
   // Опции за react-select за продукти
@@ -71,26 +74,31 @@ export default function OrdersPage() {
     label: product.name,
   })) || [];
 
-  // Опции за статус на поръчката
+  // Опции за статус на доставката
   const statusOptions = [
-    { value: 'pending', label: 'В обработка' },
-    { value: 'shipped', label: 'Изпратена' },
-    { value: 'delivered', label: 'Доставена' },
+    { value: 'pending', label: 'Очакваща' },
+    { value: 'received', label: 'Получена' },
     { value: 'canceled', label: 'Отменена' },
   ];
 
+  // Опции за валута
+  const currencyOptions = [
+    { value: 'EUR', label: 'Евро' },
+    { value: 'BGN', label: 'Лев' },
+  ];
+
   // Дефиниция на колони за главната таблица
-  const [colDefs, setColDefs] = useState<ColDef<Order>[]>([
+  const [colDefs, setColDefs] = useState<ColDef<Supply>[]>([
     {
-      field: 'clientName',
-      headerName: 'Клиент',
+      field: 'supplierName',
+      headerName: 'Доставчик',
       filter: true,
     },
     {
-      field: 'totalPrice',
-      headerName: 'Обща цена',
+      field: 'price',
+      headerName: 'Цена на доставка',
       filter: true,
-      valueFormatter: (params) => formatPrice(params.value),
+      valueFormatter: (params) => formatPrice(params.data.price, params.data.currency),
     },
     {
       field: 'status',
@@ -102,8 +110,8 @@ export default function OrdersPage() {
       },
     },
     {
-      field: 'createdAt',
-      headerName: 'Създадена на',
+      field: 'deliveryDate',
+      headerName: 'Дата на доставка',
       filter: true,
       valueFormatter: (params) => new Date(params.value).toLocaleString('bg-BG'),
     },
@@ -111,7 +119,7 @@ export default function OrdersPage() {
       headerName: 'Действия',
       cellRenderer: (params: any) => (
         <button
-          onClick={() => setSelectedOrder(params.data)}
+          onClick={() => setSelectedSupply(params.data)}
           className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded transition duration-200"
         >
           Детайли
@@ -182,43 +190,77 @@ export default function OrdersPage() {
   // Състояние за модала за добавяне
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    clientId: null as string | null,
-    products: [] as OrderProduct[],
+    supplierId: null as string | null,
+    products: [] as SupplyProduct[],
     status: 'pending' as string,
+    deliveryDate: new Date().toISOString().split('T')[0],
+    price: 0,
+    currency: 'EUR' as 'EUR' | 'BGN', // Първоначална стойност за валута
   });
   const [formErrors, setFormErrors] = useState({
-    clientId: '',
+    supplierId: '',
     products: '',
     status: '',
+    deliveryDate: '',
+    price: '',
+    currency: '',
   });
 
   // Функция за отваряне на модала за добавяне
-  const handleAddOrder = () => {
+  const handleAddSupply = () => {
     setIsModalOpen(true);
+    setFormData({
+      supplierId: null,
+      products: [],
+      status: 'pending',
+      deliveryDate: new Date().toISOString().split('T')[0],
+      price: 0,
+      currency: 'EUR',
+    });
   };
 
   // Функция за затваряне на модала за добавяне
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormData({ clientId: null, products: [], status: 'pending' });
-    setFormErrors({ clientId: '', products: '', status: '' });
+    setFormData({
+      supplierId: null,
+      products: [],
+      status: 'pending',
+      deliveryDate: new Date().toISOString().split('T')[0],
+      price: 0,
+      currency: 'EUR',
+    });
+    setFormErrors({
+      supplierId: '',
+      products: '',
+      status: '',
+      deliveryDate: '',
+      price: '',
+      currency: '',
+    });
   };
 
   // Функция за затваряне на попъпа с детайли
   const closeDetailPopup = () => {
-    setSelectedOrder(null);
+    setSelectedSupply(null);
   };
 
-  // Функция за избор на клиент
-  const handleClientChange = (selectedOption: any) => {
-    setFormData((prev) => ({ ...prev, clientId: selectedOption ? selectedOption.value : null }));
-    setFormErrors((prev) => ({ ...prev, clientId: '' }));
+  // Функция за избор на доставчик
+  const handleSupplierChange = (selectedOption: any) => {
+    setFormData((prev) => ({ ...prev, supplierId: selectedOption ? selectedOption.value : null }));
+    setFormErrors((prev) => ({ ...prev, supplierId: '' }));
   };
 
   // Функция за избор на статус
   const handleStatusChange = (selectedOption: any) => {
     setFormData((prev) => ({ ...prev, status: selectedOption ? selectedOption.value : 'pending' }));
     setFormErrors((prev) => ({ ...prev, status: '' }));
+  };
+
+  // Функция за избор на валута
+  const handleCurrencyChange = (selectedOption: any) => {
+    setFormData((prev) => ({ ...prev, currency: selectedOption ? selectedOption.value : 'EUR' }));
+    setFormErrors((prev) => ({ ...prev, currency: '' }));
   };
 
   // Функция за добавяне на нов продукт
@@ -257,13 +299,25 @@ export default function OrdersPage() {
     setFormData((prev) => ({ ...prev, products: updatedProducts }));
   };
 
+  // Функция за промяна на дата
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, deliveryDate: e.target.value }));
+    setFormErrors((prev) => ({ ...prev, deliveryDate: '' }));
+  };
+
+  // Функция за промяна на цена на доставката
+  const handlepriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, price: Number(e.target.value) }));
+    setFormErrors((prev) => ({ ...prev, price: '' }));
+  };
+
   // Функция за валидация на формата
   const validateForm = () => {
-    const errors = { clientId: '', products: '', status: '' };
+    const errors = { supplierId: '', products: '', status: '', deliveryDate: '', price: '', currency: '' };
     let isValid = true;
 
-    if (!formData.clientId) {
-      errors.clientId = 'Изборът на клиент е задължителен';
+    if (!formData.supplierId) {
+      errors.supplierId = 'Изборът на доставчик е задължителен';
       isValid = false;
     }
 
@@ -290,6 +344,21 @@ export default function OrdersPage() {
       isValid = false;
     }
 
+    if (!formData.deliveryDate) {
+      errors.deliveryDate = 'Датата на доставка е задължителна';
+      isValid = false;
+    }
+
+    if (formData.price < 0 || isNaN(formData.price)) {
+      errors.price = 'Цената на доставката не може да бъде отрицателна';
+      isValid = false;
+    }
+
+    if (!formData.currency) {
+      errors.currency = 'Изборът на валута е задължителен';
+      isValid = false;
+    }
+
     setFormErrors(errors);
     return isValid;
   };
@@ -299,16 +368,16 @@ export default function OrdersPage() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    // Изчисляване на totalPrice
+    // Изчисляване на totalPrice (без включване на price)
     let totalPrice = 0;
-    const selectedProducts = formData.products.map((orderProd) => {
-      const product = products.find((p) => p._id === orderProd.productId);
+    const selectedProducts = formData.products.map((supplyProd) => {
+      const product = products.find((p) => p._id === supplyProd.productId);
       if (product) {
-        totalPrice += product.price * orderProd.quantity;
+        totalPrice += product.price * supplyProd.quantity;
       }
       return {
-        productId: orderProd.productId,
-        quantity: orderProd.quantity,
+        productId: supplyProd.productId,
+        quantity: supplyProd.quantity,
       };
     });
 
@@ -318,11 +387,14 @@ export default function OrdersPage() {
     }
 
     try {
-      await createOrder({
-        clientId: formData.clientId!,
+      await createSupply({
+        supplierId: formData.supplierId!,
         products: selectedProducts,
         totalPrice,
+        price: formData.price,
         status: formData.status,
+        deliveryDate: formData.deliveryDate,
+        currency: formData.currency,
       });
       mutate();
       closeModal();
@@ -332,14 +404,14 @@ export default function OrdersPage() {
   };
 
   // Дефиниция на колони за таблицата в попъпа
-  const detailColDefs: ColDef<OrderProduct>[] = [
+  const detailColDefs: ColDef<SupplyProduct>[] = [
     { field: 'productName', headerName: 'Продукт', filter: true },
     { field: 'quantity', headerName: 'Количество', filter: true },
     {
       field: 'productPrice',
       headerName: 'Цена',
       filter: true,
-      valueFormatter: (params) => formatPrice(params.value),
+      valueFormatter: (params) => formatPrice(params.value, selectedSupply?.currency || 'EUR'),
     },
   ];
 
@@ -347,12 +419,12 @@ export default function OrdersPage() {
     <div className={styles.grid}>
       <div className={styles.card}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className={styles.cardTitle}>Поръчки</h2>
+          <h2 className={styles.cardTitle}>Доставки</h2>
           <button
-            onClick={handleAddOrder}
+            onClick={handleAddSupply}
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
           >
-            Добави поръчка
+            Добави доставка
           </button>
         </div>
         <div className="ag-theme-alpine" style={{ height: 500 }}>
@@ -367,21 +439,21 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Модал за добавяне на поръчка */}
+      {/* Модал за добавяне на доставка */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className={`${styles.card} w-full max-w-md`}>
-            <h2 className={styles.cardTitle}>Добави нова поръчка</h2>
+            <h2 className={styles.cardTitle}>Добави нова доставка</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Клиент
+                  Доставчик
                 </label>
                 <Select
-                  options={clientOptions}
+                  options={supplierOptions}
                   isClearable
-                  placeholder="Избери клиент..."
-                  onChange={handleClientChange}
+                  placeholder="Избери доставчик..."
+                  onChange={handleSupplierChange}
                   className="mt-1"
                   classNamePrefix="react-select"
                   styles={{
@@ -395,8 +467,8 @@ export default function OrdersPage() {
                     singleValueDark: customStyles.singleValueDark,
                   }}
                 />
-                {formErrors.clientId && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.clientId}</p>
+                {formErrors.supplierId && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.supplierId}</p>
                 )}
               </div>
               <div className="mb-4">
@@ -454,6 +526,62 @@ export default function OrdersPage() {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Дата на доставка
+                </label>
+                <input
+                  type="date"
+                  value={formData.deliveryDate}
+                  onChange={handleDateChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                {formErrors.deliveryDate && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.deliveryDate}</p>
+                )}
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Цена на доставка
+                </label>
+                <input
+                  type="number"
+                  value={formData.price}
+                  onChange={handlepriceChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  min="0"
+                  step="0.01"
+                />
+                {formErrors.price && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.price}</p>
+                )}
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Валута
+                </label>
+                <Select
+                  options={currencyOptions}
+                  value={currencyOptions.find((opt) => opt.value === formData.currency) || null}
+                  onChange={handleCurrencyChange}
+                  placeholder="Избери валута..."
+                  className="mt-1"
+                  classNamePrefix="react-select"
+                  styles={{
+                    control: customStyles.control,
+                    menu: customStyles.menu,
+                    option: customStyles.option,
+                    singleValue: customStyles.singleValue,
+                    controlDark: customStyles.controlDark,
+                    menuDark: customStyles.menuDark,
+                    optionDark: customStyles.optionDark,
+                    singleValueDark: customStyles.singleValueDark,
+                  }}
+                />
+                {formErrors.currency && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.currency}</p>
+                )}
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Статус
                 </label>
                 <Select
@@ -498,14 +626,21 @@ export default function OrdersPage() {
         </div>
       )}
 
-      {/* Попъп за детайли на поръчката */}
-      {selectedOrder && (
+      {/* Попъп за детайли на доставката */}
+      {selectedSupply && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className={`${styles.card} w-full max-w-md`}>
-            <h2 className={styles.cardTitle}>Детайли за поръчка</h2>
+            <h2 className={styles.cardTitle}>Детайли за доставка</h2>
+            <div className="mb-4">
+              <p><strong>Доставчик:</strong> {selectedSupply.supplierName}</p>
+              <p><strong>Обща цена:</strong> {formatPrice(selectedSupply.totalPrice, selectedSupply.currency)}</p>
+              <p><strong>Цена на доставка:</strong> {formatPrice(selectedSupply.price, selectedSupply.currency)}</p>
+              <p><strong>Статус:</strong> {statusOptions.find((opt) => opt.value === selectedSupply.status)?.label || selectedSupply.status}</p>
+              <p><strong>Дата на доставка:</strong> {new Date(selectedSupply.deliveryDate).toLocaleString('bg-BG')}</p>
+            </div>
             <div className="ag-theme-alpine" style={{ height: 200, width: '100%' }}>
               <AgGridReact
-                rowData={selectedOrder.products}
+                rowData={selectedSupply.products}
                 columnDefs={detailColDefs}
                 domLayout="autoHeight"
                 defaultColDef={{

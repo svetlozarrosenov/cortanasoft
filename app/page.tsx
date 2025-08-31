@@ -28,7 +28,7 @@ const Title = styled.h1`
   padding: 0 16px;
   
   span {
-    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    background: #0dcaf0;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

@@ -46,6 +46,18 @@ export default function DashboardLayout({
               </Link>
             </li>
             <li>
+              <Link href="/dashboard/supplies" className={styles.navLink}>
+                <Package className={styles.icon} />
+                Доставки
+              </Link>
+            </li>
+            <li>
+              <Link href="/dashboard/suppliers" className={styles.navLink}>
+                <Package className={styles.icon} />
+                Доставчици
+              </Link>
+            </li>
+            <li>
               <Link href="/logout" className={styles.navLink}>
                 <LogOut className={styles.icon} />
                 Разлогване
@@ -98,6 +110,19 @@ export default function DashboardLayout({
                   Продукти
                 </Link>
               </li>
+              <li>
+              <Link href="/dashboard/supplies" className={styles.navLink}>
+                <Package className={styles.icon} />
+                Доставки
+              </Link>
+            </li>
+
+            <li>
+              <Link href="/dashboard/suppliers" className={styles.navLink}>
+                <Package className={styles.icon} />
+                Доставчици
+              </Link>
+            </li>
               <li>
                 <Link href="/dashboard/reports" className={styles.navLink}>
                   <BarChart className={styles.icon} />
