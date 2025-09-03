@@ -1,11 +1,11 @@
 'use client';
 import { useState } from 'react';
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Само темата alpine
-import styles from '../dashboard.module.css';
+import styles from '../../dashboard.module.css';
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { createProduct, updateProduct, useProducts } from './hooks';
+import { createProduct, updateProduct, useProducts } from '../all/hooks';
 
 // Регистриране на AG Grid модули
 ModuleRegistry.registerModules([AllCommunityModule]);

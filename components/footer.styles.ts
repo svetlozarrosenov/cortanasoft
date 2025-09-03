@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 
 export const footerStyles: CSSProperties = {
-  backgroundColor: '#0dcaf0',
+  backgroundColor: '#0092b5',
   color: 'white',
   padding: '20px 30px',
   position: 'relative',

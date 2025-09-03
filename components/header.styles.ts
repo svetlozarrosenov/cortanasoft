@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 
 export const headerStyles: CSSProperties = {
-  backgroundColor: '#0dcaf0',
+  backgroundColor: '#0092b5',
   color: 'white',
   padding: '15px 30px',
   display: 'flex',

@@ -28,7 +28,7 @@ const Title = styled.h1`
   padding: 0 16px;
   
   span {
-    background: #0dcaf0;
+    background: #0092b5;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

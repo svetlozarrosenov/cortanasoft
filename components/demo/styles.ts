@@ -13,14 +13,14 @@ export const containerStyles: CSSProperties = {
 
 export const titleStyles: CSSProperties = {
   fontSize: '32px',
-  color: '#0dcaf0', // Основен цвят
+  color: '#0092b5', // Основен цвят
   marginBottom: '20px',
 };
 
 export const buttonStyles: CSSProperties = {
   padding: '12px 30px',
   fontSize: '18px',
-  backgroundColor: '#0dcaf0', // Основен цвят
+  backgroundColor: '#0092b5', // Основен цвят
   color: 'white',
   border: 'none',
   borderRadius: '4px',
@@ -57,7 +57,7 @@ export const closeStyles: CSSProperties = {
   right: '10px',
   fontSize: '24px',
   cursor: 'pointer',
-  color: '#0dcaf0',
+  color: '#0092b5',
 };
 
 export const formStyles: CSSProperties = {
@@ -78,7 +78,7 @@ export const inputStyles: CSSProperties = {
 export const submitStyles: CSSProperties = {
   padding: '10px',
   fontSize: '16px',
-  backgroundColor: '#0dcaf0', // Основен цвят
+  backgroundColor: '#0092b5', // Основен цвят
   color: 'white',
   border: 'none',
   borderRadius: '4px',

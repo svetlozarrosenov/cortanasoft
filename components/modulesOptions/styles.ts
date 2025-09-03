@@ -17,7 +17,7 @@ export const containerStyles: CSSProperties = {
 
 export const titleStyles: CSSProperties = {
   fontSize: '32px',
-  color: '#0dcaf0', // Основен цвят
+  color: '#0092b5', // Основен цвят
   marginBottom: '20px',
 };
 
@@ -39,6 +39,6 @@ export const optionStyles: CSSProperties = {
 export const totalStyles: CSSProperties = {
   fontSize: '20px',
   fontWeight: 'bold',
-  color: '#0dcaf0', // Основен цвят
+  color: '#0092b5', // Основен цвят
   marginTop: '20px',
 };

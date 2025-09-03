@@ -33,7 +33,7 @@ const Login: React.FC = () => {
     setter(e.target.value);
   };
 
-  const activeColor = '#0dcaf0';
+  const activeColor = '#0092b5';
   const defaultColor = '#6e8efb';
 
   return (

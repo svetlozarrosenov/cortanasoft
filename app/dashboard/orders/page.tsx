@@ -7,7 +7,7 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import Select from 'react-select';
 import { useClients } from '../clients/hooks';
-import { useProducts } from '../products/hooks';
+import { useProducts } from '../products/all/hooks';
 import { useOrders, createOrder } from './hooks';
 
 // Регистриране на AG Grid модули

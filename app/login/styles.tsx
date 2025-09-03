@@ -97,7 +97,7 @@ export const styles: StylesType = {
 
   submitButton: {
     width: '100%',
-    background: '#0dcaf0',
+    background: '#0092b5',
     color: 'white',
     border: 'none',
     padding: '0.875rem',
@@ -144,7 +144,7 @@ export const styles: StylesType = {
   },
 
   forgotPasswordActive: {
-    color: '#0dcaf0',
+    color: '#0092b5',
   },
 
   // Медия стилове се прилагат програмно в компонента

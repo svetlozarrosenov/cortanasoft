@@ -9,7 +9,7 @@
   .title {
     font-size: 2.5rem;
     margin-bottom: 20px;
-    color: #0dcaf0;
+    color: #0092b5;
   }
   
   .description {
@@ -28,7 +28,7 @@
   }
   
   .contactLink {
-    color: #0dcaf0;
+    color: #0092b5;
     text-decoration: none;
     transition: color 0.3s ease;
   }
@@ -54,7 +54,7 @@
   }
   
   .submitButton {
-    background-color: #0dcaf0;
+    background-color: #0092b5;
     color: white;
     padding: 10px 20px;
     border: none;

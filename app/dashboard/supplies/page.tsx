@@ -6,7 +6,7 @@ import type { ColDef } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import Select from 'react-select';
-import { useProducts } from '../products/hooks';
+import { useProducts } from '../products/all/hooks';
 import { useSuppliers } from '../suppliers/hooks';
 import { useSupplies, createSupply } from './hooks';
 
@@ -41,7 +41,7 @@ interface SupplyProduct {
 interface Supply {
   _id: string;
   supplierId: string;
-  supplierName: string;
+  companyName: string;
   products: SupplyProduct[];
   totalPrice: number;
   price: number;
@@ -90,7 +90,7 @@ export default function SuppliesPage() {
   // Дефиниция на колони за главната таблица
   const [colDefs, setColDefs] = useState<ColDef<Supply>[]>([
     {
-      field: 'supplierName',
+      field: 'companyName',
       headerName: 'Доставчик',
       filter: true,
     },

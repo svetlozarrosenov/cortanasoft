@@ -12,7 +12,7 @@ export const containerStyles: CSSProperties = {
 };
 
 export const boxStyles: CSSProperties = {
-  backgroundColor: '#0dcaf0', // Основен цвят
+  backgroundColor: '#0092b5', // Основен цвят
   color: 'white',
   padding: '20px',
   borderRadius: '8px',
