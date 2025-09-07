@@ -4,7 +4,7 @@ import { useUser } from '../login/hooks';
 
 export default function DashboardPage() {
   const { user } = useUser();
-  console.log('crb_user', user);
+
   let revenue = null;
   let tasks = [];
   let customers = null;

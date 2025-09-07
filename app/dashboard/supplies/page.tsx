@@ -1,16 +1,16 @@
 'use client';
 import { useState } from 'react';
+// import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import styles from '../dashboard.module.css';
 import type { ColDef } from 'ag-grid-community';
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import Select from 'react-select';
 import { useProducts } from '../products/all/hooks';
 import { useSuppliers } from '../suppliers/hooks';
 import { useSupplies, createSupply } from './hooks';
+import { useLocations } from '../locations/hooks';
 
-// Регистриране на AG Grid модули
+// Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface Supplier {
@@ -28,7 +28,12 @@ interface Product {
   _id: string;
   name: string;
   price: number;
-  quantity: number;
+}
+
+interface Location {
+  _id: string;
+  name: string;
+  type: 'warehouse' | 'store' | 'bin';
 }
 
 interface SupplyProduct {
@@ -36,6 +41,10 @@ interface SupplyProduct {
   quantity: number;
   productName: string;
   productPrice: number;
+  lotNumber: string;
+  expiryDate?: string;
+  serialNumber?: string;
+  isIndividual: boolean;
 }
 
 interface Supply {
@@ -47,48 +56,24 @@ interface Supply {
   price: number;
   status: string;
   deliveryDate: string;
-  currency: 'EUR' | 'BGN'; // Ново поле за валута
+  currency: 'EUR' | 'BGN';
   updatedAt: string;
 }
 
 // Функция за форматиране на цена с избрана валута
 const formatPrice = (price: number, currency: 'EUR' | 'BGN') => {
-  return price?.toLocaleString('bg-BG', { style: 'currency', currency });
+  return price.toLocaleString('bg-BG', { style: 'currency', currency });
 };
 
 export default function SuppliesPage() {
   const { suppliers } = useSuppliers();
   const { products } = useProducts();
+  const { locations } = useLocations();
   const { supplies: rowData, mutate } = useSupplies();
   const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
 
-  // Опции за react-select за доставчици
-  const supplierOptions = suppliers?.map((supplier) => ({
-    value: supplier._id,
-    label: supplier.companyName,
-  })) || [];
-
-  // Опции за react-select за продукти
-  const productOptions = products?.map((product) => ({
-    value: product._id,
-    label: product.name,
-  })) || [];
-
-  // Опции за статус на доставката
-  const statusOptions = [
-    { value: 'pending', label: 'Очакваща' },
-    { value: 'received', label: 'Получена' },
-    { value: 'canceled', label: 'Отменена' },
-  ];
-
-  // Опции за валута
-  const currencyOptions = [
-    { value: 'EUR', label: 'Евро' },
-    { value: 'BGN', label: 'Лев' },
-  ];
-
   // Дефиниция на колони за главната таблица
-  const [colDefs, setColDefs] = useState<ColDef<Supply>[]>([
+  const [colDefs] = useState<ColDef<Supply>[]>([
     {
       field: 'companyName',
       headerName: 'Доставчик',
@@ -105,8 +90,12 @@ export default function SuppliesPage() {
       headerName: 'Статус',
       filter: true,
       valueFormatter: (params) => {
-        const status = statusOptions.find((opt) => opt.value === params.value);
-        return status ? status.label : params.value;
+        const statusMap: Record<string, string> = {
+          pending: 'Очакваща',
+          received: 'Получена',
+          canceled: 'Отменена',
+        };
+        return statusMap[params.value] || params.value;
       },
     },
     {
@@ -120,7 +109,7 @@ export default function SuppliesPage() {
       cellRenderer: (params: any) => (
         <button
           onClick={() => setSelectedSupply(params.data)}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded transition duration-200"
+          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
         >
           Детайли
         </button>
@@ -129,76 +118,20 @@ export default function SuppliesPage() {
     },
   ]);
 
-  // Персонализирани стилове за react-select
-  const customStyles = {
-    control: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? '#f9fafb' : '#ffffff',
-      borderColor: state.isFocused ? '#3b82f6' : '#d1d5db',
-      color: '#1f2937',
-      boxShadow: state.isFocused ? '0 0 0 1px #3b82f6' : 'none',
-      '&:hover': {
-        borderColor: '#3b82f6',
-      },
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      backgroundColor: '#ffffff',
-      color: '#1f2937',
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? '#e5e7eb' : '#ffffff',
-      color: '#1f2937',
-      '&:hover': {
-        backgroundColor: '#d1d5db',
-      },
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: '#1f2937',
-    }),
-    controlDark: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? '#374151' : '#1f2937',
-      borderColor: state.isFocused ? '#3b82f6' : '#4b5563',
-      color: '#f9fafb',
-      boxShadow: state.isFocused ? '0 0 0 1px #3b82f6' : 'none',
-      '&:hover': {
-        borderColor: '#3b82f6',
-      },
-    }),
-    menuDark: (provided: any) => ({
-      ...provided,
-      backgroundColor: '#1f2937',
-      color: '#f9fafb',
-    }),
-    optionDark: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? '#4b5563' : '#1f2937',
-      color: '#f9fafb',
-      '&:hover': {
-        backgroundColor: '#6b7280',
-      },
-    }),
-    singleValueDark: (provided: any) => ({
-      ...provided,
-      color: '#f9fafb',
-    }),
-  };
-
   // Състояние за модала за добавяне
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    supplierId: null as string | null,
+    supplierId: '',
+    locationId: '',
     products: [] as SupplyProduct[],
-    status: 'pending' as string,
+    status: 'pending',
     deliveryDate: new Date().toISOString().split('T')[0],
     price: 0,
-    currency: 'EUR' as 'EUR' | 'BGN', // Първоначална стойност за валута
+    currency: 'EUR' as 'EUR' | 'BGN',
   });
   const [formErrors, setFormErrors] = useState({
     supplierId: '',
+    locationId: '',
     products: '',
     status: '',
     deliveryDate: '',
@@ -206,24 +139,11 @@ export default function SuppliesPage() {
     currency: '',
   });
 
-  // Функция за отваряне на модала за добавяне
   const handleAddSupply = () => {
     setIsModalOpen(true);
     setFormData({
-      supplierId: null,
-      products: [],
-      status: 'pending',
-      deliveryDate: new Date().toISOString().split('T')[0],
-      price: 0,
-      currency: 'EUR',
-    });
-  };
-
-  // Функция за затваряне на модала за добавяне
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setFormData({
-      supplierId: null,
+      supplierId: '',
+      locationId: '',
       products: [],
       status: 'pending',
       deliveryDate: new Date().toISOString().split('T')[0],
@@ -232,6 +152,7 @@ export default function SuppliesPage() {
     });
     setFormErrors({
       supplierId: '',
+      locationId: '',
       products: '',
       status: '',
       deliveryDate: '',
@@ -240,38 +161,42 @@ export default function SuppliesPage() {
     });
   };
 
-  // Функция за затваряне на попъпа с детайли
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setFormData({
+      supplierId: '',
+      locationId: '',
+      products: [],
+      status: 'pending',
+      deliveryDate: new Date().toISOString().split('T')[0],
+      price: 0,
+      currency: 'EUR',
+    });
+    setFormErrors({
+      supplierId: '',
+      locationId: '',
+      products: '',
+      status: '',
+      deliveryDate: '',
+      price: '',
+      currency: '',
+    });
+  };
+
   const closeDetailPopup = () => {
     setSelectedSupply(null);
   };
 
-  // Функция за избор на доставчик
-  const handleSupplierChange = (selectedOption: any) => {
-    setFormData((prev) => ({ ...prev, supplierId: selectedOption ? selectedOption.value : null }));
-    setFormErrors((prev) => ({ ...prev, supplierId: '' }));
-  };
-
-  // Функция за избор на статус
-  const handleStatusChange = (selectedOption: any) => {
-    setFormData((prev) => ({ ...prev, status: selectedOption ? selectedOption.value : 'pending' }));
-    setFormErrors((prev) => ({ ...prev, status: '' }));
-  };
-
-  // Функция за избор на валута
-  const handleCurrencyChange = (selectedOption: any) => {
-    setFormData((prev) => ({ ...prev, currency: selectedOption ? selectedOption.value : 'EUR' }));
-    setFormErrors((prev) => ({ ...prev, currency: '' }));
-  };
-
-  // Функция за добавяне на нов продукт
   const addProduct = () => {
     setFormData((prev) => ({
       ...prev,
-      products: [...prev.products, { productId: '', quantity: 1, productName: '', productPrice: 0 }],
+      products: [
+        ...prev.products,
+        { productId: '', quantity: 1, productName: '', productPrice: 0, lotNumber: '', expiryDate: '', serialNumber: '', isIndividual: false },
+      ],
     }));
   };
 
-  // Функция за премахване на продукт
   const removeProduct = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -279,8 +204,7 @@ export default function SuppliesPage() {
     }));
   };
 
-  // Функция за промяна на продукт или количество
-  const handleProductChange = (index: number, field: 'productId' | 'quantity', value: string | number) => {
+  const handleProductChange = (index: number, field: keyof SupplyProduct, value: string | number | boolean) => {
     const updatedProducts = formData.products.map((p, i) => {
       if (i === index) {
         if (field === 'productId') {
@@ -292,32 +216,38 @@ export default function SuppliesPage() {
             productPrice: product ? product.price : 0,
           };
         }
+        if (field === 'isIndividual') {
+          return {
+            ...p,
+            isIndividual: value as boolean,
+            quantity: value ? 1 : p.quantity,
+            serialNumber: value ? p.serialNumber : '',
+          };
+        }
         return { ...p, [field]: value };
       }
       return p;
     });
     setFormData((prev) => ({ ...prev, products: updatedProducts }));
+    setFormErrors((prev) => ({ ...prev, products: '' }));
   };
 
-  // Функция за промяна на дата
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, deliveryDate: e.target.value }));
-    setFormErrors((prev) => ({ ...prev, deliveryDate: '' }));
+  const handleFieldChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
-  // Функция за промяна на цена на доставката
-  const handlepriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, price: Number(e.target.value) }));
-    setFormErrors((prev) => ({ ...prev, price: '' }));
-  };
-
-  // Функция за валидация на формата
   const validateForm = () => {
-    const errors = { supplierId: '', products: '', status: '', deliveryDate: '', price: '', currency: '' };
+    const errors = { supplierId: '', locationId: '', products: '', status: '', deliveryDate: '', price: '', currency: '' };
     let isValid = true;
 
     if (!formData.supplierId) {
       errors.supplierId = 'Изборът на доставчик е задължителен';
+      isValid = false;
+    }
+
+    if (!formData.locationId) {
+      errors.locationId = 'Изборът на локация е задължителен';
       isValid = false;
     }
 
@@ -329,12 +259,14 @@ export default function SuppliesPage() {
         if (!p.productId) {
           errors.products = 'Изберете продукт за всеки ред';
           isValid = false;
-          break;
         }
         if (p.quantity <= 0 || isNaN(p.quantity)) {
           errors.products = 'Въведете валидно количество за всеки продукт';
           isValid = false;
-          break;
+        }
+        if (p.isIndividual && !p.serialNumber?.trim()) {
+          errors.products = 'Серийният номер е задължителен за индивидуални продукти';
+          isValid = false;
         }
       }
     }
@@ -350,7 +282,7 @@ export default function SuppliesPage() {
     }
 
     if (formData.price < 0 || isNaN(formData.price)) {
-      errors.price = 'Цената на доставката не може да бъде отрицателна';
+      errors.price = 'Цената на доставка не може да е отрицателна';
       isValid = false;
     }
 
@@ -363,39 +295,34 @@ export default function SuppliesPage() {
     return isValid;
   };
 
-  // Функция за изпращане на формата
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    // Изчисляване на totalPrice (без включване на price)
-    let totalPrice = 0;
-    const selectedProducts = formData.products.map((supplyProd) => {
-      const product = products.find((p) => p._id === supplyProd.productId);
-      if (product) {
-        totalPrice += product.price * supplyProd.quantity;
-      }
-      return {
-        productId: supplyProd.productId,
-        quantity: supplyProd.quantity,
-      };
-    });
-
-    if (formData.products.length !== selectedProducts.length) {
-      setFormErrors((prev) => ({ ...prev, products: 'Невалидни продукти' }));
-      return;
-    }
-
     try {
-      await createSupply({
-        supplierId: formData.supplierId!,
-        products: selectedProducts,
+      const totalPrice = formData.products.reduce((sum, p) => {
+        const product = products.find((prod) => prod._id === p.productId);
+        return sum + (product ? product.price * p.quantity : 0);
+      }, 0);
+
+      const supplyData = {
+        supplierId: formData.supplierId,
+        locationId: formData.locationId,
+        products: formData.products.map((p) => ({
+          productId: p.productId,
+          quantity: p.quantity,
+          lotNumber: p.lotNumber,
+          expiryDate: p.expiryDate,
+          serialNumber: p.isIndividual ? p.serialNumber : undefined,
+        })),
         totalPrice,
         price: formData.price,
         status: formData.status,
         deliveryDate: formData.deliveryDate,
         currency: formData.currency,
-      });
+      };
+
+      await createSupply(supplyData);
       mutate();
       closeModal();
     } catch (error) {
@@ -403,10 +330,11 @@ export default function SuppliesPage() {
     }
   };
 
-  // Дефиниция на колони за таблицата в попъпа
   const detailColDefs: ColDef<SupplyProduct>[] = [
     { field: 'productName', headerName: 'Продукт', filter: true },
     { field: 'quantity', headerName: 'Количество', filter: true },
+    { field: 'lotNumber', headerName: 'Партиден номер', filter: true },
+    { field: 'serialNumber', headerName: 'Сериен номер', filter: true },
     {
       field: 'productPrice',
       headerName: 'Цена',
@@ -416,13 +344,13 @@ export default function SuppliesPage() {
   ];
 
   return (
-    <div className={styles.grid}>
-      <div className={styles.card}>
+    <div className="bg-gray-800 min-h-screen p-6">
+      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className={styles.cardTitle}>Доставки</h2>
+          <h2 className="text-lg font-semibold text-white">Доставки</h2>
           <button
             onClick={handleAddSupply}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
           >
             Добави доставка
           </button>
@@ -442,75 +370,121 @@ export default function SuppliesPage() {
       {/* Модал за добавяне на доставка */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`${styles.card} w-full max-w-md`}>
-            <h2 className={styles.cardTitle}>Добави нова доставка</h2>
+          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <h2 className="text-lg font-semibold text-white mb-4">Добави нова доставка</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Доставчик
-                </label>
-                <Select
-                  options={supplierOptions}
-                  isClearable
-                  placeholder="Избери доставчик..."
-                  onChange={handleSupplierChange}
-                  className="mt-1"
-                  classNamePrefix="react-select"
-                  styles={{
-                    control: customStyles.control,
-                    menu: customStyles.menu,
-                    option: customStyles.option,
-                    singleValue: customStyles.singleValue,
-                    controlDark: customStyles.controlDark,
-                    menuDark: customStyles.menuDark,
-                    optionDark: customStyles.optionDark,
-                    singleValueDark: customStyles.singleValueDark,
-                  }}
-                />
+                <label className="block text-sm font-medium text-white">Доставчик</label>
+                <select
+                  value={formData.supplierId}
+                  onChange={(e) => handleFieldChange('supplierId', e.target.value)}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                >
+                  <option value="">Избери доставчик...</option>
+                  {suppliers?.map((supplier) => (
+                    <option key={supplier._id} value={supplier._id}>
+                      {supplier.companyName}
+                    </option>
+                  ))}
+                </select>
                 {formErrors.supplierId && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.supplierId}</p>
+                  <p className="text-red-400 text-sm mt-1">{formErrors.supplierId}</p>
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Продукти
-                </label>
+                <label className="block text-sm font-medium text-white">Локация</label>
+                <select
+                  value={formData.locationId}
+                  onChange={(e) => handleFieldChange('locationId', e.target.value)}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                >
+                  <option value="">Избери локация...</option>
+                  {locations?.map((location) => (
+                    <option key={location._id} value={location._id}>
+                      {location.name} ({location.type})
+                    </option>
+                  ))}
+                </select>
+                {formErrors.locationId && (
+                  <p className="text-red-400 text-sm mt-1">{formErrors.locationId}</p>
+                )}
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-white mb-2">Продукти</label>
                 {formData.products.map((prod, index) => (
-                  <div key={index} className="flex items-center mb-2">
-                    <Select
-                      options={productOptions}
-                      value={productOptions.find((opt) => opt.value === prod.productId) || null}
-                      onChange={(selected) =>
-                        handleProductChange(index, 'productId', selected ? selected.value : '')
-                      }
-                      placeholder="Избери продукт..."
-                      className="flex-1 mr-2"
-                      classNamePrefix="react-select"
-                      styles={{
-                        control: customStyles.control,
-                        menu: customStyles.menu,
-                        option: customStyles.option,
-                        singleValue: customStyles.singleValue,
-                        controlDark: customStyles.controlDark,
-                        menuDark: customStyles.menuDark,
-                        optionDark: customStyles.optionDark,
-                        singleValueDark: customStyles.singleValueDark,
-                      }}
-                    />
-                    <input
-                      type="number"
-                      value={prod.quantity}
-                      onChange={(e) => handleProductChange(index, 'quantity', Number(e.target.value))}
-                      className="w-20 border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white mr-2"
-                      min="1"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeProduct(index)}
-                      className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded transition duration-200"
-                    >
-                      X
-                    </button>
+                  <div key={index} className="flex flex-col mb-4 p-4 bg-gray-800 rounded-md">
+                    <div className="flex items-center mb-2">
+                      <select
+                        value={prod.productId}
+                        onChange={(e) => handleProductChange(index, 'productId', e.target.value)}
+                        className="flex-1 mr-2 border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                      >
+                        <option value="">Избери продукт...</option>
+                        {products?.map((product) => (
+                          <option key={product._id} value={product._id}>
+                            {product.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => removeProduct(index)}
+                        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded transition duration-200"
+                      >
+                        X
+                      </button>
+                    </div>
+                    <div className="flex items-center mb-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-white">
+                        <input
+                          type="checkbox"
+                          checked={prod.isIndividual}
+                          onChange={(e) => handleProductChange(index, 'isIndividual', e.target.checked)}
+                          className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-600 rounded"
+                        />
+                        Индивидуален продукт
+                      </label>
+                    </div>
+                    <div className="mb-2">
+                      <label className="block text-sm font-medium text-white">Партиден номер</label>
+                      <input
+                        type="text"
+                        value={prod.lotNumber}
+                        onChange={(e) => handleProductChange(index, 'lotNumber', e.target.value)}
+                        className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                      />
+                    </div>
+                    <div className="mb-2">
+                      <label className="block text-sm font-medium text-white">Количество</label>
+                      <input
+                        type="number"
+                        value={prod.quantity}
+                        onChange={(e) => handleProductChange(index, 'quantity', Number(e.target.value))}
+                        disabled={prod.isIndividual}
+                        className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50 disabled:opacity-50"
+                        min="1"
+                      />
+                    </div>
+                    {prod.isIndividual && (
+                      <div className="mb-2">
+                        <label className="block text-sm font-medium text-white">Сериен номер</label>
+                        <input
+                          type="text"
+                          value={prod.serialNumber}
+                          onChange={(e) => handleProductChange(index, 'serialNumber', e.target.value)}
+                          className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                        />
+                      </div>
+                    )}
+                    <div className="mb-2">
+                      <label className="block text-sm font-medium text-white">Срок на годност</label>
+                      <input
+                        type="date"
+                        value={prod.expiryDate}
+                        onChange={(e) => handleProductChange(index, 'expiryDate', e.target.value)}
+                        className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                      />
+                    </div>
                   </div>
                 ))}
                 <button
@@ -521,102 +495,77 @@ export default function SuppliesPage() {
                   Добави продукт
                 </button>
                 {formErrors.products && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.products}</p>
+                  <p className="text-red-400 text-sm mt-1">{formErrors.products}</p>
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Дата на доставка
-                </label>
+                <label className="block text-sm font-medium text-white">Дата на доставка</label>
                 <input
                   type="date"
                   value={formData.deliveryDate}
-                  onChange={handleDateChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  onChange={(e) => handleFieldChange('deliveryDate', e.target.value)}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
                 {formErrors.deliveryDate && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.deliveryDate}</p>
+                  <p className="text-red-400 text-sm mt-1">{formErrors.deliveryDate}</p>
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Цена на доставка
-                </label>
+                <label className="block text-sm font-medium text-white">Цена на доставка</label>
                 <input
                   type="number"
                   value={formData.price}
-                  onChange={handlepriceChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  onChange={(e) => handleFieldChange('price', e.target.value)}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                   min="0"
                   step="0.01"
                 />
                 {formErrors.price && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.price}</p>
+                  <p className="text-red-400 text-sm mt-1">{formErrors.price}</p>
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Валута
-                </label>
-                <Select
-                  options={currencyOptions}
-                  value={currencyOptions.find((opt) => opt.value === formData.currency) || null}
-                  onChange={handleCurrencyChange}
-                  placeholder="Избери валута..."
-                  className="mt-1"
-                  classNamePrefix="react-select"
-                  styles={{
-                    control: customStyles.control,
-                    menu: customStyles.menu,
-                    option: customStyles.option,
-                    singleValue: customStyles.singleValue,
-                    controlDark: customStyles.controlDark,
-                    menuDark: customStyles.menuDark,
-                    optionDark: customStyles.optionDark,
-                    singleValueDark: customStyles.singleValueDark,
-                  }}
-                />
+                <label className="block text-sm font-medium text-white">Валута</label>
+                <select
+                  value={formData.currency}
+                  onChange={(e) => handleFieldChange('currency', e.target.value)}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                >
+                  <option value="">Избери валута...</option>
+                  <option value="EUR">Евро</option>
+                  <option value="BGN">Лев</option>
+                </select>
                 {formErrors.currency && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.currency}</p>
+                  <p className="text-red-400 text-sm mt-1">{formErrors.currency}</p>
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Статус
-                </label>
-                <Select
-                  options={statusOptions}
-                  value={statusOptions.find((opt) => opt.value === formData.status) || null}
-                  onChange={handleStatusChange}
-                  placeholder="Избери статус..."
-                  className="mt-1"
-                  classNamePrefix="react-select"
-                  styles={{
-                    control: customStyles.control,
-                    menu: customStyles.menu,
-                    option: customStyles.option,
-                    singleValue: customStyles.singleValue,
-                    controlDark: customStyles.controlDark,
-                    menuDark: customStyles.menuDark,
-                    optionDark: customStyles.optionDark,
-                    singleValueDark: customStyles.singleValueDark,
-                  }}
-                />
+                <label className="block text-sm font-medium text-white">Статус</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => handleFieldChange('status', e.target.value)}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                >
+                  <option value="">Избери статус...</option>
+                  <option value="pending">Очакваща</option>
+                  <option value="received">Получена</option>
+                  <option value="canceled">Отменена</option>
+                </select>
                 {formErrors.status && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.status}</p>
+                  <p className="text-red-400 text-sm mt-1">{formErrors.status}</p>
                 )}
               </div>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded transition duration-200"
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition duration-200"
                 >
                   Отказ
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
                 >
                   Запази
                 </button>
@@ -629,10 +578,10 @@ export default function SuppliesPage() {
       {/* Попъп за детайли на доставката */}
       {selectedSupply && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`${styles.card} w-full max-w-md`}>
-            <h2 className={styles.cardTitle}>Детайли за доставка</h2>
-            <div className="mb-4">
-              <p><strong>Доставчик:</strong> {selectedSupply.supplierName}</p>
+          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md">
+            <h2 className="text-lg font-semibold text-white mb-4">Детайли за доставка</h2>
+            <div className="mb-4 text-white">
+              <p><strong>Доставчик:</strong> {selectedSupply.companyName}</p>
               <p><strong>Обща цена:</strong> {formatPrice(selectedSupply.totalPrice, selectedSupply.currency)}</p>
               <p><strong>Цена на доставка:</strong> {formatPrice(selectedSupply.price, selectedSupply.currency)}</p>
               <p><strong>Статус:</strong> {statusOptions.find((opt) => opt.value === selectedSupply.status)?.label || selectedSupply.status}</p>
@@ -652,7 +601,7 @@ export default function SuppliesPage() {
             <div className="flex justify-end mt-4">
               <button
                 onClick={closeDetailPopup}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded transition duration-200"
+                className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition duration-200"
               >
                 Затвори
               </button>

@@ -5,36 +5,53 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { createProduct, updateProduct, useProducts } from './hooks';
+import { useLocations, createLocation, updateLocation } from './hooks';
 
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-interface Product {
+interface Location {
   _id?: string;
   name: string;
-  description: string;
-  price: number;
-  category: string;
-  companyId: string;
-  quantity: number;
+  type: 'warehouse' | 'store' | 'bin';
+  address?: string;
+  country?: string;
+  city?: string;
+  email?: string;
+  phone?: string;
+  description?: string;
 }
 
-export default function ProductsPage() {
-  const { products: rowData, mutate } = useProducts();
-  console.log('crb_products', rowData)
-  const [colDefs] = useState<ColDef<Product>[]>([
+export default function LocationsPage() {
+  const { locations: rowData, mutate } = useLocations();
+
+  const [colDefs] = useState<ColDef<Location>[]>([
     { field: 'name', headerName: 'Име', filter: true, flex: 1 },
+    {
+      field: 'type',
+      headerName: 'Тип',
+      filter: true,
+      valueFormatter: (params) => {
+        const typeMap: Record<string, string> = {
+          warehouse: 'Склад',
+          store: 'Магазин',
+          bin: 'Позиция',
+        };
+        return typeMap[params.value] || params.value;
+      },
+    },
+    { field: 'address', headerName: 'Адрес', filter: true, flex: 1 },
+    { field: 'country', headerName: 'Държава', filter: true },
+    { field: 'city', headerName: 'Град', filter: true },
+    { field: 'email', headerName: 'Имейл', filter: true },
+    { field: 'phone', headerName: 'Телефон', filter: true },
     { field: 'description', headerName: 'Описание', filter: true, flex: 1 },
-    { field: 'price', headerName: 'Цена', filter: true, valueFormatter: (params) => `${params.value} лв.` },
-    { field: 'category', headerName: 'Категория', filter: true },
-    { field: 'quantity', headerName: 'Наличност', filter: true },
     {
       headerName: 'Действия',
       width: 150,
       cellRenderer: (params: any) => (
         <button
-          onClick={() => handleEditProduct(params.data)}
+          onClick={() => handleEditLocation(params.data)}
           className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
         >
           Редактирай
@@ -45,58 +62,61 @@ export default function ProductsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<Product>({
+  const [formData, setFormData] = useState<Location>({
     name: '',
+    type: 'warehouse',
+    address: '',
+    country: '',
+    city: '',
+    email: '',
+    phone: '',
     description: '',
-    price: 0,
-    category: '',
-    companyId: '',
-    quantity: 0,
+ 
   });
   const [formErrors, setFormErrors] = useState({
     name: '',
-    price: '',
-    category: '',
-    description: '',
+    type: '',
   });
 
-  const handleAddProduct = () => {
+  const handleAddLocation = () => {
     setIsEditMode(false);
     setFormData({
       name: '',
+      type: 'warehouse',
+      address: '',
+      country: '',
+      city: '',
+      email: '',
+      phone: '',
       description: '',
-      price: 0,
-      category: '',
-      companyId: '',
-      quantity: 0,
     });
-    setFormErrors({ name: '', price: '', category: '', description: '' });
+    setFormErrors({ name: '', type: ''});
     setIsModalOpen(true);
   };
 
-  const handleEditProduct = (product: Product) => {
+  const handleEditLocation = (location: Location) => {
     setIsEditMode(true);
-    setFormData(product);
-    setFormErrors({ name: '', price: '', category: '', description: '' });
+    setFormData(location);
+    setFormErrors({ name: '', type: '' });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormErrors({ name: '', price: '', category: '', description: '' });
+    setFormErrors({ name: '', type: '' });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' ? Number(value) : value,
+      [name]: value,
     }));
     setFormErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const validateForm = () => {
-    const errors = { name: '', price: '', category: '', description: '' };
+    const errors = { name: '', type: '' };
     let isValid = true;
 
     if (!formData.name.trim()) {
@@ -104,18 +124,8 @@ export default function ProductsPage() {
       isValid = false;
     }
 
-    if (formData.price <= 0) {
-      errors.price = 'Цената трябва да е по-голяма от 0';
-      isValid = false;
-    }
-
-    if (!formData.category.trim()) {
-      errors.category = 'Категорията е задължителна';
-      isValid = false;
-    }
-
-    if (!formData.description.trim()) {
-      errors.description = 'Описанието е задължително';
+    if (!formData.type) {
+      errors.type = 'Типът е задължителен';
       isValid = false;
     }
 
@@ -128,16 +138,13 @@ export default function ProductsPage() {
     if (!validateForm()) return;
 
     try {
-      const dataToSubmit = {
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        category: formData.category,
+      const data = {
+        ...formData,
       };
       if (isEditMode) {
-        await updateProduct(formData._id!, dataToSubmit);
+        await updateLocation(data);
       } else {
-        await createProduct(dataToSubmit);
+        await createLocation(data);
       }
       mutate();
       closeModal();
@@ -150,12 +157,12 @@ export default function ProductsPage() {
     <div className="bg-gray-800 min-h-screen p-6">
       <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Продукти</h2>
+          <h2 className="text-lg font-semibold text-white">Локации</h2>
           <button
-            onClick={handleAddProduct}
+            onClick={handleAddLocation}
             className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
           >
-            Добави продукт
+            Добави локация
           </button>
         </div>
         <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
@@ -164,16 +171,20 @@ export default function ProductsPage() {
             columnDefs={colDefs}
             pagination={true}
             paginationPageSize={10}
+            defaultColDef={{
+              flex: 1,
+              minWidth: 100,
+            }}
           />
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Модал за добавяне/редактиране на локация */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold text-white mb-4">
-              {isEditMode ? 'Редактирай продукт' : 'Добави нов продукт'}
+              {isEditMode ? 'Редактирай локация' : 'Добави нова локация'}
             </h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
@@ -188,37 +199,79 @@ export default function ProductsPage() {
                 {formErrors.name && <p className="text-red-400 text-sm mt-1">{formErrors.name}</p>}
               </div>
               <div className="mb-4">
+                <label className="block text-sm font-medium text-white">Тип</label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                >
+                  <option value="">Избери тип...</option>
+                  <option value="warehouse">Склад</option>
+                  <option value="store">Магазин</option>
+                  <option value="bin">Позиция</option>
+                </select>
+                {formErrors.type && <p className="text-red-400 text-sm mt-1">{formErrors.type}</p>}
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-white">Адрес</label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address || ''}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-white">Държава</label>
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country || ''}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-white">Град</label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city || ''}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-white">Имейл</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email || ''}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-white">Телефон</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone || ''}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                />
+              </div>
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Описание</label>
                 <input
                   type="text"
                   name="description"
-                  value={formData.description}
+                  value={formData.description || ''}
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
-                {formErrors.description && <p className="text-red-400 text-sm mt-1">{formErrors.description}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Цена</label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                />
-                {formErrors.price && <p className="text-red-400 text-sm mt-1">{formErrors.price}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Категория</label>
-                <input
-                  type="text"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                />
-                {formErrors.category && <p className="text-red-400 text-sm mt-1">{formErrors.category}</p>}
               </div>
               <div className="flex justify-end gap-2">
                 <button

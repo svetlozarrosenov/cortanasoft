@@ -1,34 +1,40 @@
 'use client';
 import { useState } from 'react';
-// import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css'; // Alpine theme CSS
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { createProduct, updateProduct, useProducts } from './hooks';
+import { useLots, createLots } from './hooks';
 
-// Регистриране на модули
+// Register all Community modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-interface Product {
+interface Lot {
   _id?: string;
   name: string;
   description: string;
   price: number;
+  quantity?: number;
   category: string;
-  companyId: string;
-  quantity: number;
+  sku?: string;
+  serialNumber?: string;
+  expiryDate?: string;
+  status: string;
 }
 
-export default function ProductsPage() {
-  const { products: rowData, mutate } = useProducts();
-  console.log('crb_products', rowData)
-  const [colDefs] = useState<ColDef<Product>[]>([
-    { field: 'name', headerName: 'Име', filter: true, flex: 1 },
-    { field: 'description', headerName: 'Описание', filter: true, flex: 1 },
-    { field: 'price', headerName: 'Цена', filter: true, valueFormatter: (params) => `${params.value} лв.` },
-    { field: 'category', headerName: 'Категория', filter: true },
+export default function LotsPage() {
+  const { lots: rowData, mutate } = useLots();
+
+  const [colDefs] = useState<ColDef<Lot>[]>([
+    { field: 'name', headerName: 'Име', filter: true },
+    { field: 'description', headerName: 'Описание', filter: true },
+    { field: 'price', headerName: 'Цена', filter: true },
     { field: 'quantity', headerName: 'Наличност', filter: true },
+    { field: 'category', headerName: 'Категория', filter: true },
+    { field: 'sku', headerName: 'SKU', filter: true },
+    { field: 'serialNumber', headerName: 'Сериен номер', filter: true },
+    { field: 'expiryDate', headerName: 'Срок на годност', filter: true },
+    { field: 'status', headerName: 'Статус', filter: true },
     {
       headerName: 'Действия',
       width: 150,
@@ -45,19 +51,24 @@ export default function ProductsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<Product>({
+  const [activeTab, setActiveTab] = useState<'serialized' | 'bulk'>('serialized');
+  const [formData, setFormData] = useState<Lot>({
     name: '',
     description: '',
     price: 0,
-    category: '',
-    companyId: '',
     quantity: 0,
+    category: '',
+    sku: '',
+    serialNumber: '',
+    expiryDate: '',
+    status: '',
   });
   const [formErrors, setFormErrors] = useState({
     name: '',
     price: '',
-    category: '',
-    description: '',
+    quantity: '',
+    sku: '',
+    serialNumber: '',
   });
 
   const handleAddProduct = () => {
@@ -66,37 +77,39 @@ export default function ProductsPage() {
       name: '',
       description: '',
       price: 0,
-      category: '',
-      companyId: '',
       quantity: 0,
+      category: '',
+      sku: '',
+      serialNumber: '',
+      expiryDate: '',
+      status: '',
     });
-    setFormErrors({ name: '', price: '', category: '', description: '' });
+    setFormErrors({ name: '', price: '', quantity: '', sku: '', serialNumber: '' });
     setIsModalOpen(true);
   };
 
-  const handleEditProduct = (product: Product) => {
+  const handleEditProduct = (product: Lot) => {
     setIsEditMode(true);
     setFormData(product);
-    setFormErrors({ name: '', price: '', category: '', description: '' });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormErrors({ name: '', price: '', category: '', description: '' });
+    setFormErrors({ name: '', price: '', quantity: '', sku: '', serialNumber: '' });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' ? Number(value) : value,
+      [name]: name === 'price' || name === 'quantity' ? Number(value) : value,
     }));
     setFormErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const validateForm = () => {
-    const errors = { name: '', price: '', category: '', description: '' };
+    const errors = { name: '', price: '', quantity: '', sku: '', serialNumber: '' };
     let isValid = true;
 
     if (!formData.name.trim()) {
@@ -109,13 +122,13 @@ export default function ProductsPage() {
       isValid = false;
     }
 
-    if (!formData.category.trim()) {
-      errors.category = 'Категорията е задължителна';
+    if (activeTab === 'serialized' && !formData.sku?.trim()) {
+      errors.sku = 'SKU е задължителен за индивидуални продукти';
       isValid = false;
     }
 
-    if (!formData.description.trim()) {
-      errors.description = 'Описанието е задължително';
+    if (activeTab === 'serialized' && !formData.serialNumber?.trim()) {
+      errors.serialNumber = 'Серийният номер е задължителен за индивидуални продукти';
       isValid = false;
     }
 
@@ -128,21 +141,22 @@ export default function ProductsPage() {
     if (!validateForm()) return;
 
     try {
-      const dataToSubmit = {
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        category: formData.category,
-      };
+      const dataToSubmit = { ...formData, productType: activeTab };
       if (isEditMode) {
-        await updateProduct(formData._id!, dataToSubmit);
       } else {
-        await createProduct(dataToSubmit);
       }
       mutate();
       closeModal();
     } catch (error) {
       console.error('Грешка при изпращане на заявката:', error);
+    }
+  };
+
+  const handleCellValueChanged = async (event: any) => {
+    try {
+      mutate();
+    } catch (error) {
+      console.error('Грешка при обновяване на продукта:', error);
     }
   };
 
@@ -162,8 +176,8 @@ export default function ProductsPage() {
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
+            onCellValueChanged={handleCellValueChanged}
             pagination={true}
-            paginationPageSize={10}
           />
         </div>
       </div>
@@ -175,6 +189,24 @@ export default function ProductsPage() {
             <h2 className="text-lg font-semibold text-white mb-4">
               {isEditMode ? 'Редактирай продукт' : 'Добави нов продукт'}
             </h2>
+            <div className="flex mb-4">
+              <button
+                onClick={() => setActiveTab('serialized')}
+                className={`flex-1 py-2 text-sm font-medium rounded-l-md transition-colors duration-200 ${
+                  activeTab === 'serialized' ? 'bg-cyan-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                Индивидуален продукт
+              </button>
+              <button
+                onClick={() => setActiveTab('bulk')}
+                className={`flex-1 py-2 text-sm font-medium rounded-r-md transition-colors duration-200 ${
+                  activeTab === 'bulk' ? 'bg-cyan-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                Партиден продукт
+              </button>
+            </div>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Име</label>
@@ -196,7 +228,6 @@ export default function ProductsPage() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
-                {formErrors.description && <p className="text-red-400 text-sm mt-1">{formErrors.description}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Цена</label>
@@ -209,6 +240,55 @@ export default function ProductsPage() {
                 />
                 {formErrors.price && <p className="text-red-400 text-sm mt-1">{formErrors.price}</p>}
               </div>
+              {activeTab === 'bulk' && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-white">Наличност</label>
+                  <input
+                    type="number"
+                    name="quantity"
+                    value={formData.quantity}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                  />
+                  {formErrors.quantity && <p className="text-red-400 text-sm mt-1">{formErrors.quantity}</p>}
+                </div>
+              )}
+              {activeTab === 'serialized' && (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-white">SKU</label>
+                    <input
+                      type="text"
+                      name="sku"
+                      value={formData.sku}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                    />
+                    {formErrors.sku && <p className="text-red-400 text-sm mt-1">{formErrors.sku}</p>}
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-white">Сериен номер</label>
+                    <input
+                      type="text"
+                      name="serialNumber"
+                      value={formData.serialNumber}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                    />
+                    {formErrors.serialNumber && <p className="text-red-400 text-sm mt-1">{formErrors.serialNumber}</p>}
+                  </div>
+                </>
+              )}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-white">Срок на годност</label>
+                <input
+                  type="date"
+                  name="expiryDate"
+                  value={formData.expiryDate}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                />
+              </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Категория</label>
                 <input
@@ -218,7 +298,6 @@ export default function ProductsPage() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
-                {formErrors.category && <p className="text-red-400 text-sm mt-1">{formErrors.category}</p>}
               </div>
               <div className="flex justify-end gap-2">
                 <button

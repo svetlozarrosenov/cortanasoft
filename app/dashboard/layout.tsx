@@ -1,8 +1,8 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, ShoppingCart, Package, BarChart, Settings, LogOut } from 'lucide-react';
+import { Home, Users, ShoppingCart, Package, Truck, MapPin, BarChart, Settings, LogOut, SofaIcon } from 'lucide-react';
 import { useCurrentCompany } from './hooks';
 
 export default function DashboardLayout({
@@ -13,11 +13,6 @@ export default function DashboardLayout({
   const { company } = useCurrentCompany();
   const pathname = usePathname();
   const [isProductsOpen, setIsProductsOpen] = useState(false);
-
-  // Синхронизиране на подменюто след хидратация
-  useEffect(() => {
-    setIsProductsOpen(true); // Разтваря подменюто по подразбиране
-  }, []);
 
   const toggleProductsMenu = () => {
     setIsProductsOpen((prev) => !prev);
@@ -31,7 +26,7 @@ export default function DashboardLayout({
       {/* Desktop Sidebar */}
       <aside className="hidden md:block bg-gray-800 text-white w-64 min-h-screen p-4 fixed top-0 left-0">
         {company && (
-          <div className="mb-6 px-4 py-2">
+          <div className="mb-6 mt-20 px-4 py-2">
             <h2 className="text-xl font-bold text-white">{company.name}</h2>
           </div>
         )}
@@ -50,6 +45,17 @@ export default function DashboardLayout({
                 Дашборд
               </Link>
             </li>
+            <li>
+                <Link
+                  href="/dashboard/tasks"
+                  className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
+                    isActive('/dashboard/tasks') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+                  }`}
+                >
+                  <SofaIcon className="w-5 h-5" />
+                  Задачи
+                </Link>
+              </li>
             <li>
               <Link
                 href="/dashboard/clients"
@@ -101,27 +107,17 @@ export default function DashboardLayout({
                       isActive('/dashboard/products/all') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
                     }`}
                   >
-                    Всички продукти
+                    Видове продукти
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/dashboard/products/serialized"
+                    href="/dashboard/products/lots"
                     className={`block px-4 py-2 text-sm rounded transition-colors duration-300 ${
                       isActive('/dashboard/products/serialized') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
                     }`}
                   >
-                    Индивидуални продукти
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/dashboard/products/bulk"
-                    className={`block px-4 py-2 text-sm rounded transition-colors duration-300 ${
-                      isActive('/dashboard/products/bulk') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                    }`}
-                  >
-                    Bulk продукти
+                    Партиди
                   </Link>
                 </li>
               </ul>
@@ -144,41 +140,19 @@ export default function DashboardLayout({
                   isActive('/dashboard/suppliers') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
                 }`}
               >
-                <Package className="w-5 h-5" />
+                <Truck className="w-5 h-5" />
                 Доставчици
               </Link>
             </li>
             <li>
               <Link
-                href="/dashboard/reports"
+                href="/dashboard/locations"
                 className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard/reports') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+                  isActive('/dashboard/locations') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
                 }`}
               >
-                <BarChart className="w-5 h-5" />
-                Репорти
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/settings"
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/settings') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <Settings className="w-5 h-5" />
-                Настройки
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/users"
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/users') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <Users className="w-5 h-5" />
-                Потребители
+                <MapPin className="w-5 h-5" />
+                Обекти
               </Link>
             </li>
             <li>
@@ -236,6 +210,19 @@ export default function DashboardLayout({
                 >
                   <Home className="w-5 h-5" />
                   Дашборд
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/dashboard/tasks"
+                  className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
+                    isActive('/dashboard/tasks') && !pathname.includes('/dashboard/tasks/')
+                      ? 'bg-cyan-600 text-white'
+                      : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+                  }`}
+                >
+                  <SofaIcon className="w-5 h-5" />
+                  Задачи
                 </Link>
               </li>
               <li>
@@ -332,41 +319,19 @@ export default function DashboardLayout({
                     isActive('/dashboard/suppliers') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
                   }`}
                 >
-                  <Package className="w-5 h-5" />
+                  <Truck className="w-5 h-5" />
                   Доставчици
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/dashboard/reports"
+                  href="/dashboard/locations"
                   className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                    isActive('/dashboard/reports') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+                    isActive('/dashboard/locations') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
                   }`}
                 >
-                  <BarChart className="w-5 h-5" />
-                  Репорти
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/settings"
-                  className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                    isActive('/settings') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                  }`}
-                >
-                  <Settings className="w-5 h-5" />
-                  Настройки
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/users"
-                  className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                    isActive('/users') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                  }`}
-                >
-                  <Users className="w-5 h-5" />
-                  Потребители
+                  <MapPin className="w-5 h-5" />
+                  Обекти
                 </Link>
               </li>
               <li>

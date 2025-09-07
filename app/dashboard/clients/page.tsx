@@ -39,30 +39,25 @@ const [colDefs, setColDefs] = useState([
   const [formData, setFormData] = useState({ firstName: '', middleName: '', lastName: '', email: '', phone: '', city: '', country: '', });
   const [formErrors, setFormErrors] = useState({ name: '', email: '' });
 
-  // Функция за отваряне/затваряне на модала
   const handleAddClient = () => {
     setIsModalOpen(true);
   };
 
-  // Функция за затваряне на модала
   const closeModal = () => {
     setIsModalOpen(false);
     setFormData({ firstName: '', middleName: '', lastName: '', country: '', email: '', phone: '', city: '' });
     setFormErrors({ name: '', email: '' });
   };
 
-  // Функция за обработка на промените във формата
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setFormErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // Функция за валидация на формата
   const validateForm = () => {
     const errors = { name: '', email: '' };
     let isValid = true;
-    console.log('crb_formData', formData)
     if (!formData.firstName.trim()) {
       errors.name = 'Името е задължително';
       isValid = false;
@@ -77,7 +72,6 @@ const [colDefs, setColDefs] = useState([
    return isValid;
   };
 
-  // Функция за изпращане на формата
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -110,7 +104,6 @@ const [colDefs, setColDefs] = useState([
         </div>
       </div>
 
-      {/* Модал за добавяне на клиент */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className={`${styles.card} w-full max-w-md`}>
