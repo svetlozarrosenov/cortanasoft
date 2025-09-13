@@ -5,7 +5,8 @@ import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import Link from 'next/link';
-import { useTasks, createTask, updateTask, useUsers } from './hooks'
+import { useTasks, createTask, updateTask } from './hooks'
+import { useUsers } from '../companies/hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 

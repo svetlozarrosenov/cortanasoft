@@ -157,6 +157,17 @@ export default function DashboardLayout({
             </li>
             <li>
               <Link
+                href="/dashboard/companies"
+                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
+                  isActive('/dashboard/companies') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+                }`}
+              >
+                <Truck className="w-5 h-5" />
+                Компании
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/logout"
                 className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
                   isActive('/logout') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
@@ -334,6 +345,17 @@ export default function DashboardLayout({
                   Обекти
                 </Link>
               </li>
+              <li>
+              <Link
+                href="/dashboard/companies"
+                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
+                  isActive('/dashboard/companies') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+                }`}
+              >
+                <Truck className="w-5 h-5" />
+                Компании
+              </Link>
+            </li>
               <li>
                 <Link
                   href="/logout"

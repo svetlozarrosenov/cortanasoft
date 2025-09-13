@@ -1,12 +1,13 @@
 'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useTask, updateTask, useUsers } from '../hooks';
+import { useTask, updateTask, createTaskComment } from '../hooks';
+import { useUsers } from '../../companies/hooks';
 import { PencilSquareIcon, XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 
 interface Comment {
   text: string;
-  author: string;
+  author: { _id: string; name: string };
   createdAt: Date;
 }
 
@@ -18,8 +19,8 @@ interface Task {
   isRecurring: boolean;
   recurrenceInterval?: 'daily' | 'weekly' | 'monthly';
   status: 'pending' | 'in_progress' | 'completed';
-  creator: string;
-  assignee: string;
+  creator: { _id: string; name: string };
+  assignee: { _id: string; name: string };
   comments?: Comment[];
 }
 
@@ -65,9 +66,9 @@ export default function TaskDetailsPage() {
     );
   }
 
-  const getUserName = (userId: string) => {
-    const user = users?.find((u: User) => u._id === userId);
-    return user ? user.name : userId;
+  const getUserName = (user: { _id: string; name: string } | string) => {
+    if (typeof user === 'string') return user || 'Непознат';
+    return user?.name || user?._id || 'Непознат';
   };
 
   const handleEditOpen = () => {
@@ -121,6 +122,8 @@ export default function TaskDetailsPage() {
     try {
       const data = {
         ...formData,
+        creator: typeof formData.creator === 'object' ? formData.creator._id : formData.creator,
+        assignee: typeof formData.assignee === 'object' ? formData.assignee._id : formData.assignee,
         deadline: formData.deadline ? new Date(formData.deadline).toISOString() : undefined,
       };
       await updateTask(data);
@@ -140,17 +143,9 @@ export default function TaskDetailsPage() {
 
     try {
       const currentUserId = 'current_user_id'; // Замени с реален ID от автентикация
-      const newComment = { text: commentText, author: currentUserId, createdAt: new Date() };
-      const response = await fetch(`/api/tasks/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ comment: newComment }),
-      });
-      if (!response.ok) {
-        throw new Error('Грешка при добавяне на коментар');
-      }
-      const updatedTask = await response.json();
-      mutate(updatedTask);
+      const newComment = { text: commentText, author: currentUserId };
+      await createTaskComment({ ...newComment, _id: id });
+      mutate();
       setCommentText('');
       setCommentError('');
     } catch (error) {
@@ -178,16 +173,16 @@ export default function TaskDetailsPage() {
             {task.comments?.length ? (
               <div className="space-y-6">
                 {task.comments.map((comment, index) => (
-                  <div key={index} className="flex gap-4 bg-gray-700 rounded-lg p-6">
+                  <div key={index} className="flex gap-4 bg-gray-700 rounded-lg p-6 shadow-md">
                     <div className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                      {getUserName(comment?.author)}
+                      {getUserName(comment.author)[0]}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-200">
+                      <p className="text-sm font-medium text-gray-200 mb-2">
                         <span className="font-semibold">{getUserName(comment.author)}</span> -{' '}
                         {new Date(comment.createdAt).toLocaleString('bg-BG')}
                       </p>
-                      <p className="mt-2 text-gray-100 text-lg">{comment.text}</p>
+                      <p className="text-gray-100 text-lg">{comment.text}</p>
                     </div>
                   </div>
                 ))}
@@ -302,7 +297,7 @@ export default function TaskDetailsPage() {
                 <label className="block text-sm font-medium text-gray-200 mb-2">Създател</label>
                 <select
                   name="creator"
-                  value={formData.creator}
+                  value={typeof formData.creator === 'object' ? formData.creator._id : formData.creator}
                   onChange={handleInputChange}
                   className="w-full border border-gray-600 rounded-lg p-4 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
@@ -319,7 +314,7 @@ export default function TaskDetailsPage() {
                 <label className="block text-sm font-medium text-gray-200 mb-2">Отговорник</label>
                 <select
                   name="assignee"
-                  value={formData.assignee}
+                  value={typeof formData.assignee === 'object' ? formData.assignee._id : formData.assignee}
                   onChange={handleInputChange}
                   className="w-full border border-gray-600 rounded-lg p-4 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
