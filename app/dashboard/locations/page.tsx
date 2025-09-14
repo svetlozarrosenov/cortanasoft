@@ -4,7 +4,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { useLocations, createLocation, updateLocation } from './hooks';
+import { useLocations, createLocation, updateLocation, deleteLocation } from './hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 
@@ -28,6 +28,9 @@ export default function LocationsPage() {
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [locationToDelete, setLocationToDelete] = useState<Location | null>(null);
+  const [locationToEdit, setLocationToEdit] = useState<Location | null>(null);
   const [formData, setFormData] = useState<Location>({
     name: '',
     type: 'warehouse',
@@ -49,15 +52,17 @@ export default function LocationsPage() {
   });
 
   useEffect(() => {
-    if(userRole) {
-      const table = findTableFields(userRole, "locationsSection", "locationsTable")
- 
+    if (userRole) {
+      const table = findTableFields(userRole, "locationsSection", "locationsTable");
+      console.log('crb_table', table)
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
           headerName: col.headerName,
           filter: col.filter || false,
           flex: col.flex || 1,
+          width: col.width,
+          minWidth: col.minWidth
         };
 
         if (col.field === 'type') {
@@ -70,26 +75,36 @@ export default function LocationsPage() {
             return typeMap[params.value] || params.value;
           };
         }
-          
 
         if (col.field === 'actions') {
+          console.log('crb_colDef', colDef)
           colDef.cellRenderer = (params: any) => (
-            <button
-              onClick={() => handleEditLocation(params.data)}
-              className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-            >
-              Редактирай
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleEditLocation(params.data)}
+                className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+              >
+                Редактирай
+              </button>
+              <button
+                onClick={() => {
+                  setLocationToDelete(params.data);
+                  setIsDeleteConfirmOpen(true);
+                }}
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+              >
+                Изтрий
+              </button>
+            </div>
           );
-        };
-      
+        }
+
         return colDef;
       });
-      setColDefs(modifiedColDefs)
+      setColDefs(modifiedColDefs);
     }
-  }, [userRole])
+  }, [userRole]);
 
-  // Добавяне на gridOptions за стилизиране на редовете
   const gridOptions = {
     getRowStyle: (params: any) => {
       if (params.node.rowIndex % 2 === 0) {
@@ -114,7 +129,17 @@ export default function LocationsPage() {
     setIsModalOpen(true);
   };
 
+  const handleDeleteLocation = async () => {
+    if (locationToDelete?._id) {
+      await deleteLocation(locationToDelete._id);
+      mutate();
+      setIsDeleteConfirmOpen(false);
+      setLocationToDelete(null);
+    }
+  };
+
   const handleEditLocation = (location: Location) => {
+    setLocationToEdit(location);
     setIsEditMode(true);
     setFormData({
       name: location.name,
@@ -133,6 +158,11 @@ export default function LocationsPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setFormErrors({ name: '', type: '', address: '', country: '', city: '', email: '', phone: '' });
+  };
+
+  const closeDeleteConfirmModal = () => {
+    setIsDeleteConfirmOpen(false);
+    setLocationToDelete(null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -196,7 +226,7 @@ export default function LocationsPage() {
         ...formData,
       };
       if (isEditMode) {
-        await updateLocation(data);
+        await updateLocation(locationToEdit?._id, data);
       } else {
         await createLocation(data);
       }
@@ -234,7 +264,6 @@ export default function LocationsPage() {
         </div>
       </div>
 
-      {/* Модал за добавяне/редактиране на локация */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
@@ -351,7 +380,29 @@ export default function LocationsPage() {
           </div>
         </div>
       )}
+
+      {isDeleteConfirmOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold text-white mb-4">Потвърждение за изтриване</h2>
+            <p className="text-white mb-4">Сигурни ли сте, че искате да изтриете локацията "{locationToDelete?.name}"?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeDeleteConfirmModal}
+                className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition duration-200"
+              >
+                Отказ
+              </button>
+              <button
+                onClick={handleDeleteLocation}
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+              >
+                Изтрий
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

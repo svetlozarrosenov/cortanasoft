@@ -10,9 +10,20 @@ const urls = {
     updateUser: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/user/update/${id}`,
     createRole: `${process.env.NEXT_PUBLIC_BACK_END_URL}/roles/create`,
     updateRole: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/roles/update/${id}`,
+    deleteRole: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/roles/delete/${id}`,
 };
 
 const fetcher = (url: string) => axios.get(url, { withCredentials: true }).then(res => res.data);
+
+export const deleteRole = async (roleId: string) => {
+  try {
+    const result = await axios.delete(urls.deleteRole(roleId), { withCredentials: true });
+    return result.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
+  }
+}
 
 export const createUser = async (clientData: any) => {
     try {

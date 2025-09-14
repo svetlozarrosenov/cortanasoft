@@ -5,7 +5,7 @@ import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useParams } from 'next/navigation';
-import { useUsers, createUser, updateUser, useRolesByCompany, createRole, updateRole, useRolesPermissions, useUserRole } from './hooks';
+import { useUsers, createUser, updateUser, useRolesByCompany, createRole, updateRole, deleteRole, useUserRole } from './hooks';
 import RoleForm from '@/components/dashboard/companies/rolesForm';
 import { findTableFields } from '@/utils/helpers';
 
@@ -118,12 +118,21 @@ export default function CompanyDetailsPage() {
 
         if (col.field === 'actions') {
           colDef.cellRenderer = (params: any) => (
-            <button
-              onClick={() => handleEditRole(params.data)}
+            <>
+              <button
+                onClick={() => handleEditRole(params.data)}
+                className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200 mr-10"
+              >
+                Редактирай
+              </button>
+
+              <button
+              onClick={() => handleDeleteRole(params.data)}
               className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-            >
-              Редактирай
-            </button>
+              >
+              Изтрий
+              </button>
+            </>
           );
         };
       
@@ -205,6 +214,18 @@ export default function CompanyDetailsPage() {
     setRoleFormErrors({ name: '' });
     setRoleModalOpen(true);
   };
+
+  const handleDeleteRole = async (role: any) => {
+    const confirmed = window.confirm(`Сигурни ли сте, че искате да изтриете ролята "${role.name}"?`);
+    if (confirmed) {
+      try {
+        await deleteRole(role._id);
+        mutateRoles();
+      } catch (error) {
+        console.error('Грешка при изтриване на роля:', error);
+      }
+    }
+  }
 
   const closeUserModal = () => {
     setUserModalOpen(false);
