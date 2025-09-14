@@ -1,11 +1,13 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import Link from 'next/link';
 import { useCompanies, createCompany, updateCompany } from './hooks';
+import { useUserRole } from './[id]/hooks';
+import { findTableFields } from '@/utils/helpers';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -29,59 +31,8 @@ interface Company {
 
 export default function CompaniesPage() {
   const { companies: rowData, mutate } = useCompanies();
-
-  const [colDefs] = useState<ColDef<Company>[]>([
-    {
-      field: 'name',
-      headerName: 'Име на компанията',
-      filter: true,
-      flex: 1,
-      cellRenderer: (params: any) => (
-        <Link
-          href={`/dashboard/companies/${params.data._id}`}
-          className="text-[#0092b5] hover:underline"
-        >
-          {params.value}
-        </Link>
-      ),
-    },
-    { field: 'description', headerName: 'Описание', filter: true, flex: 1 },
-    { field: 'industry', headerName: 'Индустрия', filter: true },
-    { field: 'email', headerName: 'Имейл за контакт', filter: true },
-    { field: 'phone', headerName: 'Телефон за контакт', filter: true },
-    { field: 'eik', headerName: 'ЕИК номер', filter: true },
-    { field: 'vatNumber', headerName: 'ДДС номер', filter: true },
-    { field: 'personInCharge', headerName: 'МОЛ', filter: true },
-    { field: 'country', headerName: 'Държава', filter: true },
-    { field: 'city', headerName: 'Град', filter: true },
-    { field: 'address', headerName: 'Адрес', filter: true },
-    { field: 'price', headerName: 'Цена', filter: true },
-    {
-      field: 'charging',
-      headerName: 'Таксуване',
-      filter: true,
-      valueFormatter: (params) => {
-        const chargingMap: Record<string, string> = {
-          monthly: 'Месечно',
-          yearly: 'Годишно',
-        };
-        return chargingMap[params.value] || params.value;
-      },
-    },
-    { field: 'roleInTheSystem', headerName: 'Роля в системата', filter: true },
-    {
-      headerName: 'Действия',
-      width: 150,
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleEditCompany(params.data)}
-          className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-        >
-          Редактирай
-        </button>
-      ),
-    },
-  ]);
+  const { userRole } = useUserRole();
+  const [colDefs, setColDefs] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -106,6 +57,56 @@ export default function CompaniesPage() {
     personInCharge: '',
     eik: '',
   });
+
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "companiesSection", "companiesTable")
+ 
+      const modifiedColDefs = table.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
+        };
+
+        if (col.field === 'name') {
+          colDef.cellRenderer = (params: any) => (
+            <Link
+              href={`/dashboard/companies/${params.data._id}`}
+              className="text-[#0092b5] hover:underline"
+            >
+              {params.value}
+            </Link>
+          );
+        }
+          
+        if (col.field === 'charging') {
+          colDef.valueFormatter = (params) => {
+            const chargingMap: Record<string, string> = {
+              monthly: 'Месечно',
+              yearly: 'Годишно',
+            };
+            return chargingMap[params.value] || params.value;
+          };
+        }
+
+        if (col.field === 'actions') {
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => handleEditCompany(params.data)}
+              className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              Редактирай
+            </button>
+          );
+        };
+      
+        return colDef;
+      });
+      setColDefs(modifiedColDefs)
+    }
+  }, [userRole])
 
   const handleAddCompany = () => {
     setIsEditMode(false);
@@ -179,7 +180,6 @@ export default function CompaniesPage() {
       if (isEditMode) {
         await updateCompany(data);
       } else {
-        console.log('crb_data', data)
         await createCompany(data);
       }
       mutate();

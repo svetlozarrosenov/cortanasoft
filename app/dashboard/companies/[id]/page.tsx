@@ -37,8 +37,7 @@ interface Role {
 export default function CompanyDetailsPage() {
   const { id } = useParams();
   const { users: userData, mutate: mutateUsers } = useUsers(id as string);
-  const { roles: roleData, mutate: mutateRoles } = useRolesByCompany(id);
-  const { rolesPermissions } =  useRolesPermissions();
+  const { roles: roleData, mutate: mutateRoles } = useRolesByCompany(id as string);
 
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
@@ -209,7 +208,7 @@ export default function CompanyDetailsPage() {
     try {
       const data = { ...userFormData };
       if (data.password === '') {
-        delete data.password; // Премахваме паролата, ако не е зададена нова
+        delete data.password;
       }
       if (isEditMode) {
         await updateUser(data);
@@ -487,7 +486,6 @@ export default function CompanyDetailsPage() {
     initialRole={roleFormData}
     isEditMode={isEditMode}
     onSave={async (role) => {
-      console.log('crb_from_on_save', role)
       try {
         if (isEditMode) {
           await updateRole(role._id, role);

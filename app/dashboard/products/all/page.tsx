@@ -22,7 +22,7 @@ interface Product {
 
 export default function ProductsPage() {
   const { products: rowData, mutate } = useProducts();
-  console.log('crb_products', rowData)
+
   const [colDefs] = useState<ColDef<Product>[]>([
     { field: 'name', headerName: 'Име', filter: true, flex: 1 },
     { field: 'description', headerName: 'Описание', filter: true, flex: 1 },

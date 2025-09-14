@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
@@ -9,6 +9,8 @@ import { useProducts } from '../products/all/hooks';
 import { useSuppliers } from '../suppliers/hooks';
 import { useSupplies, createSupply } from './hooks';
 import { useLocations } from '../locations/hooks';
+import { useUserRole } from '../companies/[id]/hooks';
+import { findTableFields } from '@/utils/helpers';
 
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -72,53 +74,9 @@ export default function SuppliesPage() {
   const { supplies: rowData, mutate } = useSupplies();
   const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
 
-  // Дефиниция на колони за главната таблица
-  const [colDefs] = useState<ColDef<Supply>[]>([
-    {
-      field: 'companyName',
-      headerName: 'Доставчик',
-      filter: true,
-    },
-    {
-      field: 'price',
-      headerName: 'Цена на доставка',
-      filter: true,
-      valueFormatter: (params) => formatPrice(params.data.price, params.data.currency),
-    },
-    {
-      field: 'status',
-      headerName: 'Статус',
-      filter: true,
-      valueFormatter: (params) => {
-        const statusMap: Record<string, string> = {
-          pending: 'Очакваща',
-          received: 'Получена',
-          canceled: 'Отменена',
-        };
-        return statusMap[params.value] || params.value;
-      },
-    },
-    {
-      field: 'deliveryDate',
-      headerName: 'Дата на доставка',
-      filter: true,
-      valueFormatter: (params) => new Date(params.value).toLocaleString('bg-BG'),
-    },
-    {
-      headerName: 'Действия',
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => setSelectedSupply(params.data)}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-        >
-          Детайли
-        </button>
-      ),
-      width: 120,
-    },
-  ]);
+  const { userRole } = useUserRole();
+  const [colDefs, setColDefs] = useState([]);
 
-  // Състояние за модала за добавяне
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     supplierId: '',
@@ -138,6 +96,54 @@ export default function SuppliesPage() {
     price: '',
     currency: '',
   });
+
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "suppliesSection", "suppliesTable")
+ 
+      const modifiedColDefs = table.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
+        };
+
+        if (col.field === 'price]') {
+          colDef.valueFormatter = (params) => formatPrice(params.data.price, params.data.currency);
+        }
+        
+        if (col.field === 'status') {
+          colDef.valueFormatter = (params) => {
+            const statusMap: Record<string, string> = {
+              pending: 'Очакваща',
+              received: 'Получена',
+              canceled: 'Отменена',
+            };
+            return statusMap[params.value] || params.value;
+          };
+        }
+
+        if (col.field === 'deliveryDate') {
+          colDef.valueFormatter = (params) => new Date(params.value).toLocaleString('bg-BG');
+        }
+
+        if (col.field === 'actions') {
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => setSelectedSupply(params.data)}
+              className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              Детайли
+            </button>
+          );
+        };
+      
+        return colDef;
+      });
+      setColDefs(modifiedColDefs)
+    }
+  }, [userRole])
 
   const handleAddSupply = () => {
     setIsModalOpen(true);

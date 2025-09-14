@@ -1,38 +1,27 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Само темата alpine
 import styles from '../dashboard.module.css';
-import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { createClient, useClients } from './hooks';
+import { useUserRole } from '../companies/[id]/hooks';
+import { findTableFields } from '@/utils/helpers';
 
-// Регистриране на AG Grid модули
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-interface Client {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  city: string;
-}
 
 export default function ClientsPage() {
   const {clients: rowData, mutate} = useClients();
+  const { userRole } = useUserRole();
+  const [colDefs, setColDefs] = useState([]);
 
-// Column Definitions: Defines the columns to be displayed.
-const [colDefs, setColDefs] = useState([
-    { field: "firstName", filter: true },
-    { field: "middleName", filter: true },
-    { field: "lastName", filter: true },
-    { field: "phone", filter: true },
-    { field: "email", filter: true },
-    { field: "country", filter: true },
-    { field: "city", filter: true }
-]);
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "clientsSection", "clientsTable")
 
-  // Състояние за данните на редовете
+      setColDefs(table)
+    }
+  }, [userRole])
 
   // Състояние за модала
   const [isModalOpen, setIsModalOpen] = useState(false);

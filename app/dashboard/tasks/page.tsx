@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
@@ -7,6 +7,8 @@ import { AgGridReact } from 'ag-grid-react';
 import Link from 'next/link';
 import { useTasks, createTask, updateTask } from './hooks'
 import { useUsers } from '../companies/hooks';
+import { useUserRole } from '../companies/[id]/hooks';
+import { findTableFields } from '@/utils/helpers';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -31,96 +33,172 @@ interface Task {
 
 export default function TasksPage() {
   const { tasks: rowData, mutate } = useTasks();
+  const { userRole } = useUserRole();
   const { users } = useUsers();
 
-  const [colDefs] = useState<ColDef<Task>[]>([
-    {
-      field: 'title',
-      headerName: 'Заглавие',
-      filter: true,
-      flex: 1,
-      cellRenderer: (params: any) => (
-        <Link
-          href={`/dashboard/tasks/${params.data._id}`}
-          className="text-cyan-500 hover:underline"
-        >
-          {params.value}
-        </Link>
-      ),
-    },
-    { field: 'description', headerName: 'Описание', filter: true, flex: 1 },
-    {
-      field: 'deadline',
-      headerName: 'Краен срок',
-      filter: true,
-      valueFormatter: (params) =>
-        params.value
-          ? new Date(params.value).toLocaleDateString('bg-BG')
-          : '-',
-    },
-    {
-      field: 'isRecurring',
-      headerName: 'Повтарящо се',
-      filter: true,
-      valueFormatter: (params) => (params.value ? 'Да' : 'Не'),
-    },
-    {
-      field: 'recurrenceInterval',
-      headerName: 'Интервал',
-      filter: true,
-      valueFormatter: (params) => {
-        const intervalMap: Record<string, string> = {
-          daily: 'Дневно',
-          weekly: 'Седмично',
-          monthly: 'Месечно',
+  const [colDefs, setColDefs] = useState([]);
+
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "tasksSection", "tasksTable")
+ 
+      const modifiedColDefs = table.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
         };
-        return params.value ? intervalMap[params.value] || params.value : '-';
-      },
-    },
-    {
-      field: 'status',
-      headerName: 'Статус',
-      filter: true,
-      valueFormatter: (params) => {
-        const statusMap: Record<string, string> = {
-          pending: 'Чакаща',
-          in_progress: 'В процес',
-          completed: 'Завършена',
+
+        // Прилагане на valueFormatter за специфични колони
+        if (col.field === 'title') {
+          colDef.valueFormatter = (params) => {
+            return params.value ? `Задача: ${params.value}` : '-';
+          };
+          colDef.cellRenderer = (params: any) => (
+                  <Link
+                    href={`/dashboard/tasks/${params.data._id}`}
+                    className="text-cyan-500 hover:underline"
+                  >
+                    {params.value}
+                  </Link>
+                );
+        }  
+        if (col.field === 'recurrenceInterval') {
+          colDef.valueFormatter = (params) => {
+                  const intervalMap: Record<string, string> = {
+                    daily: 'Дневно',
+                    weekly: 'Седмично',
+                    monthly: 'Месечно',
+                  };
+                  return params.value ? intervalMap[params.value] || params.value : '-';
+                };};
+        if(col.field === 'status') {
+          colDef.valueFormatter = (params) => {
+                  const statusMap: Record<string, string> = {
+                    pending: 'Чакаща',
+                    in_progress: 'В процес',
+                    completed: 'Завършена',
+                  };
+                  return statusMap[params.value] || params.value;
+                };
+              
+        }
+        if (col.field === 'deadline') {
+          colDef.valueFormatter = (params) => {
+            return params.value
+              ? new Date(params.value).toLocaleDateString('bg-BG')
+              : '-';
+          };
+        }
+
+        if (col.field === 'actions') {
+          console.log('crb_col', col)
+
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => handleEditTask(params.data)}
+              className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              {col.headerName}
+            </button>
+          );
         };
-        return statusMap[params.value] || params.value;
-      },
-    },
-    {
-      field: 'reporter',
-      headerName: 'Възложител',
-      filter: true,
-      valueFormatter: (params) => {
-        const user = users?.find((u: User) => u._id === params.value);
-        return user ? user.name : params.value;
-      },
-    },
-    {
-      field: 'assignee',
-      headerName: 'Отговорник',
-      filter: true,
-      valueFormatter: (params) => {
-        const user = users?.find((u: User) => u._id === params.value);
-        return user ? user.name : params.value;
-      },
-    },
-    {
-      headerName: 'Действия',
-      width: 150,
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleEditTask(params.data)}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-        >
-          Редактирай
-        </button>
-      ),
-    },
-  ]);
+      
+        return colDef;
+      });
+      setColDefs(modifiedColDefs)
+    }
+  }, [userRole])
+  
+  // const [colDefs] = useState<ColDef<Task>[]>([
+  //   {
+  //     field: 'title',
+  //     headerName: 'Заглавие',
+  //     filter: true,
+  //     flex: 1,
+  //     cellRenderer: (params: any) => (
+  //       <Link
+  //         href={`/dashboard/tasks/${params.data._id}`}
+  //         className="text-cyan-500 hover:underline"
+  //       >
+  //         {params.value}
+  //       </Link>
+  //     ),
+  //   },
+  //   { field: 'description', headerName: 'Описание', filter: true, flex: 1 },
+  //   {
+  //     field: 'deadline',
+  //     headerName: 'Краен срок',
+  //     filter: true,
+  //     valueFormatter: (params) =>
+  //       params.value
+  //         ? new Date(params.value).toLocaleDateString('bg-BG')
+  //         : '-',
+  //   },
+  //   {
+  //     field: 'isRecurring',
+  //     headerName: 'Повтарящо се',
+  //     filter: true,
+  //     valueFormatter: (params) => (params.value ? 'Да' : 'Не'),
+  //   },
+  //   {
+  //     field: 'recurrenceInterval',
+  //     headerName: 'Интервал',
+  //     filter: true,
+  //     valueFormatter: (params) => {
+  //       const intervalMap: Record<string, string> = {
+  //         daily: 'Дневно',
+  //         weekly: 'Седмично',
+  //         monthly: 'Месечно',
+  //       };
+  //       return params.value ? intervalMap[params.value] || params.value : '-';
+  //     },
+  //   },
+  //   {
+  //     field: 'status',
+  //     headerName: 'Статус',
+  //     filter: true,
+  //     valueFormatter: (params) => {
+  //       const statusMap: Record<string, string> = {
+  //         pending: 'Чакаща',
+  //         in_progress: 'В процес',
+  //         completed: 'Завършена',
+  //       };
+  //       return statusMap[params.value] || params.value;
+  //     },
+  //   },
+  //   {
+  //     field: 'reporter',
+  //     headerName: 'Възложител',
+  //     filter: true,
+  //     valueFormatter: (params) => {
+  //       const user = users?.find((u: User) => u._id === params.value);
+  //       return user ? user.name : params.value;
+  //     },
+  //   },
+  //   {
+  //     field: 'assignee',
+  //     headerName: 'Отговорник',
+  //     filter: true,
+  //     valueFormatter: (params) => {
+  //       const user = users?.find((u: User) => u._id === params.value);
+  //       return user ? user.name : params.value;
+  //     },
+  //   },
+  //   {
+  //     headerName: 'Действия',
+  //     width: 150,
+  //     cellRenderer: (params: any) => (
+  //       <button
+  //         onClick={() => handleEditTask(params.data)}
+  //         className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+  //       >
+  //         Редактирай
+  //       </button>
+  //     ),
+  //   },
+  // ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);

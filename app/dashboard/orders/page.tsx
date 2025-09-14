@@ -1,5 +1,5 @@
   'use client';
-  import { useState } from 'react';
+  import { useEffect, useState } from 'react';
   import './orders.module.css'
   // import 'ag-grid-community/styles/ag-grid.css';
   import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -10,6 +10,9 @@
   import { useProducts } from '../products/all/hooks';
   import { useOrders, createOrder } from './hooks';
   import { useAvailableLots } from '../products/lots/hooks';
+import { useUserRole } from '../companies/[id]/hooks';
+import { findTableFields } from '@/utils/helpers';
+import Link from 'next/link';
 
   // Регистриране на модули
   ModuleRegistry.registerModules([AllCommunityModule]);
@@ -89,6 +92,65 @@
       products: '',
       status: '',
     });
+
+  const { userRole } = useUserRole();
+
+  const [colDefs, setColDefs] = useState([]);
+
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "ordersSection", "ordersTable")
+ 
+      const modifiedColDefs = table.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
+        };
+
+        // Прилагане на valueFormatter за специфични колони
+        if (col.field === 'totalPrice') {
+          colDef.valueFormatter = (params) => formatPrice(params.value);
+        }
+          
+        if (col.field === 'recurrenceInterval') {
+          colDef.valueFormatter = (params) => {
+                  const intervalMap: Record<string, string> = {
+                    daily: 'Дневно',
+                    weekly: 'Седмично',
+                    monthly: 'Месечно',
+                  };
+                  return params.value ? intervalMap[params.value] || params.value : '-';
+                };};
+        if(col.field === 'status') {
+          colDef.valueFormatter = (params) => {
+            const status = statusOptions.find((opt) => opt.value === params.value);
+            return status ? status.label : params.value;
+          };
+              
+        }
+        if (col.field === 'createdAt') {
+          colDef.valueFormatter = (params) => new Date(params.value).toLocaleString('bg-BG');
+        }
+
+        if (col.field === 'actions') {
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => setSelectedOrder(params.data)}
+              className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              Детайли
+            </button>
+          );
+        };
+      
+        return colDef;
+      });
+      setColDefs(modifiedColDefs)
+    }
+  }, [userRole])
+
 
     // Функция за отваряне на модала за добавяне
     const handleAddOrder = () => {
@@ -252,48 +314,6 @@
         console.error('Грешка при изпращане на заявката:', error);
       }
     };
-
-    // Дефиниция на колони за главната таблица
-    const colDefs: ColDef<Order>[] = [
-      {
-        field: 'clientName',
-        headerName: 'Клиент',
-        filter: true,
-      },
-      {
-        field: 'totalPrice',
-        headerName: 'Обща цена',
-        filter: true,
-        valueFormatter: (params) => formatPrice(params.value),
-      },
-      {
-        field: 'status',
-        headerName: 'Статус',
-        filter: true,
-        valueFormatter: (params) => {
-          const status = statusOptions.find((opt) => opt.value === params.value);
-          return status ? status.label : params.value;
-        },
-      },
-      {
-        field: 'createdAt',
-        headerName: 'Създадена на',
-        filter: true,
-        valueFormatter: (params) => new Date(params.value).toLocaleString('bg-BG'),
-      },
-      {
-        headerName: 'Действия',
-        cellRenderer: (params: any) => (
-          <button
-            onClick={() => setSelectedOrder(params.data)}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-          >
-            Детайли
-          </button>
-        ),
-        width: 120,
-      },
-    ];
 
     // Дефиниция на колони за таблицата в попъпа
     const detailColDefs: ColDef<OrderProduct>[] = [

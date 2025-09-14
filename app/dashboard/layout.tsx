@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Users, ShoppingCart, Package, Truck, MapPin, BarChart, Settings, LogOut, SofaIcon } from 'lucide-react';
 import { useCurrentCompany } from './hooks';
+import { useUserRole } from './companies/[id]/hooks';
 
 export default function DashboardLayout({
   children,
@@ -11,6 +12,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { company } = useCurrentCompany();
+  const { userRole } = useUserRole();
+
   const pathname = usePathname();
   const [isProductsOpen, setIsProductsOpen] = useState(false);
 
@@ -18,8 +21,9 @@ export default function DashboardLayout({
     setIsProductsOpen((prev) => !prev);
   };
 
-  // Проверка за активен линк
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+  const isActive = (href: string) => {
+    return pathname === href
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-900">
@@ -32,140 +36,21 @@ export default function DashboardLayout({
         )}
         <nav>
           <ul className="space-y-1">
-            <li>
+            {userRole?.permissions?.map((permission: any) => {
+             return ( <li key={permission.sectionId}>
               <Link
-                href="/dashboard"
+                href={permission.url}
                 className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard') && !pathname.includes('/dashboard/')
+                  isActive(permission.url)
                     ? 'bg-cyan-600 text-white'
                     : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
                 }`}
               >
                 <Home className="w-5 h-5" />
-                Дашборд
+                {permission.title}
               </Link>
-            </li>
-            <li>
-                <Link
-                  href="/dashboard/tasks"
-                  className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                    isActive('/dashboard/tasks') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                  }`}
-                >
-                  <SofaIcon className="w-5 h-5" />
-                  Задачи
-                </Link>
-              </li>
-            <li>
-              <Link
-                href="/dashboard/clients"
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard/clients') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <Users className="w-5 h-5" />
-                Клиенти
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/dashboard/orders"
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard/orders') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <ShoppingCart className="w-5 h-5" />
-                Поръчки
-              </Link>
-            </li>
-            <li>
-              <button
-                onClick={toggleProductsMenu}
-                className={`w-full flex items-center justify-between px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard/products') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Package className="w-5 h-5" />
-                  Продукти
-                </div>
-                <svg
-                  className={`w-4 h-4 transform transition-transform duration-300 ${isProductsOpen ? 'rotate-90' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-              <ul className={`pl-6 mt-1 space-y-1 ${isProductsOpen ? 'block' : 'hidden'}`}>
-                <li>
-                  <Link
-                    href="/dashboard/products/all"
-                    className={`block px-4 py-2 text-sm rounded transition-colors duration-300 ${
-                      isActive('/dashboard/products/all') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                    }`}
-                  >
-                    Видове продукти
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/dashboard/products/lots"
-                    className={`block px-4 py-2 text-sm rounded transition-colors duration-300 ${
-                      isActive('/dashboard/products/serialized') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                    }`}
-                  >
-                    Партиди
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <Link
-                href="/dashboard/supplies"
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard/supplies') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <Package className="w-5 h-5" />
-                Доставки
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/dashboard/suppliers"
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard/suppliers') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <Truck className="w-5 h-5" />
-                Доставчици
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/dashboard/locations"
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard/locations') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <MapPin className="w-5 h-5" />
-                Обекти
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/dashboard/companies"
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive('/dashboard/companies') ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <Truck className="w-5 h-5" />
-                Компании
-              </Link>
-            </li>
+            </li>)
+            })}
             <li>
               <Link
                 href="/logout"

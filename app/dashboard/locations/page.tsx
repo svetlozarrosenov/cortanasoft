@@ -1,11 +1,13 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useLocations, createLocation, updateLocation } from './hooks';
+import { useUserRole } from '../companies/[id]/hooks';
+import { findTableFields } from '@/utils/helpers';
 
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -24,41 +26,49 @@ interface Location {
 
 export default function LocationsPage() {
   const { locations: rowData, mutate } = useLocations();
+  const { userRole } = useUserRole();
+  const [colDefs, setColDefs] = useState([]);
 
-  const [colDefs] = useState<ColDef<Location>[]>([
-    { field: 'name', headerName: 'Име', filter: true, flex: 1 },
-    {
-      field: 'type',
-      headerName: 'Тип',
-      filter: true,
-      valueFormatter: (params) => {
-        const typeMap: Record<string, string> = {
-          warehouse: 'Склад',
-          store: 'Магазин',
-          bin: 'Позиция',
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "locationsSection", "locationsTable")
+ 
+      const modifiedColDefs = table.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
         };
-        return typeMap[params.value] || params.value;
-      },
-    },
-    { field: 'address', headerName: 'Адрес', filter: true, flex: 1 },
-    { field: 'country', headerName: 'Държава', filter: true },
-    { field: 'city', headerName: 'Град', filter: true },
-    { field: 'email', headerName: 'Имейл', filter: true },
-    { field: 'phone', headerName: 'Телефон', filter: true },
-    { field: 'description', headerName: 'Описание', filter: true, flex: 1 },
-    {
-      headerName: 'Действия',
-      width: 150,
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleEditLocation(params.data)}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-        >
-          Редактирай
-        </button>
-      ),
-    },
-  ]);
+
+        if (col.field === 'type') {
+          colDef.valueFormatter = (params) => {
+            const typeMap: Record<string, string> = {
+              warehouse: 'Склад',
+              store: 'Магазин',
+              bin: 'Позиция',
+            };
+            return typeMap[params.value] || params.value;
+          };
+        }
+          
+
+        if (col.field === 'actions') {
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => handleEditLocation(params.data)}
+              className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              Редактирай
+            </button>
+          );
+        };
+      
+        return colDef;
+      });
+      setColDefs(modifiedColDefs)
+    }
+  }, [userRole])
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);

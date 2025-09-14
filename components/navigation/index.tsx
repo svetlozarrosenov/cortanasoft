@@ -2,13 +2,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { useUser } from '@/app/login/hooks';
-import { useUserRole } from '@/app/dashboard/companies/[id]/hooks';
 
 const Navigation: React.FC = () => {
   const { user } = useUser();
-  const { userRole } = useUserRole();
 
-  console.log('crb_userRole', userRole)
   return (
     <nav>
       <ul className="flex flex-col md:flex-row gap-6 text-white text-lg font-semibold">

@@ -1,11 +1,13 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import styles from '../dashboard.module.css';
 import type { ColDef } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useSuppliers, createSupplier } from '../suppliers/hooks';
+import { useUserRole } from '../companies/[id]/hooks';
+import { findTableFields } from '@/utils/helpers';
 
 // Регистриране на AG Grid модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -23,18 +25,16 @@ interface Supplier {
 
 export default function SuppliersPage() {
   const { suppliers: rowData, mutate } = useSuppliers();
+  const { userRole } = useUserRole();
+  const [colDefs, setColDefs] = useState([]);
 
-  // Дефиниция на колони за главната таблица
-  const [colDefs, setColDefs] = useState<ColDef<Supplier>[]>([
-    { field: 'companyName', headerName: 'Име на компания', filter: true, flex: 1 },
-    { field: 'responsiblePerson', headerName: 'Отговорно лице', filter: true, flex: 1 },
-    { field: 'email', headerName: 'Имейл', filter: true, flex: 1 },
-    { field: 'phone', headerName: 'Телефон', filter: true, flex: 1 },
-    { field: 'address', headerName: 'Адрес', filter: true, flex: 1 },
-    { field: 'city', headerName: 'Град', filter: true, flex: 1 },
-    { field: 'country', headerName: 'Държава', filter: true, flex: 1 },
-  ]);
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "suppliersSection", "suppliersTable")
 
+      setColDefs(table)
+    }
+  }, [userRole])
   // Състояние за модала
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
