@@ -24,7 +24,6 @@ export const createTask = async (tasksData: any) => {
 
   export const updateTask = async (tasksData: any) => {
     try {
-      console.log('crb_taskData', tasksData)
       const result = await axios.put(urls.updateTask(tasksData._id), tasksData, { withCredentials: true });
       return result.data;
     } catch (error) {

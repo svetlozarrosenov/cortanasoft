@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-// import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
@@ -9,7 +8,6 @@ import { useLocations, createLocation, updateLocation } from './hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 
-// Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface Location {
@@ -27,7 +25,28 @@ interface Location {
 export default function LocationsPage() {
   const { locations: rowData, mutate } = useLocations();
   const { userRole } = useUserRole();
-  const [colDefs, setColDefs] = useState([]);
+  const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [formData, setFormData] = useState<Location>({
+    name: '',
+    type: 'warehouse',
+    address: '',
+    country: '',
+    city: '',
+    email: '',
+    phone: '',
+    description: '',
+  });
+  const [formErrors, setFormErrors] = useState({
+    name: '',
+    type: '',
+    address: '',
+    country: '',
+    city: '',
+    email: '',
+    phone: '',
+  });
 
   useEffect(() => {
     if(userRole) {
@@ -70,23 +89,14 @@ export default function LocationsPage() {
     }
   }, [userRole])
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<Location>({
-    name: '',
-    type: 'warehouse',
-    address: '',
-    country: '',
-    city: '',
-    email: '',
-    phone: '',
-    description: '',
- 
-  });
-  const [formErrors, setFormErrors] = useState({
-    name: '',
-    type: '',
-  });
+  // Добавяне на gridOptions за стилизиране на редовете
+  const gridOptions = {
+    getRowStyle: (params: any) => {
+      if (params.node.rowIndex % 2 === 0) {
+        return { background: '#0092b5' };
+      }
+    },
+  };
 
   const handleAddLocation = () => {
     setIsEditMode(false);
@@ -100,23 +110,32 @@ export default function LocationsPage() {
       phone: '',
       description: '',
     });
-    setFormErrors({ name: '', type: ''});
+    setFormErrors({ name: '', type: '', address: '', country: '', city: '', email: '', phone: '' });
     setIsModalOpen(true);
   };
 
   const handleEditLocation = (location: Location) => {
     setIsEditMode(true);
-    setFormData(location);
-    setFormErrors({ name: '', type: '' });
+    setFormData({
+      name: location.name,
+      type: location.type,
+      address: location.address || '',
+      country: location.country || '',
+      city: location.city || '',
+      email: location.email || '',
+      phone: location.phone || '',
+      description: location.description || '',
+    });
+    setFormErrors({ name: '', type: '', address: '', country: '', city: '', email: '', phone: '' });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormErrors({ name: '', type: '' });
+    setFormErrors({ name: '', type: '', address: '', country: '', city: '', email: '', phone: '' });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -126,7 +145,7 @@ export default function LocationsPage() {
   };
 
   const validateForm = () => {
-    const errors = { name: '', type: '' };
+    const errors = { name: '', type: '', address: '', country: '', city: '', email: '', phone: '' };
     let isValid = true;
 
     if (!formData.name.trim()) {
@@ -136,6 +155,31 @@ export default function LocationsPage() {
 
     if (!formData.type) {
       errors.type = 'Типът е задължителен';
+      isValid = false;
+    }
+
+    if (!formData.address?.trim()) {
+      errors.address = 'Адресът е задължителен';
+      isValid = false;
+    }
+
+    if (!formData.country?.trim()) {
+      errors.country = 'Държавата е задължителна';
+      isValid = false;
+    }
+
+    if (!formData.city?.trim()) {
+      errors.city = 'Градът е задължителен';
+      isValid = false;
+    }
+
+    if (!formData.email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Въведете валиден имейл';
+      isValid = false;
+    }
+
+    if (!formData.phone?.trim()) {
+      errors.phone = 'Телефонът е задължителен';
       isValid = false;
     }
 
@@ -179,6 +223,7 @@ export default function LocationsPage() {
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
+            gridOptions={gridOptions}
             pagination={true}
             paginationPageSize={10}
             defaultColDef={{
@@ -192,7 +237,7 @@ export default function LocationsPage() {
       {/* Модал за добавяне/редактиране на локация */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md">
+          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
             <h2 className="text-lg font-semibold text-white mb-4">
               {isEditMode ? 'Редактирай локация' : 'Добави нова локация'}
             </h2>
@@ -232,6 +277,7 @@ export default function LocationsPage() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
+                {formErrors.address && <p className="text-red-400 text-sm mt-1">{formErrors.address}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Държава</label>
@@ -242,6 +288,7 @@ export default function LocationsPage() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
+                {formErrors.country && <p className="text-red-400 text-sm mt-1">{formErrors.country}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Град</label>
@@ -252,6 +299,7 @@ export default function LocationsPage() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
+                {formErrors.city && <p className="text-red-400 text-sm mt-1">{formErrors.city}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Имейл</label>
@@ -262,6 +310,7 @@ export default function LocationsPage() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
+                {formErrors.email && <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Телефон</label>
@@ -272,11 +321,11 @@ export default function LocationsPage() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 />
+                {formErrors.phone && <p className="text-red-400 text-sm mt-1">{formErrors.phone}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Описание</label>
-                <input
-                  type="text"
+                <textarea
                   name="description"
                   value={formData.description || ''}
                   onChange={handleInputChange}
@@ -305,3 +354,4 @@ export default function LocationsPage() {
     </div>
   );
 }
+

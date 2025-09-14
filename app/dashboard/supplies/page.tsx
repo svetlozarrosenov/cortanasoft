@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-// import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
@@ -109,7 +108,7 @@ export default function SuppliesPage() {
           flex: col.flex || 1,
         };
 
-        if (col.field === 'price]') {
+        if (col.field === 'price') { // Поправка на грешката от 'price]' на 'price'
           colDef.valueFormatter = (params) => formatPrice(params.data.price, params.data.currency);
         }
         
@@ -144,6 +143,15 @@ export default function SuppliesPage() {
       setColDefs(modifiedColDefs)
     }
   }, [userRole])
+
+  // Добавяне на gridOptions за стилизиране на редовете
+  const gridOptions = {
+    getRowStyle: (params: any) => {
+      if (params.node.rowIndex % 2 === 0) {
+        return { background: '#0092b5' };
+      }
+    },
+  };
 
   const handleAddSupply = () => {
     setIsModalOpen(true);
@@ -361,10 +369,13 @@ export default function SuppliesPage() {
             Добави доставка
           </button>
         </div>
-        <div className="ag-theme-alpine" style={{ height: 500 }}>
+        <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
+            gridOptions={gridOptions}
+            pagination={true}
+            paginationPageSize={10}
             defaultColDef={{
               flex: 1,
               minWidth: 100,

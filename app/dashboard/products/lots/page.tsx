@@ -1,10 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Alpine theme CSS
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useLots, createLots } from './hooks';
+import { findTableFields } from '@/utils/helpers';
+import { useUserRole } from '../../companies/[id]/hooks';
 
 // Register all Community modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -25,29 +27,9 @@ interface Lot {
 export default function LotsPage() {
   const { lots: rowData, mutate } = useLots();
 
-  const [colDefs] = useState<ColDef<Lot>[]>([
-    { field: 'name', headerName: 'Име', filter: true },
-    { field: 'description', headerName: 'Описание', filter: true },
-    { field: 'price', headerName: 'Цена', filter: true },
-    { field: 'quantity', headerName: 'Наличност', filter: true },
-    { field: 'category', headerName: 'Категория', filter: true },
-    { field: 'sku', headerName: 'SKU', filter: true },
-    { field: 'serialNumber', headerName: 'Сериен номер', filter: true },
-    { field: 'expiryDate', headerName: 'Срок на годност', filter: true },
-    { field: 'status', headerName: 'Статус', filter: true },
-    {
-      headerName: 'Действия',
-      width: 150,
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleEditProduct(params.data)}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-        >
-          Редактирай
-        </button>
-      ),
-    },
-  ]);
+  const { userRole } = useUserRole();
+
+  const [colDefs, setColDefs] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -70,6 +52,35 @@ export default function LotsPage() {
     sku: '',
     serialNumber: '',
   });
+
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "productsLotsSection", "productsLotsTable", 1)
+ 
+      const modifiedColDefs = table?.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
+        };
+
+        if (col.field === 'actions') {
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => handleEditProduct(params.data)}
+              className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              Редактирай
+            </button>
+          );
+        };
+      
+        return colDef;
+      });
+      setColDefs(modifiedColDefs)
+    }
+  }, [userRole])
 
   const handleAddProduct = () => {
     setIsEditMode(false);

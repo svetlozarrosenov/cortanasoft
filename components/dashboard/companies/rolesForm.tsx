@@ -29,6 +29,7 @@ interface Section {
   url: string;
   tables: Table[];
   apis: string[];
+  children?: Section[];
 }
 
 interface BackendRoleData {
@@ -39,23 +40,120 @@ interface BackendRoleData {
   permissions: Section[];
 }
 
+interface SectionProps {
+  section: Section;
+  level: number;
+  roleData: Role;
+  handleSectionChange: (sectionId: string, isChecked: boolean) => void;
+  handleColumnChange: (tableId: string, identifier: string, isChecked: boolean) => void;
+}
+
+const SectionItem: React.FC<SectionProps> = ({
+  section,
+  level,
+  roleData,
+  handleSectionChange,
+  handleColumnChange,
+}) => {
+  return (
+    <div key={section.sectionId} className="border-b border-gray-600" style={{ paddingLeft: `${level * 20}px` }}>
+      <div className="flex items-center py-2">
+        <input
+          type="checkbox"
+          id={section.sectionId}
+          checked={roleData.selectedSections?.includes(section.sectionId) || false}
+          onChange={(e) => handleSectionChange(section.sectionId, e.target.checked)}
+          className="h-4 w-4 text-[#0092b5] focus:ring-[#0092b5] border-gray-600 rounded"
+        />
+        <label htmlFor={section.sectionId} className="ml-2 text-sm text-white font-medium">
+          {section.title}
+        </label>
+      </div>
+      {roleData.selectedSections?.includes(section.sectionId) && (
+        <div className="pl-4 py-2 space-y-2">
+          {section.tables.map((table) => (
+            <div key={table.id}>
+              <h4 className="text-white text-sm font-medium mb-2">Колони за {table.id}</h4>
+              <ul className="space-y-1">
+                {table.fields.map((field) => {
+                  const identifier = field.field || field.headerName;
+                  return (
+                    <li key={identifier} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`${table.id}.${identifier}`}
+                        checked={roleData.visibleColumns?.[table.id]?.includes(identifier) || false}
+                        onChange={(e) => handleColumnChange(table.id, identifier, e.target.checked)}
+                        className="h-4 w-4 text-[#0092b5] focus:ring-[#0092b5] border-gray-600 rounded"
+                      />
+                      <label htmlFor={`${table.id}.${identifier}`} className="ml-2 text-sm text-white">
+                        {field.headerName}
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+      {section.children && section.children.length > 0 && (
+        <div>
+          {section.children.map((child) => (
+            <SectionItem
+              key={child.sectionId}
+              section={child}
+              level={level + 1}
+              roleData={roleData}
+              handleSectionChange={handleSectionChange}
+              handleColumnChange={handleColumnChange}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function RoleForm({ initialRole, isEditMode = false, onSave, onCancel }: any) {
   const { id } = useParams();
   const { rolesPermissions } = useRolesPermissions();
   const [formStep, setFormStep] = useState(1);
 
-  // Инициализация на roleData с преобразуване на permissions
   const [roleData, setRoleData] = useState<Role>(() => {
-    // Извличане на selectedSections и visibleColumns от initialRole.permissions
-    const selectedSections: string[] = initialRole?.permissions?.map((section: Section) => section.sectionId) || [];
+    // Рекурсивна функция за събиране на sectionId-та от всички нива
+    const collectSectionIds = (sections: Section[]): string[] => {
+      let ids: string[] = [];
+      sections.forEach((section) => {
+        ids.push(section.sectionId);
+        if (section.children) {
+          ids = ids.concat(collectSectionIds(section.children));
+        }
+      });
+      return ids;
+    };
+
+    const selectedSections: string[] = initialRole?.permissions
+      ? collectSectionIds(initialRole.permissions)
+      : initialRole?.selectedSections || [];
+
     const visibleColumns: Record<string, string[]> = {};
 
-    // Попълване на visibleColumns от permissions.tables
-    initialRole?.permissions?.forEach((section: Section) => {
-      section.tables.forEach((table: Table) => {
-        visibleColumns[table.id] = table.fields.map((field: TableField) => field.field || field.headerName);
+    // Рекурсивна функция за обработка на секции и деца
+    const processSectionFields = (sections: Section[]) => {
+      sections.forEach((section) => {
+        section.tables.forEach((table: Table) => {
+          visibleColumns[table.id] = table.fields.map((field: TableField) => field.field || field.headerName);
+        });
+        if (section.children) {
+          processSectionFields(section.children);
+        }
       });
-    });
+    };
+
+    if (initialRole?.permissions) {
+      processSectionFields(initialRole.permissions);
+    }
 
     return {
       _id: initialRole?._id || '',
@@ -76,7 +174,6 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
     return initialOpenSections;
   });
 
-  // Синхронизиране на openSections при промяна на selectedSections
   useEffect(() => {
     setOpenSections((prev) => {
       const newOpenSections = { ...prev };
@@ -87,9 +184,7 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
     });
   }, [roleData.selectedSections]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setRoleData((prev) => ({
       ...prev,
@@ -111,37 +206,46 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
     return isValid;
   };
 
+  // Рекурсивна функция за събиране на permissions
+  const buildPermissions = (sections: Section[]): Section[] => {
+    return sections
+      .filter((section) => roleData.selectedSections?.includes(section.sectionId))
+      .map((section) => {
+        const permission: Section = {
+          sectionId: section.sectionId,
+          title: section.title,
+          url: section.url,
+          apis: section.apis,
+          tables: section.tables.map((table) => ({
+            id: table.id,
+            fields: table.fields.filter((field) =>
+              field.field
+                ? roleData.visibleColumns?.[table.id]?.includes(field.field)
+                : roleData.visibleColumns?.[table.id]?.includes(field.headerName)
+            ),
+          })),
+        };
+        if (section.children && section.children.length > 0) {
+          permission.children = buildPermissions(section.children);
+        }
+        return permission;
+      });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formStep === 1 && !validateForm()) return;
 
     if (formStep === 2) {
-      // Трансформация на roleData към формат за бекенда
       const backendData: BackendRoleData = {
         name: roleData.name,
         description: roleData.description,
         companyId: roleData.companyId,
-        permissions: rolesPermissions
-          .filter((section) => roleData.selectedSections?.includes(section.sectionId))
-          .map((section) => ({
-            sectionId: section.sectionId,
-            title: section.title,
-            url: section.url,
-            apis: section.apis,
-            tables: section.tables.map((table) => ({
-              id: table.id,
-              fields: table.fields.filter((field) =>
-                field.field
-                  ? roleData.visibleColumns?.[table.id]?.includes(field.field)
-                  : roleData.visibleColumns?.[table.id]?.includes(field.headerName)
-              ),
-            })),
-          })),
+        permissions: buildPermissions(rolesPermissions),
       };
-      if(isEditMode) {
-        backendData._id = roleData._id
+      if (isEditMode) {
+        backendData._id = roleData._id;
       }
-      console.log('crb_backendData', backendData)
       onSave(backendData);
     } else {
       setFormStep(2);
@@ -160,15 +264,21 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
       [sectionId]: isChecked,
     }));
     if (!isChecked) {
-      // Изчистваме visibleColumns за всички таблици в тази секция
-      const section = rolesPermissions.find((s) => s.sectionId === sectionId);
-      if (section) {
+      const clearColumnsForSection = (section: Section) => {
         const tableIds = section.tables.map((t) => t.id);
         setRoleData((prev) => {
           const newVisibleColumns = { ...prev.visibleColumns };
           tableIds.forEach((tableId) => delete newVisibleColumns[tableId]);
           return { ...prev, visibleColumns: newVisibleColumns };
         });
+        if (section.children) {
+          section.children.forEach(clearColumnsForSection);
+        }
+      };
+
+      const section = rolesPermissions.find((s) => s.sectionId === sectionId);
+      if (section) {
+        clearColumnsForSection(section);
       }
     }
   };
@@ -252,60 +362,14 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
                 <label className="block text-sm font-medium text-white">Избери секции</label>
                 <div className="mt-2 space-y-2">
                   {rolesPermissions.map((section) => (
-                    <div key={section.sectionId} className="border-b border-gray-600">
-                      <div className="flex items-center py-2">
-                        <input
-                          type="checkbox"
-                          id={section.sectionId}
-                          checked={roleData.selectedSections?.includes(section.sectionId) || false}
-                          onChange={(e) => handleSectionChange(section.sectionId, e.target.checked)}
-                          className="h-4 w-4 text-[#0092b5] focus:ring-[#0092b5] border-gray-600 rounded"
-                        />
-                        <label
-                          htmlFor={section.sectionId}
-                          className="ml-2 text-sm text-white font-medium"
-                        >
-                          {section.title}
-                        </label>
-                      </div>
-                      {roleData.selectedSections?.includes(section.sectionId) && (
-                        <div className="pl-4 py-2 space-y-2">
-                          {section.tables.map((table) => (
-                            <div key={table.id}>
-                              <h4 className="text-white text-sm font-medium mb-2">
-                                Колони за {table.id}
-                              </h4>
-                              <ul className="space-y-1">
-                                {table.fields.map((field) => {
-                                  const identifier = field.field || field.headerName;
-                                  return (
-                                    <li key={identifier} className="flex items-center">
-                                      <input
-                                        type="checkbox"
-                                        id={`${table.id}.${identifier}`}
-                                        checked={
-                                          roleData.visibleColumns?.[table.id]?.includes(identifier) || false
-                                        }
-                                        onChange={(e) =>
-                                          handleColumnChange(table.id, identifier, e.target.checked)
-                                        }
-                                        className="h-4 w-4 text-[#0092b5] focus:ring-[#0092b5] border-gray-600 rounded"
-                                      />
-                                      <label
-                                        htmlFor={`${table.id}.${identifier}`}
-                                        className="ml-2 text-sm text-white"
-                                      >
-                                        {field.headerName}
-                                      </label>
-                                    </li>
-                                  );
-                                })}
-                              </ul>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <SectionItem
+                      key={section.sectionId}
+                      section={section}
+                      level={0}
+                      roleData={roleData}
+                      handleSectionChange={handleSectionChange}
+                      handleColumnChange={handleColumnChange}
+                    />
                   ))}
                 </div>
               </div>

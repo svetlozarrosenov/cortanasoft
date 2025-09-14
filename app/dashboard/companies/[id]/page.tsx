@@ -1,12 +1,13 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useParams } from 'next/navigation';
-import { useUsers, createUser, updateUser, useRolesByCompany, createRole, updateRole, useRolesPermissions } from './hooks';
+import { useUsers, createUser, updateUser, useRolesByCompany, createRole, updateRole, useRolesPermissions, useUserRole } from './hooks';
 import RoleForm from '@/components/dashboard/companies/rolesForm';
+import { findTableFields } from '@/utils/helpers';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -75,6 +76,65 @@ export default function CompanyDetailsPage() {
     name: '',
   });
 
+  const { userRole } = useUserRole();
+  const [userColDefs, setUserColDefs] = useState([]);
+  const [roleColDefs, setRoleColDefs] = useState([]);
+
+  useEffect(() => {
+    if(userRole) {
+      const userTable = findTableFields(userRole, "companiesSection", "usersTable")
+
+      const roleTable = findTableFields(userRole, "companiesSection", "rolesTable")
+
+      const modifiedUsersColDefs = userTable.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
+        };
+
+        if (col.field === 'actions') {
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => handleEditUser(params.data)}
+              className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              Редактирай
+            </button>
+          );
+        };
+      
+        return colDef;
+      });
+
+      const modifiedRolesColDefs = roleTable.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
+        };
+
+        if (col.field === 'actions') {
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => handleEditRole(params.data)}
+              className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              Редактирай
+            </button>
+          );
+        };
+      
+        return colDef;
+      });
+
+      setUserColDefs(modifiedUsersColDefs)
+      setRoleColDefs(modifiedRolesColDefs)
+    }
+  }, [userRole])
+  
   const generatePassword = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
     let password = '';
@@ -221,47 +281,6 @@ export default function CompanyDetailsPage() {
       console.error('Грешка при изпращане на заявката:', error);
     }
   };
-
-  const userColDefs: ColDef<User>[] = [
-    { field: 'firstName', headerName: 'Име', filter: true, flex: 1 },
-    { field: 'middleName', headerName: 'Презиме', filter: true },
-    { field: 'lastName', headerName: 'Фамилия', filter: true },
-    { field: 'role', headerName: 'Роля', filter: true },
-    { field: 'country', headerName: 'Държава', filter: true },
-    { field: 'city', headerName: 'Град', filter: true },
-    { field: 'address', headerName: 'Адрес', filter: true },
-    { field: 'phone', headerName: 'Телефон', filter: true },
-    { field: 'email', headerName: 'Имейл', filter: true },
-    {
-      headerName: 'Действия',
-      width: 150,
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleEditUser(params.data)}
-          className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-        >
-          Редактирай
-        </button>
-      ),
-    },
-  ];
-
-  const roleColDefs: ColDef<Role>[] = [
-    { field: 'name', headerName: 'Име на ролята', filter: true, flex: 1 },
-    { field: 'description', headerName: 'Описание', filter: true, flex: 1 },
-    {
-      headerName: 'Действия',
-      width: 150,
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleEditRole(params.data)}
-          className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-        >
-          Редактирай
-        </button>
-      ),
-    },
-  ];
 
   return (
     <div className="bg-gray-800 min-h-screen p-6">

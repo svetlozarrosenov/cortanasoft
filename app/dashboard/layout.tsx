@@ -25,6 +25,57 @@ export default function DashboardLayout({
     return pathname === href
   }
 
+  const itemWithSubItems = (permission: any) => (<li key={permission.sectionId}>
+  <button
+    onClick={toggleProductsMenu}
+    className={`w-full flex items-center justify-between px-4 py-2 text-base rounded transition-colors duration-300 ${
+      isActive(permission.url) ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+    }`}
+  >
+    <div className="flex items-center gap-2">
+      <Package className="w-5 h-5" />
+      {permission.title}
+    </div>
+    <svg
+      className={`w-4 h-4 transform transition-transform duration-300 ${isProductsOpen ? 'rotate-90' : ''}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+    </svg>
+  </button>
+  <ul className={`pl-6 mt-1 space-y-1 ${isProductsOpen ? 'block' : 'hidden'}`}>
+  {permission.children.map((childPermission: any) => {
+     return (<li key={childPermission.sectionId}>
+     <Link
+       href={childPermission?.url || ''}
+       className={`block px-4 py-2 text-sm rounded transition-colors duration-300 ${
+         isActive(childPermission.url) ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+       }`}
+     >
+       {childPermission.title}
+     </Link>
+   </li>)
+  })}
+  </ul>
+</li>)
+
+const item = (permission: any) => ( <li key={permission.sectionId}>
+  <Link
+    href={permission.url}
+    className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
+      isActive(permission.url)
+        ? 'bg-cyan-600 text-white'
+        : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+    }`}
+  >
+    <Home className="w-5 h-5" />
+    {permission.title}
+  </Link>
+</li>)
+  
   return (
     <div className="flex min-h-screen bg-gray-900">
       {/* Desktop Sidebar */}
@@ -37,19 +88,7 @@ export default function DashboardLayout({
         <nav>
           <ul className="space-y-1">
             {userRole?.permissions?.map((permission: any) => {
-             return ( <li key={permission.sectionId}>
-              <Link
-                href={permission.url}
-                className={`flex items-center gap-2 px-4 py-2 text-base rounded transition-colors duration-300 ${
-                  isActive(permission.url)
-                    ? 'bg-cyan-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                }`}
-              >
-                <Home className="w-5 h-5" />
-                {permission.title}
-              </Link>
-            </li>)
+             return permission?.children?.length && permission ? itemWithSubItems(permission) : item(permission);
             })}
             <li>
               <Link

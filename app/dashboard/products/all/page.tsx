@@ -1,11 +1,13 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { createProduct, updateProduct, useProducts } from './hooks';
+import { findTableFields } from '@/utils/helpers';
+import { useUserRole } from '../../companies/[id]/hooks';
 
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -23,25 +25,42 @@ interface Product {
 export default function ProductsPage() {
   const { products: rowData, mutate } = useProducts();
 
-  const [colDefs] = useState<ColDef<Product>[]>([
-    { field: 'name', headerName: 'Име', filter: true, flex: 1 },
-    { field: 'description', headerName: 'Описание', filter: true, flex: 1 },
-    { field: 'price', headerName: 'Цена', filter: true, valueFormatter: (params) => `${params.value} лв.` },
-    { field: 'category', headerName: 'Категория', filter: true },
-    { field: 'quantity', headerName: 'Наличност', filter: true },
-    {
-      headerName: 'Действия',
-      width: 150,
-      cellRenderer: (params: any) => (
-        <button
-          onClick={() => handleEditProduct(params.data)}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-        >
-          Редактирай
-        </button>
-      ),
-    },
-  ]);
+  const { userRole } = useUserRole();
+
+  const [colDefs, setColDefs] = useState([]);
+
+  useEffect(() => {
+    if(userRole) {
+      const table = findTableFields(userRole, "productsListSection", "productsListTable", 1)
+ 
+      const modifiedColDefs = table?.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
+        };
+
+        if (col.field === 'price') {
+          colDef.valueFormatter = (params) => `${params.value} лв.`;
+        }
+
+        if (col.field === 'actions') {
+          colDef.cellRenderer = (params: any) => (
+            <button
+              onClick={() => handleEditProduct(params.data)}
+              className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
+            >
+              Редактирай
+            </button>
+          );
+        };
+      
+        return colDef;
+      });
+      setColDefs(modifiedColDefs)
+    }
+  }, [userRole])
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);

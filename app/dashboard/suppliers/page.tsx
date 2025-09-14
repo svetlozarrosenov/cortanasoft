@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import styles from '../dashboard.module.css';
 import type { ColDef } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
@@ -35,6 +34,7 @@ export default function SuppliersPage() {
       setColDefs(table)
     }
   }, [userRole])
+
   // Състояние за модала
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -55,6 +55,15 @@ export default function SuppliersPage() {
     city: '',
     country: '',
   });
+
+  // Добавяне на gridOptions за стилизиране на редовете
+  const gridOptions = {
+    getRowStyle: (params: any) => {
+      if (params.node.rowIndex % 2 === 0) {
+        return { background: '#0092b5' };
+      }
+    },
+  };
 
   // Функция за отваряне на модал за добавяне
   const handleAddSupplier = () => {
@@ -161,13 +170,13 @@ export default function SuppliersPage() {
   };
 
   return (
-    <div className={styles.grid}>
-      <div className={styles.card}>
+    <div className="bg-gray-800 min-h-screen p-6">
+      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className={styles.cardTitle}>Доставчици</h2>
+          <h2 className="text-lg font-semibold text-white">Доставчици</h2>
           <button
             onClick={handleAddSupplier}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
           >
             Добави доставчик
           </button>
@@ -176,6 +185,7 @@ export default function SuppliersPage() {
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
+            gridOptions={gridOptions}
             pagination={true}
             paginationPageSize={10}
             defaultColDef={{
@@ -291,3 +301,4 @@ export default function SuppliersPage() {
     </div>
   );
 }
+
