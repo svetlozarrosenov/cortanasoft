@@ -6,7 +6,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import Link from 'next/link';
 import { useTasks, createTask, updateTask } from './hooks';
-import { useUsers } from '../companies/hooks';
+import { useCompanyUsers } from '../companies/[id]/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 
@@ -34,7 +34,7 @@ interface Task {
 export default function TasksPage() {
   const { tasks: rowData, mutate } = useTasks();
   const { userRole } = useUserRole();
-  const { users } = useUsers();
+  const { users } = useCompanyUsers();
 
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -293,11 +293,13 @@ export default function TasksPage() {
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
                   <option value="">Избери възложител...</option>
-                  {users.map((user: User) => (
+                  {users?.map((user: User) => {
+                    console.log('crb_user_we', user)
+                    return (
                     <option key={user._id} value={user._id}>
                       {user.firstName + ' ' + user.lastName + ` (${user.email})`}
                     </option>
-                  ))}
+                  )})}
                 </select>
                 {formErrors.reporter && <p className="text-red-400 text-sm mt-1">{formErrors.reporter}</p>}
               </div>
@@ -310,7 +312,7 @@ export default function TasksPage() {
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
                   <option value="">Избери отговорник...</option>
-                  {users.map((user: User) => (
+                  {users?.map((user: User) => (
                     <option key={user._id} value={user._id}>
                       {user.firstName + ' ' + user.lastName + ` (${user.email})`}
                     </option>

@@ -2,7 +2,8 @@ import axios from 'axios';
 import useSWR from 'swr';
 
 const urls = {
-    fetchUsers: (companyId: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/user/${companyId}`,
+    fetchUsers: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/user/${id}`,
+    fetchCompanyUsers: `${process.env.NEXT_PUBLIC_BACK_END_URL}/user/company/collegues`,
     fetchRolesByCompany: (id: string) =>  `${process.env.NEXT_PUBLIC_BACK_END_URL}/roles/company/${id}`,
     fetchRolesPermissions:  `${process.env.NEXT_PUBLIC_BACK_END_URL}/roles/permissions`,
     createUser: `${process.env.NEXT_PUBLIC_BACK_END_URL}/user/create`,
@@ -101,6 +102,17 @@ export const createUser = async (clientData: any) => {
 
   export function useUsers(companyId: string) {
     const { data: users, error, mutate } = useSWR(urls.fetchUsers(companyId), fetcher);
+  
+    return {
+      users,
+      isLoading: !error && !users,
+      error,
+      mutate,
+    };
+  }
+
+  export function useCompanyUsers() {
+    const { data: users, error, mutate } = useSWR(urls.fetchCompanyUsers, fetcher);
   
     return {
       users,

@@ -41,14 +41,3 @@ export function useCompanies() {
     mutate,
   };
 }
-
-export function useUsers() {
-  const { data: users, error, mutate } = useSWR(urls.fetchCompanies, fetcher);
-
-  return {
-    users,
-    isLoading: !error && !users,
-    error,
-    mutate,
-  };
-}

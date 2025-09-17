@@ -4,7 +4,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { useSuppliers, createSupplier } from '../suppliers/hooks';
+import { useSuppliers, createSupplier, updateSupplier } from '../suppliers/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 
@@ -25,18 +25,10 @@ interface Supplier {
 export default function SuppliersPage() {
   const { suppliers: rowData, mutate } = useSuppliers();
   const { userRole } = useUserRole();
-  const [colDefs, setColDefs] = useState([]);
-
-  useEffect(() => {
-    if(userRole) {
-      const table = findTableFields(userRole, "suppliersSection", "suppliersTable")
-
-      setColDefs(table)
-    }
-  }, [userRole])
-
-  // Състояние за модала
+  const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // Track if editing or creating
+  const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null); // Store ID of supplier being edited
   const [formData, setFormData] = useState({
     companyName: '',
     responsiblePerson: '',
@@ -56,7 +48,34 @@ export default function SuppliersPage() {
     country: '',
   });
 
-  // Добавяне на gridOptions за стилизиране на редовете
+  useEffect(() => {
+    if (userRole) {
+      const table = findTableFields(userRole, 'suppliersSection', 'suppliersTable');
+      setColDefs(table);
+    }
+  }, [userRole]);
+
+  // Add action column for editing
+  const actionColumn: ColDef = {
+    headerName: 'Действия',
+    cellRenderer: (params: any) => (
+      <button
+        onClick={() => handleEditSupplier(params.data)}
+        className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-1 px-2 rounded transition duration-200"
+      >
+        Редактирай
+      </button>
+    ),
+    width: 120,
+    pinned: 'right',
+  };
+
+  useEffect(() => {
+    if (colDefs.length > 0 && !colDefs.some((col) => col.headerName === 'Действия')) {
+      setColDefs([...colDefs, actionColumn]);
+    }
+  }, [colDefs]);
+
   const gridOptions = {
     getRowStyle: (params: any) => {
       if (params.node.rowIndex % 2 === 0) {
@@ -76,12 +95,32 @@ export default function SuppliersPage() {
       city: '',
       country: '',
     });
+    setIsEditing(false);
+    setSelectedSupplierId(null);
+    setIsModalOpen(true);
+  };
+
+  // Функция за отваряне на модал за редактиране
+  const handleEditSupplier = (supplier: Supplier) => {
+    setFormData({
+      companyName: supplier.companyName,
+      responsiblePerson: supplier.responsiblePerson,
+      email: supplier.email,
+      phone: supplier.phone,
+      address: supplier.address,
+      city: supplier.city,
+      country: supplier.country,
+    });
+    setIsEditing(true);
+    setSelectedSupplierId(supplier._id);
     setIsModalOpen(true);
   };
 
   // Функция за затваряне на модала
   const closeModal = () => {
     setIsModalOpen(false);
+    setIsEditing(false);
+    setSelectedSupplierId(null);
     setFormErrors({
       companyName: '',
       responsiblePerson: '',
@@ -161,7 +200,13 @@ export default function SuppliersPage() {
     if (!validateForm()) return;
 
     try {
-      await createSupplier(formData);
+      if (isEditing && selectedSupplierId) {
+        // Update existing supplier
+        await updateSupplier(selectedSupplierId, formData);
+      } else {
+        // Create new supplier
+        await createSupplier(formData);
+      }
       mutate();
       closeModal();
     } catch (error) {
@@ -196,11 +241,13 @@ export default function SuppliersPage() {
         </div>
       </div>
 
-      {/* Модал за добавяне на доставчик */}
+      {/* Модал за добавяне/редактиране на доставчик */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`${styles.card} w-full max-w-md`}>
-            <h2 className={styles.cardTitle}>Добави нов доставчик</h2>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              {isEditing ? 'Редактирай доставчик' : 'Добави нов доставчик'}
+            </h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Име на компания</label>
@@ -291,7 +338,7 @@ export default function SuppliersPage() {
                   type="submit"
                   className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
                 >
-                  Запази
+                  {isEditing ? 'Запази промените' : 'Запази'}
                 </button>
               </div>
             </form>
@@ -301,4 +348,3 @@ export default function SuppliersPage() {
     </div>
   );
 }
-

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useTask, updateTask, createTaskComment } from '../hooks';
-import { useUsers } from '../../companies/hooks';
+import { useUsers } from '../../companies/[id]/hooks';
 import { PencilSquareIcon, XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 
 interface Comment {
@@ -33,7 +33,7 @@ export default function TaskDetailsPage() {
   const params = useParams();
   const id = params.id as string;
   const { task, isLoading, error, mutate } = useTask(id);
-  const { users } = useUsers();
+  const { users } = useUsers(id);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState<Task | null>(null);
@@ -302,7 +302,7 @@ export default function TaskDetailsPage() {
                   className="w-full border border-gray-600 rounded-lg p-4 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
                   <option value="">Избери създател...</option>
-                  {users.map((user: User) => (
+                  {users?.map((user: User) => (
                     <option key={user._id} value={user._id}>
                       {user.name}
                     </option>
@@ -319,7 +319,7 @@ export default function TaskDetailsPage() {
                   className="w-full border border-gray-600 rounded-lg p-4 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
                   <option value="">Избери отговорник...</option>
-                  {users.map((user: User) => (
+                  {users?.map((user: User) => (
                     <option key={user._id} value={user._id}>
                       {user.name}
                     </option>
