@@ -28,6 +28,7 @@ export default function ClientsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState<Client>({
+    _id: '',
     firstName: '',
     middleName: '',
     lastName: '',

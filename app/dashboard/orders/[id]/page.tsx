@@ -7,6 +7,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { useClients } from '../../clients/hooks';
 import { useParams } from 'next/navigation';
 import { useOrders } from '../hooks';
+import Link from 'next/link';
 
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -86,6 +87,7 @@ export default function OrderDetailPage() {
     issueDate: '',
     products: '',
   });
+  const [invoice, setInvoice] = useState<InvoiceFormData | null>(null); // Състояние за запазена фактура
 
   // Зареждане на данните за поръчката
   useEffect(() => {
@@ -93,7 +95,7 @@ export default function OrderDetailPage() {
       const foundOrder = orders.find((o) => o._id === orderId);
       setOrder(foundOrder || null);
       if (foundOrder) {
-        setInvoiceFormData({
+        const initialFormData = {
           clientId: foundOrder.clientId,
           totalPrice: foundOrder.totalPrice,
           issueDate: new Date().toISOString().split('T')[0],
@@ -102,7 +104,10 @@ export default function OrderDetailPage() {
             quantity: p.quantity,
             productPrice: p.productPrice,
           })),
-        });
+        };
+        setInvoiceFormData(initialFormData);
+        // Ако има съществуваща фактура, може да се зареди от API (тук ползваме локално състояние)
+        setInvoice(initialFormData);
       }
     }
   }, [orders, orderId]);
@@ -229,7 +234,8 @@ export default function OrderDetailPage() {
         issueDate: invoiceFormData.issueDate,
         products: invoiceFormData.products,
       });
-      // Тук може да се добави API заявка за създаване или редактиране на фактура
+      // Запазваме фактурата в състояние (в реално приложение би се изпратила към API)
+      setInvoice(invoiceFormData);
       closeInvoiceModal();
     } catch (error) {
       console.error('Грешка при издаване/редактиране на фактура:', error);
@@ -315,6 +321,14 @@ export default function OrderDetailPage() {
           >
             Редактиране на фактура
           </button>
+          {invoice && (
+            <Link
+              href={`/dashboard/invoices/${orderId}`}
+              className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+            >
+              Виж фактура
+            </Link>
+          )}
         </div>
       </div>
 

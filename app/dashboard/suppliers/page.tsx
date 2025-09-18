@@ -202,7 +202,7 @@ export default function SuppliersPage() {
     try {
       if (isEditing && selectedSupplierId) {
         // Update existing supplier
-        await updateSupplier(selectedSupplierId, formData);
+        await updateSupplier(selectedSupplierId);
       } else {
         // Create new supplier
         await createSupplier(formData);
