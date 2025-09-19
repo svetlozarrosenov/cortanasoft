@@ -276,7 +276,7 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
         }
       };
 
-      const section = rolesPermissions.find((s) => s.sectionId === sectionId);
+      const section = rolesPermissions.find((s: any) => s.sectionId === sectionId);
       if (section) {
         clearColumnsForSection(section);
       }
@@ -361,7 +361,7 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
               <div className="mb-4">
                 <label className="block text-sm font-medium text-white">Избери секции</label>
                 <div className="mt-2 space-y-2">
-                  {rolesPermissions.map((section) => (
+                  {rolesPermissions.map((section: any) => (
                     <SectionItem
                       key={section.sectionId}
                       section={section}

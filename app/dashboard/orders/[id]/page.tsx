@@ -92,14 +92,14 @@ export default function OrderDetailPage() {
   // Зареждане на данните за поръчката
   useEffect(() => {
     if (orders) {
-      const foundOrder = orders.find((o) => o._id === orderId);
+      const foundOrder = orders.find((o: any) => o._id === orderId);
       setOrder(foundOrder || null);
       if (foundOrder) {
         const initialFormData = {
           clientId: foundOrder.clientId,
           totalPrice: foundOrder.totalPrice,
           issueDate: new Date().toISOString().split('T')[0],
-          products: foundOrder.products.map((p) => ({
+          products: foundOrder.products.map((p: any) => ({
             productName: p.productName,
             quantity: p.quantity,
             productPrice: p.productPrice,
@@ -284,7 +284,7 @@ export default function OrderDetailPage() {
           </p>
           <p>
             <strong>Статус:</strong>{' '}
-            {statusOptions.find((opt) => opt.value === order.status)?.label || order.status}
+            {statusOptions.find((opt: any) => opt.value === order.status)?.label || order.status}
           </p>
           <p>
             <strong>Създадена на:</strong> {new Date(order.createdAt).toLocaleString('bg-BG')}
@@ -348,7 +348,7 @@ export default function OrderDetailPage() {
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
                   <option value="">Избери клиент...</option>
-                  {clients?.map((client) => (
+                  {clients?.map((client: any) => (
                     <option key={client._id} value={client._id}>
                       {client.firstName} {client.lastName || ''}
                     </option>

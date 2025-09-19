@@ -204,7 +204,7 @@ export default function OrdersPage() {
     const updatedProducts = formData.products.map((p, i) => {
       if (i === index) {
         if (field === 'productId') {
-          const product = products.find((prod) => prod._id === value);
+          const product = products.find((prod: any) => prod._id === value);
           return {
             ...p,
             productId: value as string,
@@ -216,7 +216,7 @@ export default function OrdersPage() {
           };
         }
         if (field === 'lotId') {
-          const lot = lots.find((lot) => lot._id === value);
+          const lot = lots.find((lot: any) => lot._id === value);
           return {
             ...p,
             lotId: value as string,
@@ -228,7 +228,7 @@ export default function OrdersPage() {
       }
       return p;
     });
-    setFormData((prev) => ({ ...prev, products: updatedProducts }));
+    setFormData((prev: any) => ({ ...prev, products: updatedProducts }));
     setFormErrors((prev) => ({ ...prev, products: '' }));
   };
 
@@ -255,7 +255,7 @@ export default function OrdersPage() {
           errors.products = 'Изберете партида за всеки продукт';
           isValid = false;
         }
-        const selectedLot = lots.find((lot) => lot._id === p.lotId);
+        const selectedLot = lots.find((lot: any) => lot._id === p.lotId);
         if (!selectedLot || p.quantity > selectedLot.quantity) {
           errors.products = 'Количеството надвишава наличността на избраната партида';
           isValid = false;
@@ -282,7 +282,7 @@ export default function OrdersPage() {
 
     let totalPrice = 0;
     const selectedProducts = formData.products.map((orderProd) => {
-      const product = products.find((p) => p._id === orderProd.productId);
+      const product = products.find((p: any) => p._id === orderProd.productId);
       if (product) {
         totalPrice += product.price * orderProd.quantity;
       }
@@ -359,7 +359,7 @@ export default function OrdersPage() {
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
                   <option value="">Избери клиент...</option>
-                  {clients?.map((client) => (
+                  {clients?.map((client: any) => (
                     <option key={client._id} value={client._id}>
                       {client.firstName} {client.lastName || ''}
                     </option>
@@ -378,7 +378,7 @@ export default function OrdersPage() {
                         className="flex-1 mr-2 border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                       >
                         <option value="">Избери продукт...</option>
-                        {products?.map((product) => (
+                        {products?.map((product: any) => (
                           <option key={product._id} value={product._id}>
                             {product.name}
                           </option>
@@ -403,8 +403,8 @@ export default function OrdersPage() {
                         <option value="">Избери партида...</option>
                         {prod.productId &&
                           lots
-                            ?.filter((lot) => lot.productId === prod.productId)
-                            .map((lot) => (
+                            ?.filter((lot: any) => lot.productId === prod.productId)
+                            .map((lot: any) => (
                               <option key={lot._id} value={lot._id}>
                                 {lot.lotNumber} (Наличност: {lot.quantity}, Срок: {lot.expiryDate ? new Date(lot.expiryDate).toLocaleString('bg-BG') : 'Няма'})
                               </option>
@@ -419,7 +419,7 @@ export default function OrdersPage() {
                         onChange={(e) => handleProductChange(index, 'quantity', Number(e.target.value))}
                         className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                         min="1"
-                        max={prod.lotId ? lots.find((lot) => lot._id === prod.lotId)?.quantity || 0 : 0}
+                        max={prod.lotId ? lots.find((lot: any) => lot._id === prod.lotId)?.quantity || 0 : 0}
                         disabled={!prod.lotId}
                       />
                     </div>

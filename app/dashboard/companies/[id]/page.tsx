@@ -525,7 +525,7 @@ export default function CompanyDetailsPage() {
   <RoleForm
     initialRole={roleFormData}
     isEditMode={isEditMode}
-    onSave={async (role) => {
+    onSave={async (role: any) => {
       try {
         if (isEditMode) {
           await updateRole(role._id, role);

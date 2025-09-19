@@ -3,7 +3,7 @@ import useSWR from 'swr';
 
 const urls = {
     addLocations: `${process.env.NEXT_PUBLIC_BACK_END_URL}/locations/create`,
-    updateLocations: (id: string | null) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/locations/update/${id}`,
+    updateLocations: (id: string | undefined) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/locations/update/${id}`,
     fetchLocations: `${process.env.NEXT_PUBLIC_BACK_END_URL}/locations`,
     deleteLocation: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/locations/delete/${id}`,
 };
@@ -30,7 +30,7 @@ export const createLocation = async (locationsData: any) => {
     }
   };
 
-  export const updateLocation = async (_id: string | null, locationsData: any) => {
+  export const updateLocation = async (_id: string | undefined, locationsData: any) => {
     try {
       console.log('crb_locationsData', _id)
       const result = await axios.put(urls.updateLocations(_id), locationsData, { withCredentials: true });

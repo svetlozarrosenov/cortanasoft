@@ -217,12 +217,12 @@ export default function SuppliesPage() {
       products: prev.products.filter((_, i) => i !== index),
     }));
   };
-
+const statusOptions: any = []
   const handleProductChange = (index: number, field: keyof SupplyProduct, value: string | number | boolean) => {
     const updatedProducts = formData.products.map((p, i) => {
       if (i === index) {
         if (field === 'productId') {
-          const product = products.find((prod) => prod._id === value);
+          const product = products.find((prod: any) => prod._id === value);
           return {
             ...p,
             productId: value as string,
@@ -315,7 +315,7 @@ export default function SuppliesPage() {
 
     try {
       const totalPrice = formData.products.reduce((sum, p) => {
-        const product = products.find((prod) => prod._id === p.productId);
+        const product = products.find((prod: any) => prod._id === p.productId);
         return sum + (product ? product.price * p.quantity : 0);
       }, 0);
 
@@ -398,7 +398,7 @@ export default function SuppliesPage() {
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
                   <option value="">Избери доставчик...</option>
-                  {suppliers?.map((supplier) => (
+                  {suppliers?.map((supplier: any) => (
                     <option key={supplier._id} value={supplier._id}>
                       {supplier.companyName}
                     </option>
@@ -416,7 +416,7 @@ export default function SuppliesPage() {
                   className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                 >
                   <option value="">Избери локация...</option>
-                  {locations?.map((location) => (
+                  {locations?.map((location: any) => (
                     <option key={location._id} value={location._id}>
                       {location.name} ({location.type})
                     </option>
@@ -437,7 +437,7 @@ export default function SuppliesPage() {
                         className="flex-1 mr-2 border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
                       >
                         <option value="">Избери продукт...</option>
-                        {products?.map((product) => (
+                        {products?.map((product: any) => (
                           <option key={product._id} value={product._id}>
                             {product.name}
                           </option>
@@ -601,7 +601,7 @@ export default function SuppliesPage() {
               <p><strong>Доставчик:</strong> {selectedSupply.companyName}</p>
               <p><strong>Обща цена:</strong> {formatPrice(selectedSupply.totalPrice, selectedSupply.currency)}</p>
               <p><strong>Цена на доставка:</strong> {formatPrice(selectedSupply.price, selectedSupply.currency)}</p>
-              <p><strong>Статус:</strong> {statusOptions.find((opt) => opt.value === selectedSupply.status)?.label || selectedSupply.status}</p>
+              <p><strong>Статус:</strong> {statusOptions.find((opt: any) => opt.value === selectedSupply.status)?.label || selectedSupply.status}</p>
               <p><strong>Дата на доставка:</strong> {new Date(selectedSupply.deliveryDate).toLocaleString('bg-BG')}</p>
             </div>
             <div className="ag-theme-alpine" style={{ height: 200, width: '100%' }}>

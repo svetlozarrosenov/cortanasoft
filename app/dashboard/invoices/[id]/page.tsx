@@ -65,7 +65,7 @@ const generateInvoiceNumber = (orderId: string) => {
 };
 
 // Стилове за PDF
-const pdfStyles = StyleSheet.create({
+const pdfStyles:any = StyleSheet.create({
   page: {
     flexDirection: 'column',
     padding: 40,
@@ -97,7 +97,7 @@ const pdfStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   table: {
-    display: 'table',
+    // display: 'table',
     width: '100%',
     borderStyle: 'solid',
     borderWidth: 1,
@@ -138,7 +138,7 @@ const pdfStyles = StyleSheet.create({
     paddingTop: 5,
     marginLeft: 'auto',
   },
-});
+}) as any;
 
 // Компонент за PDF документа
 const InvoiceDocument = ({ order, client, invoiceNumber }: { order: Order; client: Client; invoiceNumber: string }) => {
@@ -299,8 +299,8 @@ export default function InvoicePage() {
   const orderId = params.id as string;
   const { orders } = useOrders();
   const { clients } = useClients();
-  const order = orders?.find((o) => o._id === orderId);
-  const client = clients?.find((c) => c._id === order?.clientId);
+  const order = orders?.find((o: any) => o._id === orderId);
+  const client = clients?.find((c: any) => c._id === order?.clientId);
   const invoiceNumber = order ? generateInvoiceNumber(order._id) : '';
 
   if (!order || !client) {

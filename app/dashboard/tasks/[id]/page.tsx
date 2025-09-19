@@ -172,7 +172,7 @@ export default function TaskDetailsPage() {
             <h2 className="text-2xl font-semibold text-white mb-6">Коментари</h2>
             {task.comments?.length ? (
               <div className="space-y-6">
-                {task.comments.map((comment, index) => (
+                {task.comments.map((comment: any, index: any) => (
                   <div key={index} className="flex gap-4 bg-gray-700 rounded-lg p-6 shadow-md">
                     <div className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
                       {getUserName(comment.author)[0]}

@@ -42,7 +42,7 @@ export default function DashboardPage() {
           <p className="text-2xl font-bold">{tasks?.length || 0}</p>
           <ul className="mt-2 space-y-1 text-sm text-gray-100">
             {tasks?.length ? (
-              tasks?.slice(0, 3).map((task, key) => (
+              tasks?.slice(0, 3).map((task: any, key: any) => (
                 <li key={key}>{task.title}</li>
               ))
             ) : (

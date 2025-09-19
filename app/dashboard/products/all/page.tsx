@@ -154,7 +154,7 @@ export default function ProductsPage() {
         category: formData.category,
       };
       if (isEditMode) {
-        await updateProduct(formData._id!, dataToSubmit);
+        await updateProduct(formData._id!);
       } else {
         await createProduct(dataToSubmit);
       }

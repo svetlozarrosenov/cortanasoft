@@ -11,7 +11,7 @@ import { findTableFields } from '@/utils/helpers';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface Client {
-  _id: string;
+  _id?: string;
   firstName: string;
   middleName?: string;
   lastName?: string;
@@ -161,17 +161,17 @@ export default function ClientsPage() {
       isValid = false;
     }
 
-    if (!formData.phone.trim()) {
+    if (!formData?.phone?.trim()) {
       errors.phone = 'Телефонът е задължителен';
       isValid = false;
     }
 
-    if (!formData.city.trim()) {
+    if (!formData?.city?.trim()) {
       errors.city = 'Градът е задължителен';
       isValid = false;
     }
 
-    if (!formData.country.trim()) {
+    if (!formData?.country?.trim()) {
       errors.country = 'Държавата е задължителна';
       isValid = false;
     }

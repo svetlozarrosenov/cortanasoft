@@ -9,13 +9,13 @@ interface Option {
 interface MultiSelectProps {
   options: Option[];
   defaultValue?: Option[];
-  onChange?: (selected: Option[]) => void;
+  onChange?: (selected: any) => any;
 }
 
 export default function MultiSelect({ options, defaultValue = [], onChange }: MultiSelectProps) {
   const [selectedValues, setSelectedValues] = useState<Option[]>(defaultValue);
 
-  const handleChange = (selectedOptions: Option[]) => {
+  const handleChange = (selectedOptions: any) => {
     setSelectedValues(selectedOptions || []);
     if (onChange) {
       onChange(selectedOptions || []);
