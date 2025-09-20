@@ -4,19 +4,17 @@ import { useOrders } from '../../orders/hooks';
 import { useClients } from '../../clients/hooks';
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
 
-// Регистриране на Google Font Roboto с поддръжка на кирилица
-// ТОВА Е МЯСТОТО, КЪДЕТО ПОДАВАМ ШРИФТА ЧРЕЗ GOOGLE FONTS URL
 Font.register({
   family: 'Roboto',
-  src: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf', // Roboto Regular
+  src: '/fonts/roboto/static/Roboto-Regular.ttf', // Локален файл
 });
 Font.register({
   family: 'Roboto',
-  src: 'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc9.ttf', // Roboto Bold
+  src: '/fonts/roboto/static/Roboto-Bold.ttf', // Локален файл
   fontWeight: 'bold',
 });
 
-// Добавяне на пренасяне на думи за кирилица
+// Хифен callback-ът остава същият
 Font.registerHyphenationCallback((word) => {
   if (word.length <= 10) return [word];
   return [word.slice(0, 10), word.slice(10)];
