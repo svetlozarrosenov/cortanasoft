@@ -6,11 +6,11 @@ import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image, Font } 
 
 Font.register({
   family: 'Roboto',
-  src: 'fonts/roboto/static/Roboto-Regular.ttf', // Локален файл
+  src: '/fonts/Roboto/static/Roboto-Regular.ttf', // Локален файл
 });
 Font.register({
   family: 'Roboto',
-  src: 'fonts/roboto/static/Roboto-Bold.ttf', // Локален файл
+  src: '/fonts/Roboto/static/Roboto-Bold.ttf', // Локален файл
   fontWeight: 'bold',
 });
 
