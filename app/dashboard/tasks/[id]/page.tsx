@@ -126,7 +126,7 @@ export default function TaskDetailsPage() {
         assignee: typeof formData.assignee === 'object' ? formData.assignee._id : formData.assignee,
         deadline: formData.deadline ? new Date(formData.deadline).toISOString() : undefined,
       };
-      await updateTask(data);
+      await updateTask(id, data);
       mutate();
       setIsEditModalOpen(false);
     } catch (error) {

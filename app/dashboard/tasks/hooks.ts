@@ -3,7 +3,7 @@ import useSWR from 'swr';
 
 const urls = {
     addTasks: `${process.env.NEXT_PUBLIC_BACK_END_URL}/tasks/create`,
-    updateTask: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/tasks/update/${id}`,
+    updateTask: (id: any) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/tasks/update/${id}`,
     createTaskComment: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/tasks/${id}/comment/create`,
     fetchTasks: `${process.env.NEXT_PUBLIC_BACK_END_URL}/tasks`,
     fetchActiveTasks: `${process.env.NEXT_PUBLIC_BACK_END_URL}/tasks/active`,
@@ -22,9 +22,9 @@ export const createTask = async (tasksData: any) => {
     }
   };
 
-  export const updateTask = async (tasksData: any) => {
+  export const updateTask = async (taskId: any, tasksData: any) => {
     try {
-      const result = await axios.put(urls.updateTask(tasksData._id), tasksData, { withCredentials: true });
+      const result = await axios.put(urls.updateTask(taskId), tasksData, { withCredentials: true });
       return result.data;
     } catch (error) {
       console.error('Error registering user:', error);

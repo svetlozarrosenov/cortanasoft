@@ -12,7 +12,6 @@ import { findTableFields } from '@/utils/helpers';
 import DynamicForm from '@/components/form';
 import { fields } from './const';
 import { useForm } from 'react-hook-form';
-import { AxiosError } from 'axios';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -40,7 +39,7 @@ export default function TasksPage() {
   const { userRole } = useUserRole();
   const { users } = useCompanyUsers();
   const [backEndError, setBackEndError] = useState('');
-
+  const [currentTask, setCurrentTask] = useState<any>();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -93,20 +92,27 @@ export default function TasksPage() {
             params.value ? new Date(params.value).toLocaleDateString('bg-BG') : '-';
         }
         if (col.field === 'actions') {
-          colDef.cellRenderer = (params: any) => (
+          colDef.cellRenderer = (row: any) => (
             <button
               onClick={() => {
                 setIsModalOpen(true)
                 setIsEditMode(true)
+                setCurrentTask(row.data);
+                Object.keys(fields).map((fieldName: any) => {
+                  if(fieldName === 'reporter') {
+                    form.setValue('reporter', row.data[fieldName]._id)
+                  } else if(fieldName === 'assignee') {
+                    form.setValue('assignee', row.data[fieldName]._id)
+                  } else {
+                    form.setValue(fieldName, row.data[fieldName]);
+                  }
+                })
               }}
               className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
             >
               Редактирай
             </button>
           );
-          colDef.sortable = false;
-          colDef.filter = false;
-          colDef.width = 150;
         }
 
         return colDef;
@@ -116,7 +122,6 @@ export default function TasksPage() {
     }
   }, [userRole]);
 
-  // Добавяне на gridOptions за стилизиране на редовете
   const gridOptions = {
     getRowStyle: (params: any) => {
       if (params.node.rowIndex % 2 === 0) {
@@ -126,10 +131,15 @@ export default function TasksPage() {
   };
 
   const form = useForm({ mode: 'all' });
-
   const onSubmit = async (data: any) : Promise<any> => {
     try {
-      await createTask(data);
+      if(isEditMode) {
+        console.log('crb_currentTask', currentTask)
+        await updateTask(currentTask?._id, data);
+      } else {
+        await createTask(data);
+      }
+      
       setBackEndError('');
       setIsModalOpen(false);
       mutate();
@@ -194,7 +204,7 @@ export default function TasksPage() {
             <h2 className="text-lg font-semibold text-white mb-4">
               {isEditMode ? 'Редактирай задача' : 'Добави нова задача'}
             </h2>
-            <DynamicForm fields={newFields} form={form} onSubmit={onSubmit} backEndError={backEndError} />
+            <DynamicForm fields={newFields} form={form} onSubmit={onSubmit} backEndError={backEndError} onClose={() => setIsModalOpen(false)} />
           </div>
         </div>
       )}
