@@ -54,7 +54,6 @@ export default function LocationsPage() {
   useEffect(() => {
     if (userRole) {
       const table = findTableFields(userRole, "locationsSection", "locationsTable");
-      console.log('crb_table', table)
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
@@ -77,7 +76,6 @@ export default function LocationsPage() {
         }
 
         if (col.field === 'actions') {
-          console.log('crb_colDef', colDef)
           colDef.cellRenderer = (params: any) => (
             <div className="flex gap-2">
               <button

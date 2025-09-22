@@ -9,6 +9,10 @@ import { useTasks, createTask, updateTask } from './hooks';
 import { useCompanyUsers } from '../companies/[id]/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
+import DynamicForm from '@/components/form';
+import { fields } from './const';
+import { useForm } from 'react-hook-form';
+import { AxiosError } from 'axios';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -35,26 +39,11 @@ export default function TasksPage() {
   const { tasks: rowData, mutate } = useTasks();
   const { userRole } = useUserRole();
   const { users } = useCompanyUsers();
+  const [backEndError, setBackEndError] = useState('');
 
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<Task>({
-    title: '',
-    description: '',
-    deadline: '',
-    isRecurring: false,
-    recurrenceInterval: 'daily',
-    status: 'pending',
-    reporter: '',
-    assignee: '',
-  });
-  const [formErrors, setFormErrors] = useState({
-    title: '',
-    status: '',
-    reporter: '',
-    assignee: '',
-  });
 
   useEffect(() => {
     if (userRole) {
@@ -68,7 +57,6 @@ export default function TasksPage() {
           flex: col.flex || 1,
         };
 
-        // Прилагане на valueFormatter и cellRenderer за специфични колони
         if (col.field === 'title') {
           colDef.valueFormatter = (params) => `Задача: ${params.value || '-'}`;
           colDef.cellRenderer = (params: any) => (
@@ -107,7 +95,10 @@ export default function TasksPage() {
         if (col.field === 'actions') {
           colDef.cellRenderer = (params: any) => (
             <button
-              onClick={() => handleEditTask(params.data)}
+              onClick={() => {
+                setIsModalOpen(true)
+                setIsEditMode(true)
+              }}
               className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
             >
               Редактирай
@@ -134,100 +125,40 @@ export default function TasksPage() {
     },
   };
 
-  const handleAddTask = () => {
-    setIsEditMode(false);
-    setFormData({
-      title: '',
-      description: '',
-      deadline: '',
-      isRecurring: false,
-      recurrenceInterval: 'daily',
-      status: 'pending',
-      reporter: '',
-      assignee: '',
-    });
-    setFormErrors({ title: '', status: '', reporter: '', assignee: '' });
-    setIsModalOpen(true);
-  };
+  const form = useForm({ mode: 'all' });
 
-  const handleEditTask = (task: Task) => {
-    setIsEditMode(true);
-    setFormData(task);
-    setFormErrors({ title: '', status: '', reporter: '', assignee: '' });
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setFormErrors({ title: '', status: '', reporter: '', assignee: '' });
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target;
-    if (type === 'checkbox') {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: (e.target as HTMLInputElement).checked,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-    setFormErrors((prev) => ({ ...prev, [name]: '' }));
-  };
-
-  const validateForm = () => {
-    const errors = { title: '', status: '', reporter: '', assignee: '' };
-    let isValid = true;
-
-    if (!formData.title.trim()) {
-      errors.title = 'Заглавието е задължително';
-      isValid = false;
-    }
-
-    if (!formData.status) {
-      errors.status = 'Статусът е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.reporter) {
-      errors.reporter = 'Възложителят е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.assignee) {
-      errors.assignee = 'Отговорникът е задължителен';
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
+  const onSubmit = async (data: any) : Promise<any> => {
     try {
-      const data = {
-        ...formData,
-        deadline: formData.deadline ? new Date(formData.deadline).toISOString() : undefined,
-      };
-      if (isEditMode) {
-        await updateTask(data);
-      } else {
-        await createTask(data);
-      }
+      await createTask(data);
+      setBackEndError('');
+      setIsModalOpen(false);
       mutate();
-      closeModal();
-    } catch (error) {
-      console.error('Грешка при изпращане на заявката:', error);
+    } catch(e: any) {
+      setBackEndError(e.message);
     }
-  };
+  }
+
+  const newFields: any = {
+    ...fields,
+    reporter: {
+      ...fields.reporter,
+      options: users?.map((user: any) => {
+        return {value: user._id, label: user.firstName + ' ' + user.lastName}
+      })
+    },
+    assignee: {
+      ...fields.assignee,
+      options: users?.map((user: any) => {
+        return {value: user._id, label: user.firstName + ' ' + user.lastName}
+      })
+    }
+  }
+
+  const watchIsRecurring = form.watch('isRecurring')
+
+  if(!watchIsRecurring) {
+    delete newFields.recurrenceInterval
+  }
 
   return (
     <div className="bg-gray-800 min-h-screen p-6">
@@ -235,7 +166,7 @@ export default function TasksPage() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-white">Задачи</h2>
           <button
-            onClick={handleAddTask}
+            onClick={() => setIsModalOpen(true)}
             className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
           >
             Добави задача
@@ -255,7 +186,7 @@ export default function TasksPage() {
           />
         </div>
       </div>
-
+      
       {/* Модал за добавяне/редактиране на задача */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -263,128 +194,7 @@ export default function TasksPage() {
             <h2 className="text-lg font-semibold text-white mb-4">
               {isEditMode ? 'Редактирай задача' : 'Добави нова задача'}
             </h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Заглавие</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                />
-                {formErrors.title && <p className="text-red-400 text-sm mt-1">{formErrors.title}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Описание</label>
-                <textarea
-                  name="description"
-                  value={formData.description || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Възложител</label>
-                <select
-                  name="reporter"
-                  value={formData.reporter}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="">Избери възложител...</option>
-                  {users?.map((user: User) => {
-                    console.log('crb_user_we', user)
-                    return (
-                    <option key={user._id} value={user._id}>
-                      {user.firstName + ' ' + user.lastName + ` (${user.email})`}
-                    </option>
-                  )})}
-                </select>
-                {formErrors.reporter && <p className="text-red-400 text-sm mt-1">{formErrors.reporter}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Отговорник</label>
-                <select
-                  name="assignee"
-                  value={formData.assignee}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="">Избери отговорник...</option>
-                  {users?.map((user: User) => (
-                    <option key={user._id} value={user._id}>
-                      {user.firstName + ' ' + user.lastName + ` (${user.email})`}
-                    </option>
-                  ))}
-                </select>
-                {formErrors.assignee && <p className="text-red-400 text-sm mt-1">{formErrors.assignee}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Краен срок</label>
-                <input
-                  type="datetime-local"
-                  name="deadline"
-                  value={formData.deadline || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Повтарящо се</label>
-                <input
-                  type="checkbox"
-                  name="isRecurring"
-                  checked={formData.isRecurring}
-                  onChange={handleInputChange}
-                  className="mt-1 h-4 w-4 text-cyan-500 focus:ring-cyan-500 bg-gray-800 border-gray-600 rounded"
-                />
-              </div>
-              {formData.isRecurring && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-white">Интервал на повторение</label>
-                  <select
-                    name="recurrenceInterval"
-                    value={formData.recurrenceInterval}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                  >
-                    <option value="daily">Дневно</option>
-                    <option value="weekly">Седмично</option>
-                    <option value="monthly">Месечно</option>
-                  </select>
-                </div>
-              )}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Статус</label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="pending">Чакаща</option>
-                  <option value="in_progress">В процес</option>
-                  <option value="completed">Завършена</option>
-                </select>
-                {formErrors.status && <p className="text-red-400 text-sm mt-1">{formErrors.status}</p>}
-              </div>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Отказ
-                </button>
-                <button
-                  type="submit"
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Запази
-                </button>
-              </div>
-            </form>
+            <DynamicForm fields={newFields} form={form} onSubmit={onSubmit} backEndError={backEndError} />
           </div>
         </div>
       )}

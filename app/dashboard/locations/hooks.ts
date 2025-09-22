@@ -32,7 +32,6 @@ export const createLocation = async (locationsData: any) => {
 
   export const updateLocation = async (_id: string | undefined, locationsData: any) => {
     try {
-      console.log('crb_locationsData', _id)
       const result = await axios.put(urls.updateLocations(_id), locationsData, { withCredentials: true });
       return result.data;
     } catch (error) {
