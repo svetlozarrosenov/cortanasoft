@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
-import { sectionStyles, containerStyles, buttonStyles, popupStyles, popupContentStyles, closeStyles, formStyles, inputStyles, submitStyles, titleStyles } from './styles';
+import styles from './demo.module.css';
+import Shell from '../shell';
 
 const SuccessSection: React.FC = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -14,37 +15,16 @@ const SuccessSection: React.FC = () => {
   };
 
   return (
-    <section style={sectionStyles}>
-      <div style={containerStyles}>
-        <h2 style={titleStyles}>Направете бизнеса си по-успешен с CortanaSoft</h2>
-        <button style={buttonStyles} onClick={handleButtonClick}>Заяви демо</button>
+    <div className={styles.demo}>
+      <Shell>
+        <div className={styles.demoInner}>
+          <h3 className={styles.demoTitle}>The starter package starts at only 200 BGN per month!</h3>
+          <p className={styles.demoContent}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour,</p>
 
-        {isPopupOpen && (
-          <div style={popupStyles}>
-            <div style={popupContentStyles}>
-              <span style={closeStyles} onClick={handleClosePopup}>&times;</span>
-              <h3>Започнете днес!</h3>
-              <p>Нашите специалисти ще се свържат с вас, за да обсъдят възможностите на системата и ще ви предоставят демо акаунт за тестване.</p>
-              <form style={formStyles}>
-                <input
-                  type="text"
-                  placeholder="Вашето име"
-                  style={inputStyles}
-                  required
-                />
-                <input
-                  type="email"
-                  placeholder="Вашата електронна поща"
-                  style={inputStyles}
-                  required
-                />
-                <button type="submit" style={submitStyles}>Изпрати</button>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
-    </section>
+          <button className={styles.demoButton}>Request Demo and Learn More</button>
+        </div>
+      </Shell>
+    </div>
   );
 };
 

@@ -1,0 +1,59 @@
+.section {
+    padding: 110px 0;
+    padding-bottom: 94px;
+    background-color: #E0F7FF;
+}
+.title {
+    max-width: 700px; 
+    margin: 0 auto;
+    font-size: 50px;
+    font-weight: bold;
+}
+
+.content {
+    max-width: 900px; 
+    margin: 0 auto;
+    font-size: 20px;
+}
+.sectionInner { text-align: center; }
+
+.boxes {
+    margin: 0 auto;
+    padding-top: 30px;
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-between; 
+    align-items: center;
+    gap: 20px; 
+    max-width: 1270px; 
+}
+
+.box {
+    flex: 0 0 calc(50% - 20px);
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: #000;
+    background-color: #fff;
+}
+
+.boxInner {
+    display: flex;
+    flex-direction: row; /* Хоризонтално подреждане */
+    align-items: center;
+    gap: 8px; /* Разстояние между иконата и заглавието */
+  }
+  
+.boxTitle {
+    padding: 20px 0;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.boxContent {
+    font-size: 20px;
+}
+
+.boxIcon {
+    color: #00AFEF;
+    font-size: 30px;
+}

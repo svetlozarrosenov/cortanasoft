@@ -2,10 +2,11 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #fff;
   --primary: #0092b5; /* Главен цвят */
   --primary-dark: #007a99; /* По-тъмен нюанс за hover ефекти */
-  --text-on-primary: #ffffff; /* Текст върху главния цвят */
+  --text-on-primary-black: #000; /* Текст върху главния цвят */
+  --text-on-primary-white: #fff; /* Текст върху главния цвят */
 }
 
 @theme inline {
@@ -19,9 +20,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1a1a1a; /* По-тъмен фон за тъмен режим */
-    --foreground: #e0e0e0; /* Светъл текст за тъмен режим */
-    --text-on-primary: #ffffff; /* Запазва бял текст върху главния цвят */
+    --background: #fff; /* По-тъмен фон за тъмен режим */
+    --foreground: #000; /* Светъл текст за тъмен режим */
+    --text-on-primary-black: #000; /* Текст върху главния цвят */
+    --text-on-primary-white: #fff; /* Текст върху главния цвят */
   }
 }
 
@@ -33,7 +35,6 @@ body {
 
 .main {
   flex: 1;
-  padding-top: 74px;
   margin-left: 0;
   background-color: #f4f4f9; /* Светлосив фон за съвпадение с container */
   border-left: 1px solid #fff;
@@ -44,8 +45,12 @@ body {
   background-color: var(--primary);
 }
 
-.text-on-primary {
-  color: var(--text-on-primary);
+.text-on-primary-black {
+  color: var(--text-on-primary-black);
+}
+
+.text-on-primary-white {
+  color: var(--text-on-primary-white);
 }
 
 .bg-primary-dark:hover {

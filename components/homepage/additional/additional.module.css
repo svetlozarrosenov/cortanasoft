@@ -1,0 +1,40 @@
+.section {
+    padding-bottom: 110px;
+}
+
+.title {
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.boxes {
+    padding-top: 65px;
+    display: flex;
+    flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
+    justify-content: space-between; /* Разпределя елементите с максимално разстояние */
+    align-items: center;
+    gap: 20px; /* Разстояние между елементите */
+}
+
+.box {
+    flex: 0 0 calc(33% - 20px);
+    padding: 40px;
+    border-radius: 8px;
+    color: #fff;
+    background-color: #00AFEF;
+}
+
+.boxIcon {
+    font-size: 25px;
+    margin-bottom: 30px;
+}
+.boxTitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.boxContent {
+    font-size: 18px;
+}

@@ -1,0 +1,43 @@
+.section {
+    margin: 110px 0;
+    text-align: center;
+}
+
+.title {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.boxes {
+    padding-top: 65px;
+    display: flex;
+    flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
+    justify-content: space-between; /* Разпределя елементите с максимално разстояние */
+    align-items: center;
+    gap: 20px; /* Разстояние между елементите */
+}
+
+.box {
+    flex: 0 0 calc(25% - 20px);
+    padding: 40px;
+    border-radius: 8px;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #00AFEF;
+    border-radius: 30px;
+}
+
+.boxTitle {
+    font-size: 30px;
+    font-weight: bold;
+    color: #00AFEF;
+    margin-bottom: 20px;
+}
+
+.boxIcon { 
+    color: #00AFEF;
+    font-size: 40px;
+    text-align: center;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}

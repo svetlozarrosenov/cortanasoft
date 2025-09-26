@@ -1,0 +1,54 @@
+.section {
+    margin-bottom: 110px;
+}
+
+.title {
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.boxes {
+    padding-top: 65px;
+    display: flex;
+    flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
+    justify-content: space-between; /* Разпределя елементите с максимално разстояние */
+    align-items: center;
+    gap: 20px; /* Разстояние между елементите */
+}
+
+.box {
+    flex: 0 0 calc(33% - 20px);
+    padding: 40px;
+    border-radius: 8px;
+    color: #000;
+    background-color: #E0F7FF;
+    border: 1px solid #00AFEF;
+    border-radius: 25px;
+}
+
+.boxTitle {
+    font-size: 30px;
+    font-weight: bold;
+    color: #00AFEF;
+    margin-bottom: 20px;
+}
+
+.boxContent {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Разстояние между иконата и текста */
+    font-size: 16px;
+    font-family: var(--font-sans);
+    color: var(--text-on-primary);
+    margin: 5px 0;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+
+.boxIcon { 
+    color: #35BE3A;
+    font-size: 25px;
+}

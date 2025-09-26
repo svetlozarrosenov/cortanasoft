@@ -1,0 +1,27 @@
+.demoInner {
+  text-align: center;
+  padding: 40px;
+  border-radius: 20px;
+  color: #fff;
+  background-color: #00AFEF;
+}
+
+.demoTitle {
+  font-size: 40px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.demoContent {
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.demoButton {
+  font-size: 18px;
+  color: #00AFEF;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 10px
+}

@@ -1,0 +1,39 @@
+.lang-nav {
+    display: inline-block; /* За да заема само нужното пространство */
+    position: relative; /* За позициониране на втория елемент */
+    list-style: none; /* Премахва булетите */
+    padding: 0;
+    margin: 0;
+  }
+  
+  .lang-nav__item {
+    font-family: var(--font-sans); /* DM Sans от global.css */
+    color: var(--text-on-primary-white); /* Цвят от global.css */
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  /* Само първият елемент е видим по подразбиране */
+  .lang-nav__item:nth-child(1) {
+    display: block;
+  }
+  
+  /* Вторият елемент е скрит */
+  .lang-nav__item:nth-child(2) {
+    display: none;
+    position: absolute;
+    top: 100%; /* Показва се точно под първия елемент */
+    left: 0;
+    background-color: var(--primary); /* Фон от global.css */
+    width: 100%; /* Заема ширината на първия елемент */
+  }
+  
+  /* При ховър върху lang-nav контейнера, показваме втория елемент */
+  .lang-nav:hover .lang-nav__item:nth-child(2) {
+    display: block;
+  }
+  
+  /* Hover ефект за елементите */
+  .lang-nav__item:hover {
+    background-color: var(--primary-dark); /* Hover цвят от global.css */
+  }
