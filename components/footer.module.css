@@ -1,0 +1,38 @@
+.footer {
+  background-color: #F2FBFE;
+}
+
+.footerHead {
+  display: flex;
+  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
+  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
+  align-items: center;
+  gap: 20px; /* Разстояние между елементите */
+  border-bottom: 1px solid #000;
+  padding: 30px 0;
+}
+
+.footerFoot {
+  display: flex;
+  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
+  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
+  align-items: center;
+  gap: 20px; /* Разстояние между елементите */
+  padding: 30px 0;
+}
+
+.footerNav {
+  display: flex;
+  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
+  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
+  align-items: center;
+  gap: 20px; /* Разстояние между елементите */
+}
+
+.socials {
+  display: flex;
+  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
+  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
+  align-items: center;
+  gap: 20px; /* Разстояние между елементите */
+}
