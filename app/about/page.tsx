@@ -1,3 +1,4 @@
+import Info from '@/components/about/info';
 import Story from '@/components/about/story';
 import IntroSecondary from '@/components/common/introSecondary';
 import Demo from '@/components/demo';
@@ -9,6 +10,7 @@ export default function About() {
     <>
     <IntroSecondary />
     <Story image={'/images/about-1.png'} />
+    <Info />
     <Story image={'/images/about-2.png'} reversed />
     <Additional />
     <Demo />

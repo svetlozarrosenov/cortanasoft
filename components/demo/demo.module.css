@@ -1,3 +1,6 @@
+.demo {
+  margin-bottom: 50px;
+}
 .demoInner {
   text-align: center;
   padding: 40px;
@@ -13,15 +16,19 @@
 }
 
 .demoContent {
+  max-width: 800px;
+  margin: 0 auto;
   margin-bottom: 20px;
   font-size: 16px;
   font-weight: bold;
+  margin-bottom: 50px;
 }
 
 .demoButton {
-  font-size: 18px;
+  font-size: 23px;
+  font-weight: bold;
   color: #00AFEF;
   background-color: #fff;
-  border-radius: 5px;
-  padding: 10px
+  border-radius: 10px;
+  padding: 15px 45px;
 }

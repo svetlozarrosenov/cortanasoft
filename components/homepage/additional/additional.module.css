@@ -23,6 +23,12 @@
     border-radius: 8px;
     color: #fff;
     background-color: #00AFEF;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.05); /* Основна сянка отдолу и по-лека сянка отгоре */
+}
+
+.boxWhite {
+    background-color: #fff;
+    color: #000;
 }
 
 .boxIcon {
