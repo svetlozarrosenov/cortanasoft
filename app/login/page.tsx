@@ -105,7 +105,7 @@ const Login: React.FC = () => {
               />
 
               {errors[fields[key].name] && (
-                <p>{errors[fields[key].name]?.message}</p>
+                <p>{errors[fields[key].name]?.message as any}</p>
               )}
             </div>
           ))}
