@@ -1,11 +1,17 @@
 import React from 'react';
 import styles from './intro-secondary.module.css';
 
-const IntroSecondary: React.FC = () => {
+interface introInterface {
+  data: {
+    title: string;
+    content: string;
+  }
+}
+const IntroSecondary: React.FC<introInterface> = ({data}) => {
   return (
     <div className={styles.intro}>
-        <h1 className={styles.title}>For Cortana Soft</h1>
-        <p className={styles.content}>We are a team of passionate professionals who create innovative CRM and ERP solutions to help businesses in Bulgaria thrive.</p>
+        <h1 className={styles.title}>{data.title}</h1>
+        <p className={styles.content}>{data.content}</p>
     </div>
   );
 };
