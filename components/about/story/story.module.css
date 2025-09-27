@@ -1,0 +1,27 @@
+.section {
+    padding: 110px 0;
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-between; 
+    align-items: center;
+}
+
+.title {
+    font-size: 55px;
+    font-weight: 700;
+}
+
+.content {
+    font-size: 20px;
+}
+
+.featureImage {
+    width: 600px;
+}
+
+.sectionInner { width: 50%; }
+.image { width: 40%; }
+
+.storyReversed {
+    flex-direction: row-reverse;
+}

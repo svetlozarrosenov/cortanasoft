@@ -1,0 +1,21 @@
+.intro {
+    padding: 40px 0;
+    background-image: url('/images/intro-secondary.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--primary);
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.title {
+    font-size: 50px;
+    font-weight: bold;
+}
+
+.content {
+    font-size: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
