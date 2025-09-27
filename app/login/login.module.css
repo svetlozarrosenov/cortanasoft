@@ -1,0 +1,52 @@
+
+.login {
+    padding: 58px 20px;
+    border: 1px solid grey;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 50px auto;
+    width: 553px;
+    border-radius: 10px;
+}
+
+.form input {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid grey;
+    padding: 10px 20px;
+    min-width: 500px;
+}
+
+.form p {
+    margin-bottom: 20px;
+    color: red
+}
+
+.button {
+    border-radius: 5px;
+    margin-top: 20px;
+    padding: 10px 0;
+    background-color: #00AFEF;
+    color: #fff;
+    min-width: 500px;
+}
+
+.backEndError {
+    margin: 20px 0;
+    color: 000;
+    background-color: pink;
+    padding: 12px;
+    border-radius: 5px;
+}
+
+.loginHead { 
+    font-size: 38px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.loginText { 
+    color: #8F95B2;
+    font-size: 22px;
+    text-align: center;
+}

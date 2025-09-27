@@ -1,111 +1,124 @@
 'use client';
-import React, { useState, type FormEvent, type ChangeEvent } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from './hooks';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import styles from './login.module.css';
+import { fields } from './const';
+import { Controller, useForm } from 'react-hook-form';
+import IntroSecondary from '@/components/common/introSecondary';
 
 const Login: React.FC = () => {
+  const { user } = useAuth();
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [backEndError, setBackEndError] = useState('');
   const router = useRouter();
+  const { control, handleSubmit, formState: { errors } } = useForm({ mode: 'all' });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
+  const onSubmit = async (data: any) => {
+    console.log('crb_data', data);
     try {
-      // const token = await requestNotificationPermission();
-      await login({ email, password, firebaseId: 'token' });
+      await login({ ...data });
       router.push('/dashboard');
-    } catch (err) {
-      setError('Неуспешен опит за вход. Моля, проверете вашите данни.');
-    } finally {
-      setIsLoading(false);
+    } catch (e: any) {
+      setBackEndError(e.message);
     }
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>, setter: (value: string) => void) => {
-    setter(e.target.value);
-  };
-
   return (
-    <main className="bg-white min-h-screen py-16 px-4">
-      {/* Login Form Section (White) */}
-      <section className="bg-white py-16 px-4 md:px-8">
-        <div className="max-w-md mx-auto text-center">
-          <div className="mb-8">
-            <img src="/logo.svg" alt="CortanaSoft Logo" className="w-32 mx-auto" />
-          </div>
-          <h2 className="text-3xl font-bold mb-8 text-[#0092b5]">Вход в Cortana</h2>
-          <form onSubmit={handleSubmit} className="bg-[#0092b5] p-8 rounded-lg shadow-md text-white">
-            <div className="mb-6">
-              <label htmlFor="email" className="block mb-2 text-lg font-semibold">
-                Имейл адрес
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => handleInputChange(e, setEmail)}
-                required
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-white text-gray-900"
-              />
-            </div>
-            <div className="mb-6">
-              <label htmlFor="password" className="block mb-2 text-lg font-semibold">
-                Парола
-              </label>
-              <input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => handleInputChange(e, setPassword)}
-                required
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-white text-gray-900"
-              />
-            </div>
-            <button
-              type="submit"
-              className={`w-full py-3 px-6 rounded-lg font-bold text-[#0092b5] transition ${
-                isLoading ? 'bg-gray-300 cursor-not-allowed' : 'bg-white hover:bg-gray-100'
-              }`}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Влизане...' : 'Влез'}
-            </button>
-          </form>
-          {error && <p className="text-red-600 mt-4">{error}</p>}
-        </div>
-      </section>
+    <>
+      <IntroSecondary data={{ title: 'Login Page', content: '' }} /> 
 
-      {/* Forgot Password Section (Blue) */}
-      <section className="py-16 px-4 md:px-8 bg-[#0092b5] text-white text-center">
-        <div className="max-w-md mx-auto">
-          <Link href="/forgot-password" className="text-white hover:underline text-lg">
-            Забравена парола?
-          </Link>
-        </div>
-      </section>
+      <div className={styles.login}>
+        <h4 className={styles.loginHead}>
+          Hi, Welcome back!
+        </h4>
 
-      {/* Call to Action Section (White) */}
-      <section className="bg-white py-16 px-4 text-center">
-        <div className="max-w-md mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-[#0092b5]">Още нямате акаунт?</h2>
-          <Link
-            href="/signup"
-            className="inline-block bg-[#0092b5] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#007a99] transition"
+        <p className={styles.loginText}>
+          Login to your account to enjoy
+        </p>
+
+        {backEndError && <div className={styles.backEndError}>
+          {backEndError}
+        </div>}
+  
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          {Object.keys(fields).map((key) => (
+            <div key={fields[key].name}>
+              <label htmlFor={fields[key].name}>
+                {fields[key].label}
+                {fields[key].required && <span>*</span>}
+              </label>
+
+              <Controller
+                name={fields[key].name}
+                control={control}
+                rules={{
+                  required: fields[key].required ? `${fields[key].label} е задължително` : false,
+                  pattern: fields[key].pattern
+                    ? { value: fields[key].pattern, message: `Невалиден формат за ${fields[key].label}` }
+                    : undefined,
+                  min: fields[key].min !== undefined
+                    ? { value: fields[key].min, message: `Минимална стойност е ${fields[key].min}` }
+                    : undefined,
+                  max: fields[key].max !== undefined
+                    ? { value: fields[key].max, message: `Максимална стойност е ${fields[key].max}` }
+                    : undefined,
+                  minLength: fields[key].minLength
+                    ? { value: fields[key].minLength, message: `Минимум ${fields[key].minLength} символа` }
+                    : undefined,
+                  maxLength: fields[key].maxLength
+                    ? { value: fields[key].maxLength, message: `Максимум ${fields[key].maxLength} символа` }
+                    : undefined,
+                }}
+                render={({ field: { onChange, onBlur, value, ref } }) => {
+                  switch (fields[key].type) {
+                    case 'password':
+                      return (
+                        <input
+                          type="password"
+                          id={fields[key].name}
+                          placeholder={fields[key].placeholder}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value || ''}
+                          ref={ref}
+                          className={styles.input}
+                        />
+                      );
+                    case 'email':
+                      return (
+                        <input
+                          type="email"
+                          id={fields[key].name}
+                          placeholder={fields[key].placeholder}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value || ''}
+                          ref={ref}
+                          className={styles.input}
+                        />
+                      );
+                    default:
+                      return <></>;
+                  }
+                }}
+              />
+
+              {errors[fields[key].name] && (
+                <p>{errors[fields[key].name]?.message}</p>
+              )}
+            </div>
+          ))}
+
+          <button
+            className={styles.button}
+            type="submit"
           >
-            Регистрирайте се сега
-          </Link>
-        </div>
-      </section>
-    </main>
+            Log In
+          </button>
+        </form>
+      </div>
+    </>
   );
 };
 
