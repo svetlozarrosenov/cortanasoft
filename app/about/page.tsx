@@ -1,5 +1,5 @@
-import Info from '@/components/about/info';
-import Story from '@/components/about/story';
+import Info from '@/components/aboutPage/info';
+import Story from '@/components/aboutPage/story';
 import IntroSecondary from '@/components/common/introSecondary';
 import Demo from '@/components/demo';
 import Additional from '@/components/homepage/additional';

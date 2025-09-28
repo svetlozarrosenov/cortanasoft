@@ -1,7 +1,7 @@
 
 .login {
     padding: 58px 20px;
-    border: 1px solid grey;
+    border: 1px solid #EDEDED;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: 50px auto;
     width: 553px;
@@ -12,9 +12,10 @@
     margin-top: 20px;
     margin-bottom: 20px;
     border-radius: 5px;
-    border: 1px solid grey;
+    border: 1px solid #EDEDED;
     padding: 10px 20px;
     min-width: 500px;
+    background-color: #FBFBFB;
 }
 
 .form p {

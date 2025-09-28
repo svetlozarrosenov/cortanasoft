@@ -8,7 +8,7 @@
   justify-content: space-between; /* Разпределя елементите с максимално разстояние */
   align-items: center;
   gap: 20px; /* Разстояние между елементите */
-  border-bottom: 1px solid #000;
+  border-bottom: 2px solid #EDEDED;
   padding: 30px 0;
 }
 

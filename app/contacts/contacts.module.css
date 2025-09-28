@@ -1,81 +1,85 @@
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    text-align: center;
-    color: #2d3748;
-  }
-  
-  .title {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #0092b5;
-  }
-  
-  .description {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    padding: 0 10px;
-  }
-  
-  .contact {
-    margin-top: 30px;
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .contactLink {
-    color: #0092b5;
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-  
-  .contactLink:hover {
-    color: #09b4d0;
-    text-decoration: underline;
-  }
-  
-  .formGroup {
-    margin-bottom: 20px;
-    text-align: left;
-  }
-  
-  .input,
-  .textarea {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  .submitButton {
-    background-color: #0092b5;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .submitButton:hover {
-    background-color: #09b4d0;
-  }
-  
-  @media (max-width: 768px) {
-    .title {
-      font-size: 2rem;
-    }
-    .description {
-      font-size: 1rem;
-    }
-    .contact {
-      padding: 15px;
-    }
-  }
+.contact {
+  margin-bottom: 50px;
+  position: relative;
+}
+
+.head {
+  padding: 30px;
+  max-width: 1130;
+  margin: 0 auto;
+  border: 1px solid #D0D5DD;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.summary {
+  top: -40px;
+  position: relative;
+  width: 37%;
+  padding: 30px;
+  background-color: #00AFEF;
+  color: #fff;
+  border-radius: 20px;
+  padding-bottom: 100px;
+  height: 500px;
+}
+
+.summary h4 {
+  margin-bottom: 30px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.summary p {
+  width: 270px;
+  margin-bottom: 30px;
+  font-size: 15px;
+}
+
+.summary li {
+  margin-bottom: 30px;
+  font-size: 20px;
+}
+
+.form {
+  width: 60%;
+}
+
+.form input, .form textarea {
+  border: 1px solid #EDEDED;
+  border-radius: 5px;
+  width: 100%;
+  padding: 10px 20;
+  background-color: #FBFBFB;
+  margin-bottom: 20px;
+}
+
+.form label { display: block; }
+
+.form p { margin-top: -20px; margin-bottom: 20px; color: red }
+
+.form button {
+  border-radius: 5px;
+  padding: 10px 20px;
+  background-color: #00AFEF;
+  color: #fff;
+  float: right;
+}
+
+.form:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.feature {
+  position: relative;
+  padding-left: 35px;
+}
+
+.featureIcon { 
+  position: absolute; top: 7; left: 0; 
+}
