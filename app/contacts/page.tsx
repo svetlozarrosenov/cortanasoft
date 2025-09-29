@@ -1,6 +1,5 @@
 'use client';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import styles from './contacts.module.css';
 import { fields } from './const';
 import { Controller, useForm } from 'react-hook-form';
@@ -16,7 +15,7 @@ const Contacts: React.FC = () => {
   const onSubmit = async (data: any) => {
     console.log('crb_data', data);
     try {
-      await contact({ ...data });
+      await contact(data);
     } catch (e: any) {
       setBackEndError(e.message);
     }

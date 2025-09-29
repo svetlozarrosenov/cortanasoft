@@ -1,0 +1,203 @@
+.chatContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.iconWrapper {
+  position: relative; /* За позициониране на известието */
+}
+
+.chatIcon {
+  background-color: #00AFEF;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.chatIcon:hover {
+  transform: scale(1.1);
+}
+
+.chatNotch {
+  position: absolute;
+  bottom: 70px; /* Над иконката */
+  right: 0;
+  background-color: #fff;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+  white-space: nowrap;
+  animation: bounce 2s infinite; /* Анимация за известието */
+}
+
+/* Триъгълник под известието */
+.chatNotch::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 12px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #fff;
+}
+
+/* Анимация за известието */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.chatWindow {
+  width: 350px;
+  height: 500px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.chatWindow.closing {
+  animation: slideOut 0.3s ease-in-out forwards;
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.chatHeader {
+  background-color: #00AFEF;
+  color: #fff;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chatHeader h4 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.closeButton:hover {
+  transform: rotate(90deg);
+}
+
+.chatMessages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+}
+
+.message {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.userMessage {
+  background-color: #00AFEF;
+  color: #fff;
+  margin-left: auto;
+  text-align: right;
+}
+
+.botMessage {
+  background-color: #e0e0e0;
+  color: #000;
+  margin-right: auto;
+}
+
+.chatForm {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.chatInput {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.sendButton {
+  background-color: #00AFEF;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  margin-left: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.sendButton:hover {
+  background-color: #0086b3;
+}
+
+@media (max-width: 768px) {
+  .chatWindow {
+    width: 300px;
+    height: 400px;
+  }
+
+  .chatIcon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .chatNotch {
+    font-size: 12px;
+    padding: 6px 10px;
+    bottom: 60px;
+  }
+}

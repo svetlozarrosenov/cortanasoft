@@ -1,3 +1,4 @@
+import CortanaChat from '@/components/cortanaChat';
 import Demo from '@/components/demo';
 import Features from '@/components/features';
 import Additional from '@/components/homepage/additional';
@@ -21,6 +22,7 @@ export default function Home() {
     <Functionalities />
     <Demo />
     <FeaturesSecondary />
+    <CortanaChat />
     </>
   );
 }
