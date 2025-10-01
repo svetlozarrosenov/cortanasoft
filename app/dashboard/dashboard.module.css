@@ -1,0 +1,11 @@
+.dashboard {
+    display: flex;
+    justify-content: start;
+    width: 100%;
+    background-color: #E9EBED;
+}
+
+.content { 
+    width: 100%; margin-left: 300px;
+    background-color: #E9EBED;
+}

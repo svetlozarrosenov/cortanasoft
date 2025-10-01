@@ -1,16 +1,27 @@
+'use client';
 import React from 'react';
 import Link from 'next/link';
 import styles from './footer.module.css';
 import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram } from 'react-icons/fa';
 import Shell from './shell';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 const Footer: React.FC = () => {
-  return (
+  const pathname = usePathname();
+  const isDashboard = pathname?.startsWith('/dashboard') ?? false;
+  return !isDashboard && (
     <footer className={styles.footer}>
       <Shell>
         <div className={styles.footerInner}>
           <div className={styles.footerHead}>
-            <div className={styles.logo}><Link href={'/'}>CortanaSoft</Link></div>
+            <div className={styles.logo}><Link href={'/'}><Image
+                  src="/CortanaSoftLogo.svg"
+                  alt="CortanaSoft Logo"
+                  width={282}
+                  height={100}
+                  className={styles.featureImage}
+                /></Link></div>
 
             <ul className={styles.footerNav}>
               <li>

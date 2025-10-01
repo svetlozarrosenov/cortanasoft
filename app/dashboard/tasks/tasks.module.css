@@ -1,0 +1,17 @@
+.grid {
+    padding: 40px;
+    background-color: #E9EBED;
+    height: 100%;
+    width: 100%;
+}
+
+.title { 
+    margin-bottom: 30px;
+    font-size: 24px; 
+    font-weight: bold;
+}
+
+.table { 
+    width: 100%;
+    height: 600px; 
+}

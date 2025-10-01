@@ -4,12 +4,16 @@
 }
 .headerInner {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: end;
 }
 
 .headerInnerSecondary {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-left: 340px;
+}
+
+.headerDashboard {
+  margin-left: 490px;
 }

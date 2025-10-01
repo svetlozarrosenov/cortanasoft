@@ -10,6 +10,11 @@ const Navigation: React.FC = () => {
   return (
     <ul className={styles.headerNav}>
       <li className={styles.headerNavLink}>
+        <Link href="/dashboard">
+          Dashboard
+        </Link>
+      </li>
+      <li className={styles.headerNavLink}>
         <Link href="/">
           Home
         </Link>

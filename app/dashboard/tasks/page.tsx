@@ -12,6 +12,7 @@ import { findTableFields } from '@/utils/helpers';
 import DynamicForm from '@/components/form';
 import { fields } from './const';
 import { useForm } from 'react-hook-form';
+import styles from './tasks.module.css';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -125,7 +126,7 @@ export default function TasksPage() {
   const gridOptions = {
     getRowStyle: (params: any) => {
       if (params.node.rowIndex % 2 === 0) {
-        return { background: '#0092b5' };
+        return { background: '#E0F7FF' };
       }
     },
   };
@@ -171,18 +172,11 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="bg-gray-800 min-h-screen p-6">
-      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Задачи</h2>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-          >
-            Добави задача
-          </button>
-        </div>
-        <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+    <div className={styles.grid}>
+      <div className={styles.head}>
+        <h3 className={styles.title}>Tasks</h3>
+      </div>
+        <div className={styles.table}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
@@ -195,19 +189,6 @@ export default function TasksPage() {
             }}
           />
         </div>
-      </div>
-      
-      {/* Модал за добавяне/редактиране на задача */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold text-white mb-4">
-              {isEditMode ? 'Редактирай задача' : 'Добави нова задача'}
-            </h2>
-            <DynamicForm fields={newFields} form={form} onSubmit={onSubmit} backEndError={backEndError} onClose={() => setIsModalOpen(false)} />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
