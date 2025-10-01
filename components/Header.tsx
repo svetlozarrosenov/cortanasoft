@@ -15,7 +15,7 @@ const Header: React.FC = () => {
   const isDashboard = pathname?.startsWith('/dashboard') ?? false;
   
   return (
-    <header className={classNames(styles.header, styles.headerDashboard)}>
+    <header className={classNames(styles.header, isDashboard ? styles.headerDashboard : null)}>
       <Shell>
         <div className={styles.headerInner}>
           {!isDashboard && (<div className='logo'>
