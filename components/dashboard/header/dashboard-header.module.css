@@ -1,0 +1,13 @@
+.header {
+    padding: 0 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+}
+
+.company { 
+    font-size: 20px;
+    color: var(--text-on-primary-blue);
+}

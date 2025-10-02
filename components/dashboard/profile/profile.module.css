@@ -1,0 +1,15 @@
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 20px;
+    border-left: 1px solid#EEEFF2;
+}
+
+.image {
+    width: 80px;
+    height: aut0; 
+}
+
+.user { font-size: 18px; color: #000; }

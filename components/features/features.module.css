@@ -11,9 +11,11 @@
 .title {
     font-size: 55px;
     font-weight: 700;
+    color: #000;
 }
 
 .content {
+    color: #3C3C3C;
     font-size: 18px;
     font-weight: 700;
 }
@@ -42,6 +44,7 @@
 
 .featureContent {
     font-size: 20px;
+    color: #808080;
 }
 
 .featureIcon {

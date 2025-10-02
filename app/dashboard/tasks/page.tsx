@@ -12,7 +12,7 @@ import { findTableFields } from '@/utils/helpers';
 import DynamicForm from '@/components/form';
 import { fields } from './const';
 import { useForm } from 'react-hook-form';
-import styles from './tasks.module.css';
+import styles from '../dashboard-grid.module.css';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -123,19 +123,10 @@ export default function TasksPage() {
     }
   }, [userRole]);
 
-  const gridOptions = {
-    getRowStyle: (params: any) => {
-      if (params.node.rowIndex % 2 === 0) {
-        return { background: '#E0F7FF' };
-      }
-    },
-  };
-
   const form = useForm({ mode: 'all' });
   const onSubmit = async (data: any) : Promise<any> => {
     try {
       if(isEditMode) {
-        console.log('crb_currentTask', currentTask)
         await updateTask(currentTask?._id, data);
       } else {
         await createTask(data);
@@ -173,14 +164,14 @@ export default function TasksPage() {
 
   return (
     <div className={styles.grid}>
-      <div className={styles.head}>
-        <h3 className={styles.title}>Tasks</h3>
-      </div>
+        <div className={styles.head}>
+          <h3 className={styles.title}>Задачи</h3>
+        </div>
+
         <div className={styles.table}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
-            gridOptions={gridOptions} // Добавяме gridOptions за стилизиране на редове
             pagination={true}
             paginationPageSize={10}
             defaultColDef={{

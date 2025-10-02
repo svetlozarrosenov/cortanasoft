@@ -7,6 +7,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { useSuppliers, createSupplier, updateSupplier } from '../suppliers/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
+import styles from '../dashboard-grid.module.css';
 
 // Регистриране на AG Grid модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -214,23 +215,15 @@ export default function SuppliersPage() {
     }
   };
 
-  return (
-    <div className="bg-gray-800 min-h-screen p-6">
-      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Доставчици</h2>
-          <button
-            onClick={handleAddSupplier}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-          >
-            Добави доставчик
-          </button>
-        </div>
-        <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+ return (
+    <div className={styles.grid}>
+      <div className={styles.head}>
+        <h3 className={styles.title}>Доставчици</h3>
+      </div>
+        <div className={styles.table}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
-            gridOptions={gridOptions}
             pagination={true}
             paginationPageSize={10}
             defaultColDef={{
@@ -239,112 +232,6 @@ export default function SuppliersPage() {
             }}
           />
         </div>
-      </div>
-
-      {/* Модал за добавяне/редактиране на доставчик */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {isEditing ? 'Редактирай доставчик' : 'Добави нов доставчик'}
-            </h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Име на компания</label>
-                <input
-                  type="text"
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                {formErrors.companyName && <p className="text-red-500 text-sm mt-1">{formErrors.companyName}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Отговорно лице</label>
-                <input
-                  type="text"
-                  name="responsiblePerson"
-                  value={formData.responsiblePerson}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                {formErrors.responsiblePerson && <p className="text-red-500 text-sm mt-1">{formErrors.responsiblePerson}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Имейл</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Телефон</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                {formErrors.phone && <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Адрес</label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                {formErrors.address && <p className="text-red-500 text-sm mt-1">{formErrors.address}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Град</label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                {formErrors.city && <p className="text-red-500 text-sm mt-1">{formErrors.city}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Държава</label>
-                <input
-                  type="text"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                {formErrors.country && <p className="text-red-500 text-sm mt-1">{formErrors.country}</p>}
-              </div>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Отказ
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  {isEditing ? 'Запази промените' : 'Запази'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

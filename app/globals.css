@@ -2,11 +2,12 @@
 
 :root {
   --background: #ffffff;
+  --background-blue: #00AFEF;
   --foreground: #fff;
-  --primary: #0092b5; /* Главен цвят */
-  --primary-dark: #007a99; /* По-тъмен нюанс за hover ефекти */
   --text-on-primary-black: #000; /* Текст върху главния цвят */
   --text-on-primary-white: #fff; /* Текст върху главния цвят */
+  --text-on-primary-blue: #00AFEF;
+  --text-on-primary-grey: #808080;
 }
 
 @theme inline {
@@ -24,6 +25,7 @@
     --foreground: #000; /* Светъл текст за тъмен режим */
     --text-on-primary-black: #000; /* Текст върху главния цвят */
     --text-on-primary-white: #fff; /* Текст върху главния цвят */
+    --text-on-primary-grey: #808080; /* Текст върху главния цвят */
   }
 }
 
@@ -55,4 +57,11 @@ body {
 
 .bg-primary-dark:hover {
   background-color: var(--primary-dark);
+}
+h1, h2, h3, h4, h5, a, input, label { color: var(--text-on-primary-black); }
+
+p { color: var(--text-on-primary-grey); }
+
+.ag-header-row {
+  background-color: rgb(224, 247, 255) !important;
 }

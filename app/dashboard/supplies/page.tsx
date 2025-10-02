@@ -10,6 +10,7 @@ import { useSupplies, createSupply } from './hooks';
 import { useLocations } from '../locations/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
+import styles from '../dashboard-grid.module.css';
 
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -358,22 +359,14 @@ const statusOptions: any = []
   ];
 
   return (
-    <div className="bg-gray-800 min-h-screen p-6">
-      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Доставки</h2>
-          <button
-            onClick={handleAddSupply}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-          >
-            Добави доставка
-          </button>
-        </div>
-        <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+    <div className={styles.grid}>
+      <div className={styles.head}>
+        <h3 className={styles.title}>Доставки</h3>
+      </div>
+        <div className={styles.table}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
-            gridOptions={gridOptions}
             pagination={true}
             paginationPageSize={10}
             defaultColDef={{
@@ -382,250 +375,5 @@ const statusOptions: any = []
             }}
           />
         </div>
-      </div>
-
-      {/* Модал за добавяне на доставка */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold text-white mb-4">Добави нова доставка</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Доставчик</label>
-                <select
-                  value={formData.supplierId}
-                  onChange={(e) => handleFieldChange('supplierId', e.target.value)}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="">Избери доставчик...</option>
-                  {suppliers?.map((supplier: any) => (
-                    <option key={supplier._id} value={supplier._id}>
-                      {supplier.companyName}
-                    </option>
-                  ))}
-                </select>
-                {formErrors.supplierId && (
-                  <p className="text-red-400 text-sm mt-1">{formErrors.supplierId}</p>
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Локация</label>
-                <select
-                  value={formData.locationId}
-                  onChange={(e) => handleFieldChange('locationId', e.target.value)}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="">Избери локация...</option>
-                  {locations?.map((location: any) => (
-                    <option key={location._id} value={location._id}>
-                      {location.name} ({location.type})
-                    </option>
-                  ))}
-                </select>
-                {formErrors.locationId && (
-                  <p className="text-red-400 text-sm mt-1">{formErrors.locationId}</p>
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white mb-2">Продукти</label>
-                {formData.products.map((prod, index) => (
-                  <div key={index} className="flex flex-col mb-4 p-4 bg-gray-800 rounded-md">
-                    <div className="flex items-center mb-2">
-                      <select
-                        value={prod.productId}
-                        onChange={(e) => handleProductChange(index, 'productId', e.target.value)}
-                        className="flex-1 mr-2 border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                      >
-                        <option value="">Избери продукт...</option>
-                        {products?.map((product: any) => (
-                          <option key={product._id} value={product._id}>
-                            {product.name}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => removeProduct(index)}
-                        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded transition duration-200"
-                      >
-                        X
-                      </button>
-                    </div>
-                    <div className="flex items-center mb-2">
-                      <label className="flex items-center gap-2 text-sm font-medium text-white">
-                        <input
-                          type="checkbox"
-                          checked={prod.isIndividual}
-                          onChange={(e) => handleProductChange(index, 'isIndividual', e.target.checked)}
-                          className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-600 rounded"
-                        />
-                        Индивидуален продукт
-                      </label>
-                    </div>
-                    <div className="mb-2">
-                      <label className="block text-sm font-medium text-white">Партиден номер</label>
-                      <input
-                        type="text"
-                        value={prod.lotNumber}
-                        onChange={(e) => handleProductChange(index, 'lotNumber', e.target.value)}
-                        className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                      />
-                    </div>
-                    <div className="mb-2">
-                      <label className="block text-sm font-medium text-white">Количество</label>
-                      <input
-                        type="number"
-                        value={prod.quantity}
-                        onChange={(e) => handleProductChange(index, 'quantity', Number(e.target.value))}
-                        disabled={prod.isIndividual}
-                        className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50 disabled:opacity-50"
-                        min="1"
-                      />
-                    </div>
-                    {prod.isIndividual && (
-                      <div className="mb-2">
-                        <label className="block text-sm font-medium text-white">Сериен номер</label>
-                        <input
-                          type="text"
-                          value={prod.serialNumber}
-                          onChange={(e) => handleProductChange(index, 'serialNumber', e.target.value)}
-                          className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                        />
-                      </div>
-                    )}
-                    <div className="mb-2">
-                      <label className="block text-sm font-medium text-white">Срок на годност</label>
-                      <input
-                        type="date"
-                        value={prod.expiryDate}
-                        onChange={(e) => handleProductChange(index, 'expiryDate', e.target.value)}
-                        className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                      />
-                    </div>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addProduct}
-                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded transition duration-200 mt-2"
-                >
-                  Добави продукт
-                </button>
-                {formErrors.products && (
-                  <p className="text-red-400 text-sm mt-1">{formErrors.products}</p>
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Дата на доставка</label>
-                <input
-                  type="date"
-                  value={formData.deliveryDate}
-                  onChange={(e) => handleFieldChange('deliveryDate', e.target.value)}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                />
-                {formErrors.deliveryDate && (
-                  <p className="text-red-400 text-sm mt-1">{formErrors.deliveryDate}</p>
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Цена на доставка</label>
-                <input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => handleFieldChange('price', e.target.value)}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                  min="0"
-                  step="0.01"
-                />
-                {formErrors.price && (
-                  <p className="text-red-400 text-sm mt-1">{formErrors.price}</p>
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Валута</label>
-                <select
-                  value={formData.currency}
-                  onChange={(e) => handleFieldChange('currency', e.target.value)}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="">Избери валута...</option>
-                  <option value="EUR">Евро</option>
-                  <option value="BGN">Лев</option>
-                </select>
-                {formErrors.currency && (
-                  <p className="text-red-400 text-sm mt-1">{formErrors.currency}</p>
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Статус</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => handleFieldChange('status', e.target.value)}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="">Избери статус...</option>
-                  <option value="pending">Очакваща</option>
-                  <option value="received">Получена</option>
-                  <option value="canceled">Отменена</option>
-                </select>
-                {formErrors.status && (
-                  <p className="text-red-400 text-sm mt-1">{formErrors.status}</p>
-                )}
-              </div>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Отказ
-                </button>
-                <button
-                  type="submit"
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Запази
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Попъп за детайли на доставката */}
-      {selectedSupply && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md">
-            <h2 className="text-lg font-semibold text-white mb-4">Детайли за доставка</h2>
-            <div className="mb-4 text-white">
-              <p><strong>Доставчик:</strong> {selectedSupply.companyName}</p>
-              <p><strong>Обща цена:</strong> {formatPrice(selectedSupply.totalPrice, selectedSupply.currency)}</p>
-              <p><strong>Цена на доставка:</strong> {formatPrice(selectedSupply.price, selectedSupply.currency)}</p>
-              <p><strong>Статус:</strong> {statusOptions.find((opt: any) => opt.value === selectedSupply.status)?.label || selectedSupply.status}</p>
-              <p><strong>Дата на доставка:</strong> {new Date(selectedSupply.deliveryDate).toLocaleString('bg-BG')}</p>
-            </div>
-            <div className="ag-theme-alpine" style={{ height: 200, width: '100%' }}>
-              <AgGridReact
-                rowData={selectedSupply.products}
-                columnDefs={detailColDefs}
-                domLayout="autoHeight"
-                defaultColDef={{
-                  flex: 1,
-                  minWidth: 100,
-                }}
-              />
-            </div>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={closeDetailPopup}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition duration-200"
-              >
-                Затвори
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
-}

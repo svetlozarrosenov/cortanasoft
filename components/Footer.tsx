@@ -6,12 +6,13 @@ import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram } from 'react-icons/f
 import Shell from './shell';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import classNames from 'classnames';
 
 const Footer: React.FC = () => {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith('/dashboard') ?? false;
-  return !isDashboard && (
-    <footer className={styles.footer}>
+  return (
+    <footer className={classNames(styles.footer, isDashboard ? styles.footerHidden : '')}>
       <Shell>
         <div className={styles.footerInner}>
           <div className={styles.footerHead}>

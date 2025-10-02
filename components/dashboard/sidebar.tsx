@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { Home, LogOut, Package } from 'lucide-react';
 import { FaPaperPlane } from 'react-icons/fa';
 import Image from 'next/image';
+import classNames from 'classnames';
 
 const Sidebar: React.FC<any> = () => {
     const { company } = useCurrentCompany();
@@ -60,7 +61,7 @@ const Sidebar: React.FC<any> = () => {
       </ul>
     </li>)
     
-    const item = (permission: any) => ( <li className={styles.item} key={permission.sectionId}>
+    const item = (permission: any) => ( <li className={classNames(styles.item, isActive(permission.url) ? styles.current : '')} key={permission.sectionId}>
       <div className={styles.icon}><FaPaperPlane /></div>
       <Link
         href={permission.url}
@@ -91,7 +92,7 @@ const Sidebar: React.FC<any> = () => {
             <Link
               href="/logout"
             >
-              <LogOut className="w-5 h-5" />
+              <div className={styles.icon}><FaPaperPlane /></div>
               Разлогване
             </Link>
           </li>

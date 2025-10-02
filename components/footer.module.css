@@ -36,3 +36,5 @@
   align-items: center;
   gap: 20px; /* Разстояние между елементите */
 }
+
+.footerHidden { display: none; }

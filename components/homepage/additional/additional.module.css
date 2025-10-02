@@ -21,24 +21,38 @@
     flex: 0 0 calc(33% - 20px);
     padding: 40px;
     border-radius: 8px;
-    color: #fff;
+    color: var(--text-on-primary-white);
     background-color: #00AFEF;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.05); /* Основна сянка отдолу и по-лека сянка отгоре */
 }
 
+.box p { color: var(--text-on-primary-white); }
 .boxWhite {
-    background-color: #fff;
-    color: #000;
+    background-color: var(--text-on-primary-white);
+}
+
+.boxWhite p {
+    color: var(--text-on-primary-black);
 }
 
 .boxIcon {
     font-size: 25px;
     margin-bottom: 30px;
 }
+
+.boxWhite .boxIcon {
+    color: var(--text-on-primary-blue);
+}
+
 .boxTitle {
+    color: var(--text-on-primary-white);
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 30px;
+}
+
+.boxWhite .boxTitle {
+    color: var(--text-on-primary-black);
 }
 
 .boxContent {

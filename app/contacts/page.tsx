@@ -13,7 +13,6 @@ const Contacts: React.FC = () => {
   const { control, handleSubmit, formState: { errors } } = useForm({ mode: 'all' });
 
   const onSubmit = async (data: any) => {
-    console.log('crb_data', data);
     try {
       await contact(data);
     } catch (e: any) {

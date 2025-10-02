@@ -10,6 +10,7 @@ import { findTableFields } from '@/utils/helpers';
 import { fields } from './const';
 import DynamicForm from '@/components/form';
 import { useForm } from 'react-hook-form';
+import styles from '../dashboard-grid.module.css';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -92,31 +93,15 @@ export default function ClientsPage() {
     }
   }, [userRole]);
 
-  const gridOptions = {
-    getRowStyle: (params: any) => {
-      if (params.node.rowIndex % 2 === 0) {
-        return { background: '#0092b5' };
-      }
-    },
-  };
-
   return (
-    <div className="bg-gray-800 min-h-screen p-6">
-      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Клиенти</h2>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-          >
-            Добави клиент
-          </button>
-        </div>
-        <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+    <div className={styles.grid}>
+      <div className={styles.head}>
+        <h3 className={styles.title}>Клиенти</h3>
+      </div>
+        <div className={styles.table}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
-            gridOptions={gridOptions}
             pagination={true}
             paginationPageSize={10}
             defaultColDef={{
@@ -125,9 +110,6 @@ export default function ClientsPage() {
             }}
           />
         </div>
-      </div>
-      
-      {isModalOpen && <DynamicForm fields={fields} form={form} onSubmit={onSubmit} backEndError={backEndError} onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 }

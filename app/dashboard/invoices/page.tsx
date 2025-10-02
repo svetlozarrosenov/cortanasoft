@@ -9,6 +9,7 @@ import { useInvoices } from './hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import Link from 'next/link';
+import styles from '../dashboard-grid.module.css';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -117,23 +118,15 @@ export default function InvoicesPage() {
     alert('Функция за добавяне на фактура не е имплементирана още.');
   };
 
-  return (
-    <div className="bg-gray-800 min-h-screen p-6">
-      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Фактури</h2>
-          <button
-            onClick={handleAddInvoice}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-          >
-            Добави фактура
-          </button>
-        </div>
-        <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+return (
+    <div className={styles.grid}>
+      <div className={styles.head}>
+        <h3 className={styles.title}>Фактури</h3>
+      </div>
+        <div className={styles.table}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
-            gridOptions={gridOptions}
             pagination={true}
             paginationPageSize={10}
             defaultColDef={{
@@ -142,7 +135,6 @@ export default function InvoicesPage() {
             }}
           />
         </div>
-      </div>
     </div>
   );
 }

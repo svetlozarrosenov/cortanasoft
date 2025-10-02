@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useCompanies, createCompany, updateCompany } from './hooks';
 import { useUserRole } from './[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
+import styles from '../dashboard-grid.module.css';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -190,18 +191,11 @@ export default function CompaniesPage() {
   };
 
   return (
-    <div className="bg-gray-800 min-h-screen p-6">
-      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Компании</h2>
-          <button
-            onClick={handleAddCompany}
-            className="bg-white text-[#0092b5] font-semibold py-2 px-4 rounded transition duration-200 hover:bg-gray-100"
-          >
-            Добави компания
-          </button>
-        </div>
-        <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+    <div className={styles.grid}>
+      <div className={styles.head}>
+        <h3 className={styles.title}>Компании</h3>
+      </div>
+        <div className={styles.table}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
@@ -213,177 +207,6 @@ export default function CompaniesPage() {
             }}
           />
         </div>
-      </div>
-
-      {/* Модал за добавяне/редактиране на компания */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold text-white mb-4">
-              {isEditMode ? 'Редактирай компания' : 'Добави нова компания'}
-            </h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Име на компанията</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-                {formErrors.name && <p className="text-red-400 text-sm mt-1">{formErrors.name}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Описание</label>
-                <textarea
-                  name="description"
-                  value={formData.description || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Индустрия</label>
-                <select
-                  name="industry"
-                  value={formData.industry || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                >
-                  <option value="">Избери индустрия...</option>
-                  <option value="trade">Търговия</option>
-                  <option value="manufacturing">Производство</option>
-                  <option value="services">Услуги</option>
-                  <option value="other">Друго</option>
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Имейл за контакт</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Телефон за контакт</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">ЕИК номер</label>
-                <input
-                  type="text"
-                  name="eik"
-                  value={formData.eik}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-                {formErrors.eik && <p className="text-red-400 text-sm mt-1">{formErrors.eik}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">ДДС номер</label>
-                <input
-                  type="text"
-                  name="vatNumber"
-                  value={formData.vatNumber || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">МОЛ</label>
-                <input
-                  type="text"
-                  name="personInCharge"
-                  value={formData.personInCharge}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-                {formErrors.personInCharge && (
-                  <p className="text-red-400 text-sm mt-1">{formErrors.personInCharge}</p>
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Държава</label>
-                <input
-                  type="text"
-                  name="country"
-                  value={formData.country || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Град</label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Адрес</label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Цена</label>
-                <input
-                  type="text"
-                  name="price"
-                  value={formData.price || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Таксуване</label>
-                <select
-                  name="charging"
-                  value={formData.charging}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-[#0092b5] focus:ring focus:ring-[#0092b5] focus:ring-opacity-50"
-                >
-                  <option value="monthly">Месечно</option>
-                  <option value="yearly">Годишно</option>
-                </select>
-              </div>
-              <input type="hidden" name="roleInTheSystem" value="client" />
-              <div className="flex justify-end gap-2 pt-4">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Отказ
-                </button>
-                <button
-                  type="submit"
-                  className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Запази
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

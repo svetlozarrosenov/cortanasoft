@@ -1,0 +1,68 @@
+.boxes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.box {
+    position: relative;
+    min-width: 300px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #A261F50D;
+}
+
+.icon {
+    font-size: 40px;
+    color: #A261F5;
+}
+
+.icon, .value, .title {
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.value {
+    font-size: 30px;
+    font-weight: bold;
+    color: #000;
+}
+
+.link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.content {
+    font-size: 12px;
+}
+
+/*orange*/
+.boxOrange {
+    background-color: #FF81020D;
+}
+.boxOrange .icon { color: #FF8102 }
+
+/*yellow*/
+
+.boxYellow {
+    background-color: #FFCC000D;
+}
+.boxYellow .icon { color: #FFCC00; }
+
+/*green*/
+.boxGreen { background-color: #04D1790D; }
+.boxGreen .icon { color: #04D178; }
+
+/*blue*/
+.boxBlue { background-color: #487AFF0D; }
+.boxBlue .icon { color: #487AFF; }

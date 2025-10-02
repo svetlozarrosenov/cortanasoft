@@ -12,7 +12,7 @@ import { useAvailableLots } from '../products/lots/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import Link from 'next/link';
-
+import styles from '../dashboard-grid.module.css';
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -321,154 +321,22 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="bg-gray-800 min-h-screen p-6">
-      <div className="bg-[#0092b5] rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-white">Поръчки</h2>
-          <button
-            onClick={handleAddOrder}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-          >
-            Добави поръчка
-          </button>
-        </div>
-        <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+    <div className={styles.grid}>
+      <div className={styles.head}>
+        <h3 className={styles.title}>Поръчки</h3>
+      </div>
+        <div className={styles.table}>
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
-            gridOptions={gridOptions}
+            pagination={true}
+            paginationPageSize={10}
             defaultColDef={{
               flex: 1,
               minWidth: 100,
             }}
           />
         </div>
-      </div>
-
-      {/* Модал за добавяне на поръчка */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#0092b5] rounded-lg shadow-md p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold text-white mb-4">Добави нова поръчка</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Клиент</label>
-                <select
-                  value={formData.clientId}
-                  onChange={handleClientChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="">Избери клиент...</option>
-                  {clients?.map((client: any) => (
-                    <option key={client._id} value={client._id}>
-                      {client.firstName} {client.lastName || ''}
-                    </option>
-                  ))}
-                </select>
-                {formErrors.clientId && <p className="text-red-400 text-sm mt-1">{formErrors.clientId}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white mb-2">Продукти</label>
-                {formData.products.map((prod, index) => (
-                  <div key={index} className="flex flex-col mb-4 p-4 bg-gray-800 rounded-md">
-                    <div className="flex items-center mb-2">
-                      <select
-                        value={prod.productId}
-                        onChange={(e) => handleProductChange(index, 'productId', e.target.value)}
-                        className="flex-1 mr-2 border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                      >
-                        <option value="">Избери продукт...</option>
-                        {products?.map((product: any) => (
-                          <option key={product._id} value={product._id}>
-                            {product.name}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => removeProduct(index)}
-                        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded transition duration-200"
-                      >
-                        X
-                      </button>
-                    </div>
-                    <div className="mb-2">
-                      <label className="block text-sm font-medium text-white">Партида</label>
-                      <select
-                        value={prod.lotId}
-                        onChange={(e) => handleProductChange(index, 'lotId', e.target.value)}
-                        className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                        disabled={!prod.productId}
-                      >
-                        <option value="">Избери партида...</option>
-                        {prod.productId &&
-                          lots
-                            ?.filter((lot: any) => lot.productId === prod.productId)
-                            .map((lot: any) => (
-                              <option key={lot._id} value={lot._id}>
-                                {lot.lotNumber} (Наличност: {lot.quantity}, Срок: {lot.expiryDate ? new Date(lot.expiryDate).toLocaleString('bg-BG') : 'Няма'})
-                              </option>
-                            ))}
-                      </select>
-                    </div>
-                    <div className="mb-2">
-                      <label className="block text-sm font-medium text-white">Количество</label>
-                      <input
-                        type="number"
-                        value={prod.quantity}
-                        onChange={(e) => handleProductChange(index, 'quantity', Number(e.target.value))}
-                        className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                        min="1"
-                        max={prod.lotId ? lots.find((lot: any) => lot._id === prod.lotId)?.quantity || 0 : 0}
-                        disabled={!prod.lotId}
-                      />
-                    </div>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addProduct}
-                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded transition duration-200 mt-2"
-                >
-                  Добави продукт
-                </button>
-                {formErrors.products && <p className="text-red-400 text-sm mt-1">{formErrors.products}</p>}
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Статус</label>
-                <select
-                  value={formData.status}
-                  onChange={handleStatusChange}
-                  className="mt-1 block w-full border border-gray-600 rounded-md p-2 bg-gray-800 text-white focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
-                >
-                  <option value="">Избери статус...</option>
-                  {statusOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                {formErrors.status && <p className="text-red-400 text-sm mt-1">{formErrors.status}</p>}
-              </div>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Отказ
-                </button>
-                <button
-                  type="submit"
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
-                >
-                  Запази
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
