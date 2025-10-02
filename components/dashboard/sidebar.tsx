@@ -64,7 +64,7 @@ const Sidebar: React.FC<any> = () => {
     const item = (permission: any) => { 
       const IconComponent = iconMap[permission.icon];
       return ( <li className={classNames(styles.item, isActive(permission.url) ? styles.current : '')} key={permission.sectionId}>
-        <div className={styles.icon}><IconComponent /></div>
+        {IconComponent && <div className={styles.icon}><IconComponent /></div>}
           <Link
             href={permission.url}
           >
