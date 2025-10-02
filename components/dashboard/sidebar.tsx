@@ -5,15 +5,15 @@ import styles from './sidebar.module.css';
 import { useCurrentCompany } from '@/app/dashboard/hooks';
 import { useUserRole } from '@/app/dashboard/companies/[id]/hooks';
 import { usePathname } from 'next/navigation';
-import { Home, LogOut, Package } from 'lucide-react';
-import { FaPaperPlane } from 'react-icons/fa';
+import { FaPaperPlane, FaSignOutAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import classNames from 'classnames';
+import { iconMap } from '../icons';
 
 const Sidebar: React.FC<any> = () => {
     const { company } = useCurrentCompany();
     const { userRole } = useUserRole();
-  
+    console.log('crb_userRole', userRole);
     const pathname = usePathname();
     const [isProductsOpen, setIsProductsOpen] = useState(false);
   
@@ -61,15 +61,18 @@ const Sidebar: React.FC<any> = () => {
       </ul>
     </li>)
     
-    const item = (permission: any) => ( <li className={classNames(styles.item, isActive(permission.url) ? styles.current : '')} key={permission.sectionId}>
-      <div className={styles.icon}><FaPaperPlane /></div>
-      <Link
-        href={permission.url}
-      >
-        
-        {permission.title}
-      </Link>
-    </li>)
+    const item = (permission: any) => { 
+      const IconComponent = iconMap[permission.icon];
+      return ( <li className={classNames(styles.item, isActive(permission.url) ? styles.current : '')} key={permission.sectionId}>
+        <div className={styles.icon}><IconComponent /></div>
+          <Link
+            href={permission.url}
+          >
+            
+            {permission.title}
+          </Link>
+        </li>)
+    }
   
   return (
       <nav  className={styles.sidebar}>
@@ -92,7 +95,7 @@ const Sidebar: React.FC<any> = () => {
             <Link
               href="/logout"
             >
-              <div className={styles.icon}><FaPaperPlane /></div>
+              <div className={styles.icon}><FaSignOutAlt /></div>
               Разлогване
             </Link>
           </li>

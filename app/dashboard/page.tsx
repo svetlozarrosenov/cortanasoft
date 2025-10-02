@@ -1,5 +1,6 @@
 import React from 'react';
 import DashboardBoxes from '@/components/dashboard/boxes';
+import Chart from '@/components/dashboard/chart';
 
 export default function DashboardPage() {
 
@@ -8,6 +9,7 @@ export default function DashboardPage() {
     <div>
       <DashboardBoxes />
 
+      <Chart />
     </div>
   );
 }

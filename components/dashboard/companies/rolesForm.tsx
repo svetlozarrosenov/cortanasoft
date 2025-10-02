@@ -25,6 +25,7 @@ interface Table {
 
 interface Section {
   sectionId: string;
+  icon: string;
   title: string;
   url: string;
   tables: Table[];
@@ -213,6 +214,7 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
       .map((section) => {
         const permission: Section = {
           sectionId: section.sectionId,
+          icon: section.icon,
           title: section.title,
           url: section.url,
           apis: section.apis,
