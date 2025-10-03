@@ -1,50 +1,53 @@
 'use client';
-
+import { createPortal } from 'react-dom';
+import styles from './form.module.css';
 import { Controller } from 'react-hook-form';
 import { FieldsConfig } from '@/app/dashboard/tasks/const';
+import classNames from 'classnames';
+import { AiOutlineClose } from 'react-icons/ai';
 
 interface DynamicFormProps {
   fields: FieldsConfig;
   form: any;
+  title: string;
   onSubmit: (data: any) => Promise<{ success: boolean; error?: string }>;
   backEndError: string | null;
-  onClose: () => void; // Added prop for closing the form
+  onClose: () => void;
 }
 
-export default function DynamicForm({ fields, form, onSubmit, backEndError, onClose }: DynamicFormProps) {
+export default function DynamicForm({ fields, form, onSubmit, backEndError, onClose, title }: DynamicFormProps) {
   const {
     control,
     handleSubmit,
     formState: { errors },
+    reset
   } = form;
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-50">
-      <div className="relative max-w-lg w-full mx-4 p-6 bg-white shadow-md rounded-lg">
-        <button
-          type="button"
-          onClick={() => {
-            form.reset();
+  return createPortal (
+    (<div className={styles.formContainer}>
+      <div className={styles.overlay}></div>
+      
+      <div className={styles.formContainerInner}>
+        <h2 className={styles.formTitle}>{title}</h2>
+
+        <AiOutlineClose onClick={() => {
+            reset();
             onClose()
           }}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+          className={styles.buttonX}
           aria-label="Затвори"
-        >
-          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        />
 
         {backEndError && (
-          <div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+          <div className={styles.backEndError}>
             {backEndError}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           {Object.keys(fields).map((key) => (
-            <div key={fields[key].name} className="flex flex-col">
-              <label htmlFor={fields[key].name} className="mb-1 text-sm font-medium text-gray-700">
+            <div key={fields[key].name} className={styles.formInner}>
+              <label htmlFor={fields[key].name} className={styles.label}>
                 {fields[key].label}
                 {fields[key].required && <span className="text-red-500">*</span>}
               </label>
@@ -82,9 +85,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                           onBlur={onBlur}
                           value={value || ''}
                           ref={ref}
-                          className={`p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-400 ${
-                            errors[fields[key].name] ? 'border-red-500' : 'border-gray-300'
-                          }`}
+                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                         />
                       );
                     case 'email':
@@ -97,9 +98,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                           onBlur={onBlur}
                           value={value || ''}
                           ref={ref}
-                          className={`p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-400 ${
-                            errors[fields[key].name] ? 'border-red-500' : 'border-gray-300'
-                          }`}
+                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                         />
                       );
                     case 'textarea':
@@ -111,9 +110,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                           onBlur={onBlur}
                           value={value || ''}
                           ref={ref}
-                          className={`p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-400 ${
-                            errors[fields[key].name] ? 'border-red-500' : 'border-gray-300'
-                          }`}
+                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                         />
                       );
                     case 'select':
@@ -124,9 +121,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                           onBlur={onBlur}
                           value={value || ''}
                           ref={ref}
-                          className={`p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 ${
-                            errors[fields[key].name] ? 'border-red-500' : 'border-gray-300'
-                          }`}
+                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                         >
                           <option value="" disabled>
                             Избери...
@@ -147,9 +142,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                           onBlur={onBlur}
                           checked={value || false}
                           ref={ref}
-                          className={`h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ${
-                            errors[fields[key].name] ? 'border-red-500' : ''
-                          }`}
+                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                         />
                       );
                     case 'radio':
@@ -165,7 +158,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                                 onBlur={onBlur}
                                 checked={value === option.value}
                                 ref={ref}
-                                className="text-blue-600 focus:ring-blue-500"
+                                className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                               />
                               <span className="text-gray-800">{option.label}</span>
                             </label>
@@ -182,9 +175,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                           onBlur={onBlur}
                           value={value || ''}
                           ref={ref}
-                          className={`p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-400 ${
-                            errors[fields[key].name] ? 'border-red-500' : 'border-gray-300'
-                          }`}
+                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                         />
                       );
                     default:
@@ -194,19 +185,20 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
               />
 
               {errors[fields[key].name] && (
-                <p className="mt-1 text-sm text-red-500">{errors[fields[key].name]?.message}</p>
+                <p className={styles.frontEndErrors}>{errors[fields[key].name]?.message}</p>
               )}
             </div>
           ))}
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200"
+            className={styles.buttonSubmit}
           >
-            Изпрати
+            Запази
           </button>
         </form>
       </div>
-    </div>
+    </div>),
+    document.body
   );
 }

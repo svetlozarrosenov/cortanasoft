@@ -1,0 +1,89 @@
+.formContainer {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+
+.overlay  {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #00AFEF;
+    z-index: 101;
+    opacity: .4;
+}
+
+.formContainerInner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    max-height: 900px; /* Запазваме максималната височина */
+    padding: 25px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    z-index: 999;
+    overflow-y: auto; /* Добавено: позволява вертикален скрол, ако съдържанието превиши max-height */
+    /* Опционално: overflow-x: hidden; за да скрие хоризонтален скрол, ако не е нужен */
+}
+
+.formTitle {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.buttonX {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #000;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    font-size: 30px;
+}
+
+.buttonX:hover {
+    transform: rotate(180deg);
+}
+
+.formField { 
+    width: 100%;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border: 1px solid #EDEDED;
+    border-radius: 10px;
+    background-color: #F3F3F3;
+}
+
+textarea.formField {
+    padding: 30px 20px;
+}
+
+.frontEndErrors {
+    color: red;
+}
+
+.formContainer label { 
+    display: block;
+    margin-bottom: 20px;
+}
+
+.buttonSubmit {
+    padding: 10px 50px;
+    width: 100%;
+}
+
+.backEndError {
+    padding: 20px 10px;
+    margin-bottom: 10px;
+    background-color: #FF5C00;
+    border-radius: 10px;
+}

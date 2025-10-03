@@ -1,3 +1,9 @@
+.head {
+    display: flex;
+  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
+  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
+  align-items: center;
+}
 .grid {
     background-color: #E9EBED;
     height: 100%;
