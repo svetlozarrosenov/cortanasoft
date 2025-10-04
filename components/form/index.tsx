@@ -45,12 +45,11 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-          {Object.keys(fields).map((key) => (
+          {Object.keys(fields).map((key) => {
+            console.log('crb_fields[key]', fields[key])
+            return (
             <div key={fields[key].name} className={styles.formInner}>
-              <label htmlFor={fields[key].name} className={styles.label}>
-                {fields[key].label}
-                {fields[key].required && <span className="text-red-500">*</span>}
-              </label>
+              {/* Премахнат общия label – преместен вътре в Controller за всеки type */}
 
               <Controller
                 name={fields[key].name}
@@ -77,106 +76,169 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                   switch (fields[key].type) {
                     case 'text':
                       return (
-                        <input
-                          type="text"
-                          id={fields[key].name}
-                          placeholder={fields[key].placeholder}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          value={value || ''}
-                          ref={ref}
-                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                        />
+                        <>
+                          <label 
+                            htmlFor={fields[key].name} 
+                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                          >
+                            {fields[key].label}
+                            {fields[key].required && <span className="text-red-500">*</span>}
+                          </label>
+                          <input
+                            type="text"
+                            id={fields[key].name}
+                            placeholder={fields[key].placeholder}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            value={value || ''}
+                            ref={ref}
+                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                          />
+                        </>
                       );
                     case 'email':
                       return (
-                        <input
-                          type="email"
-                          id={fields[key].name}
-                          placeholder={fields[key].placeholder}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          value={value || ''}
-                          ref={ref}
-                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                        />
+                        <>
+                          <label 
+                            htmlFor={fields[key].name} 
+                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                          >
+                            {fields[key].label}
+                            {fields[key].required && <span className="text-red-500">*</span>}
+                          </label>
+                          <input
+                            type="email"
+                            id={fields[key].name}
+                            placeholder={fields[key].placeholder}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            value={value || ''}
+                            ref={ref}
+                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                          />
+                        </>
                       );
                     case 'textarea':
                       return (
-                        <textarea
-                          id={fields[key].name}
-                          placeholder={fields[key].placeholder}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          value={value || ''}
-                          ref={ref}
-                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                        />
+                        <>
+                          <label 
+                            htmlFor={fields[key].name} 
+                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                          >
+                            {fields[key].label}
+                            {fields[key].required && <span className="text-red-500">*</span>}
+                          </label>
+                          <textarea
+                            id={fields[key].name}
+                            placeholder={fields[key].placeholder}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            value={value || ''}
+                            ref={ref}
+                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                          />
+                        </>
                       );
                     case 'select':
                       return (
-                        <select
-                          id={fields[key].name}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          value={value || ''}
-                          ref={ref}
-                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                        >
-                          <option value="" disabled>
-                            Избери...
-                          </option>
-                          {fields[key].options?.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
+                        <>
+                          <label 
+                            htmlFor={fields[key].name} 
+                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                          >
+                            {fields[key].label}
+                            {fields[key].required && <span className="text-red-500">*</span>}
+                          </label>
+                          <select
+                            id={fields[key].name}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            value={value || ''}
+                            ref={ref}
+                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                          >
+                            <option value="" disabled>
+                              Избери...
                             </option>
-                          ))}
-                        </select>
+                            {fields[key].options?.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </>
                       );
                     case 'checkbox':
                       return (
-                        <input
-                          type="checkbox"
-                          id={fields[key].name}
-                          onChange={(e) => onChange(e.target.checked)}
-                          onBlur={onBlur}
-                          checked={value || false}
-                          ref={ref}
-                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                        />
+                        <div className={styles.checkboxWrapper}> {/* Нов parent div за checkbox и label */}
+                          <input
+                            type="checkbox"
+                            id={fields[key].name}
+                            onChange={(e) => onChange(e.target.checked)}
+                            onBlur={onBlur}
+                            checked={value || false}
+                            ref={ref}
+                            className={classNames(styles.checkbox, errors[fields[key].name] ? styles.formFieldError : '')}
+                          />
+                          <label 
+                            htmlFor={fields[key].name} 
+                            className={classNames(styles.checkboxLabel, errors[fields[key].name] ? styles.labelError : '')}
+                          >
+                            {fields[key].label}
+                            {fields[key].required && <span className="text-red-500">*</span>}
+                          </label>
+                        </div>
                       );
                     case 'radio':
                       return (
-                        <div className="flex space-x-4">
-                          {fields[key].options?.map((option) => (
-                            <label key={option.value} className="flex items-center space-x-2">
-                              <input
-                                type="radio"
-                                name={fields[key].name}
-                                value={option.value}
-                                onChange={onChange}
-                                onBlur={onBlur}
-                                checked={value === option.value}
-                                ref={ref}
-                                className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                              />
-                              <span className="text-gray-800">{option.label}</span>
-                            </label>
-                          ))}
-                        </div>
+                        <>
+                          <label 
+                            htmlFor={fields[key].name} 
+                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                          >
+                            {fields[key].label}
+                            {fields[key].required && <span className="text-red-500">*</span>}
+                          </label>
+                          <div className="flex space-x-4">
+                            {fields[key].options?.map((option) => (
+                              <label key={option.value} className="flex items-center space-x-2">
+                                <input
+                                  type="radio"
+                                  name={fields[key].name}
+                                  value={option.value}
+                                  onChange={onChange}
+                                  onBlur={onBlur}
+                                  checked={value === option.value}
+                                  ref={ref}
+                                  className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                                />
+                                <span className="text-gray-800">{option.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </>
                       );
                     case 'datetime-local':
                       return (
-                        <input
-                          type="datetime-local"
-                          id={fields[key].name}
-                          placeholder={fields[key].placeholder}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          value={value || ''}
-                          ref={ref}
-                          className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                        />
+                        <>
+                          <label 
+                            htmlFor={fields[key].name} 
+                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                          >
+                            {fields[key].label}
+                            {fields[key].required && <span className="text-red-500">*</span>}
+                          </label>
+                          <input
+                            type="datetime-local"
+                            id={fields[key].name}
+                            placeholder={fields[key].placeholder}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            value={value || ''}
+                            ref={ref}
+                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                          />
+                        </>
                       );
                     default:
                       return <></>;
@@ -188,7 +250,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                 <p className={styles.frontEndErrors}>{errors[fields[key].name]?.message}</p>
               )}
             </div>
-          ))}
+          )})}
 
           <button
             type="submit"
