@@ -1,6 +1,5 @@
 .dashboard {
-    display: flex;
-    justify-content: start;
+    padding-left: 300px;
     width: 100%;
     background-color: #E9EBED;
     height: 100vh;

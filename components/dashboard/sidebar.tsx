@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './sidebar.module.css';
 import { useCurrentCompany } from '@/app/dashboard/hooks';
@@ -9,6 +9,7 @@ import { FaPaperPlane, FaSignOutAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import classNames from 'classnames';
 import { iconMap } from '../icons';
+import { createPortal } from 'react-dom';
 
 const Sidebar: React.FC<any> = () => {
     const { company } = useCurrentCompany();
@@ -16,7 +17,17 @@ const Sidebar: React.FC<any> = () => {
     console.log('crb_userRole', userRole);
     const pathname = usePathname();
     const [isProductsOpen, setIsProductsOpen] = useState(false);
-  
+
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+      setMounted(true);
+    }, []);
+
+    if (!mounted) {
+      return null;
+    }
+
     const toggleProductsMenu = () => {
       setIsProductsOpen((prev) => !prev);
     };
@@ -74,7 +85,7 @@ const Sidebar: React.FC<any> = () => {
         </li>)
     }
   
-  return (
+    return createPortal (
       <nav  className={styles.sidebar}>
         <div className={styles.logo}>
             <Link href="/">
@@ -100,7 +111,8 @@ const Sidebar: React.FC<any> = () => {
             </Link>
           </li>
         </ul>
-      </nav>
+      </nav>,
+      document.body
   );
 };
 

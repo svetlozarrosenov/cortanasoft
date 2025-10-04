@@ -1,0 +1,51 @@
+.title {
+    margin-bottom: 30px;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.taskContainer {
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    border-radius: 20px;
+}
+
+.head {
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.boxes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comments {
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.comment {
+    margin: 20px 0;
+    border-bottom: 2px solid #EDEDED;
+}
+
+.author {
+    margin-bottom: 20px;
+}
+
+.text {
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 2px solid #EDEDED;
+}
+
+.date {
+    margin-bottom: 20px;
+}
