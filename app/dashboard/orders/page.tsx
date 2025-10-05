@@ -140,10 +140,6 @@ export default function OrdersPage() {
             colDef.valueFormatter = (params) => new Date(params.value).toLocaleString('bg-BG');
           }
 
-          if (col.field === 'actions') {
-            colDef.cellRenderer = null; // Премахване на бутона за детайли
-          }
-
           return colDef;
         }),
       ];
@@ -167,7 +163,7 @@ export default function OrdersPage() {
     }
   }
 
-  console.log('crb_kdjjfdsf', fields)
+  console.log('crb_products', products)
   const newFields: any = {
     ...fields,
     clients: {
@@ -176,6 +172,11 @@ export default function OrdersPage() {
         return {value: user._id, label: user.firstName + ' ' + user.lastName}
       })
     },
+    products: {
+      ...fields.products,
+      productOptions: products?.map((product: any) => {return {value: product._id, label: product.name}}),
+      lotsOptions: lots?.map((lot: any) => {return {value: lot._id, label: lot.name}})
+    }
   }
 
   const handleClose = () => {

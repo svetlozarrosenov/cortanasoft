@@ -1,4 +1,4 @@
-export type FieldType = 'text' | 'email' | 'password' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'number' | 'datetime-local';
+export type FieldType = 'text' | 'email' | 'password' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'number' | 'datetime-local';
 
 export interface Field {
   name: string;
@@ -11,8 +11,11 @@ export interface Field {
   pattern?: RegExp;
   min?: number;
   max?: number;
+  productOptions?: { value: string; label: string }[];
+  batchOptions?: { value: string; label: string }[];
   minLength?: number;
   maxLength?: number;
+  lotsOptions?: { value: string; label: string }[];
 }
 
 export type FieldsConfig = Record<string, Field>;
@@ -25,7 +28,14 @@ export const fields: FieldsConfig = {
         required: true,
         options: [],
       },
-
+    products: {
+      type: 'multiselect',
+      name: 'products',
+      label: 'Продукти',
+      required: true,
+      productOptions: [],
+      lotsOptions: [],
+    },
     status: {
         type: 'select',
         name: 'status',

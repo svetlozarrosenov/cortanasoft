@@ -5,6 +5,8 @@ import { Controller } from 'react-hook-form';
 import { FieldsConfig } from '@/app/dashboard/tasks/const';
 import classNames from 'classnames';
 import { AiOutlineClose } from 'react-icons/ai';
+import MultiSelect from '../fields/multiselect';
+import MultiSelectButton from '../fields/multiselect/multiselectButton';
 
 interface DynamicFormProps {
   fields: FieldsConfig;
@@ -23,7 +25,6 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
     reset
   } = form;
 
-  console.log('crb_fields', fields);
   return createPortal (
     (<div className={styles.formContainer}>
       <div className={styles.overlay}></div>
@@ -46,212 +47,223 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-          {Object.keys(fields).map((key) => {
-            console.log('crb_fields[key]', fields[key])
+          {Object.keys(fields).map((key, index) => {
             return (
-            <div key={fields[key].name} className={styles.formInner}>
-              {/* Премахнат общия label – преместен вътре в Controller за всеки type */}
-
-              <Controller
-                name={fields[key].name}
-                control={control}
-                rules={{
-                  required: fields[key].required ? `${fields[key].label} е задължително` : false,
-                  pattern: fields[key].pattern
-                    ? { value: fields[key].pattern, message: `Невалиден формат за ${fields[key].label}` }
-                    : undefined,
-                  min: fields[key].min !== undefined
-                    ? { value: fields[key].min, message: `Минимална стойност е ${fields[key].min}` }
-                    : undefined,
-                  max: fields[key].max !== undefined
-                    ? { value: fields[key].max, message: `Максимална стойност е ${fields[key].max}` }
-                    : undefined,
-                  minLength: fields[key].minLength
-                    ? { value: fields[key].minLength, message: `Минимум ${fields[key].minLength} символа` }
-                    : undefined,
-                  maxLength: fields[key].maxLength
-                    ? { value: fields[key].maxLength, message: `Максимум ${fields[key].maxLength} символа` }
-                    : undefined,
-                }}
-                render={({ field: { onChange, onBlur, value, ref } }) => {
-                  switch (fields[key].type) {
-                    case 'text':
-                      return (
-                        <>
-                          <label 
-                            htmlFor={fields[key].name} 
-                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
-                          >
-                            {fields[key].label}
-                            {fields[key].required && <span className="text-red-500">*</span>}
-                          </label>
-                          <input
-                            type="text"
-                            id={fields[key].name}
-                            placeholder={fields[key].placeholder}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            value={value || ''}
-                            ref={ref}
-                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                          />
-                        </>
-                      );
-                    case 'email':
-                      return (
-                        <>
-                          <label 
-                            htmlFor={fields[key].name} 
-                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
-                          >
-                            {fields[key].label}
-                            {fields[key].required && <span className="text-red-500">*</span>}
-                          </label>
-                          <input
-                            type="email"
-                            id={fields[key].name}
-                            placeholder={fields[key].placeholder}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            value={value || ''}
-                            ref={ref}
-                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                          />
-                        </>
-                      );
-                    case 'textarea':
-                      return (
-                        <>
-                          <label 
-                            htmlFor={fields[key].name} 
-                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
-                          >
-                            {fields[key].label}
-                            {fields[key].required && <span className="text-red-500">*</span>}
-                          </label>
-                          <textarea
-                            id={fields[key].name}
-                            placeholder={fields[key].placeholder}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            value={value || ''}
-                            ref={ref}
-                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                          />
-                        </>
-                      );
-                    case 'select':
-                      return (
-                        <>
-                          <label 
-                            htmlFor={fields[key].name} 
-                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
-                          >
-                            {fields[key].label}
-                            {fields[key].required && <span className="text-red-500">*</span>}
-                          </label>
-                          <select
-                            id={fields[key].name}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            value={value || ''}
-                            ref={ref}
-                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                          >
-                            <option value="" disabled>
-                              Избери...
-                            </option>
-                            {fields[key].options?.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
+              <div key={index} className={styles.formInner}>
+                <Controller
+                  name={fields[key].name}
+                  control={control}
+                  rules={{
+                    required: fields[key].required ? `${fields[key].label} е задължително` : false,
+                    pattern: fields[key].pattern
+                      ? { value: fields[key].pattern, message: `Невалиден формат за ${fields[key].label}` }
+                      : undefined,
+                    min: fields[key].min !== undefined
+                      ? { value: fields[key].min, message: `Минимална стойност е ${fields[key].min}` }
+                      : undefined,
+                    max: fields[key].max !== undefined
+                      ? { value: fields[key].max, message: `Максимална стойност е ${fields[key].max}` }
+                      : undefined,
+                    minLength: fields[key].minLength
+                      ? { value: fields[key].minLength, message: `Минимум ${fields[key].minLength} символа` }
+                      : undefined,
+                    maxLength: fields[key].maxLength
+                      ? { value: fields[key].maxLength, message: `Максимум ${fields[key].maxLength} символа` }
+                      : undefined,
+                  }}
+                  render={({ field: { onChange, onBlur, value, ref } }) => {
+                    switch (fields[key].type) {
+                      case 'text':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                            <input
+                              type="text"
+                              id={fields[key].name}
+                              placeholder={fields[key].placeholder}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              value={value || ''}
+                              ref={ref}
+                              className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                            />
+                          </>
+                        );
+                      case 'email':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                            <input
+                              type="email"
+                              id={fields[key].name}
+                              placeholder={fields[key].placeholder}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              value={value || ''}
+                              ref={ref}
+                              className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                            />
+                          </>
+                        );
+                      case 'textarea':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                            <textarea
+                              id={fields[key].name}
+                              placeholder={fields[key].placeholder}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              value={value || ''}
+                              ref={ref}
+                              className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                            />
+                          </>
+                        );
+                      case 'select':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                            <select
+                              id={fields[key].name}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              value={value || ''}
+                              ref={ref}
+                              className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                            >
+                              <option value="" disabled>
+                                Избери...
                               </option>
-                            ))}
-                          </select>
-                        </>
-                      );
-                    case 'checkbox':
-                      return (
-                        <div className={styles.checkboxWrapper}> {/* Нов parent div за checkbox и label */}
-                          <input
-                            type="checkbox"
-                            id={fields[key].name}
-                            onChange={(e) => onChange(e.target.checked)}
-                            onBlur={onBlur}
-                            checked={value || false}
-                            ref={ref}
-                            className={classNames(styles.checkbox, errors[fields[key].name] ? styles.formFieldError : '')}
-                          />
-                          <label 
-                            htmlFor={fields[key].name} 
-                            className={classNames(styles.checkboxLabel, errors[fields[key].name] ? styles.labelError : '')}
-                          >
-                            {fields[key].label}
-                            {fields[key].required && <span className="text-red-500">*</span>}
-                          </label>
-                        </div>
-                      );
-                    case 'radio':
-                      return (
-                        <>
-                          <label 
-                            htmlFor={fields[key].name} 
-                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
-                          >
-                            {fields[key].label}
-                            {fields[key].required && <span className="text-red-500">*</span>}
-                          </label>
-                          <div className="flex space-x-4">
-                            {fields[key].options?.map((option) => (
-                              <label key={option.value} className="flex items-center space-x-2">
-                                <input
-                                  type="radio"
-                                  name={fields[key].name}
-                                  value={option.value}
-                                  onChange={onChange}
-                                  onBlur={onBlur}
-                                  checked={value === option.value}
-                                  ref={ref}
-                                  className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                                />
-                                <span className="text-gray-800">{option.label}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </>
-                      );
-                    case 'datetime-local':
-                      return (
-                        <>
-                          <label 
-                            htmlFor={fields[key].name} 
-                            className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
-                          >
-                            {fields[key].label}
-                            {fields[key].required && <span className="text-red-500">*</span>}
-                          </label>
-                          <input
-                            type="datetime-local"
-                            id={fields[key].name}
-                            placeholder={fields[key].placeholder}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            value={value || ''}
-                            ref={ref}
-                            className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
-                          />
-                        </>
-                      );
-                    default:
-                      return <></>;
-                  }
-                }}
-              />
+                              {fields[key].options?.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </>
+                        );
+                      case 'multiselect':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
 
-              {errors[fields[key].name] && (
-                <p className={styles.frontEndErrors}>{errors[fields[key].name]?.message}</p>
-              )}
-            </div>
-          )})}
+                            <MultiSelectButton fields={fields[key]} errors={errors} ref={ref}/>
+                          </>
+                        );
+                      case 'checkbox':
+                        return (
+                          <div className={styles.checkboxWrapper}>
+                            <input
+                              type="checkbox"
+                              id={fields[key].name}
+                              onChange={(e) => onChange(e.target.checked)}
+                              onBlur={onBlur}
+                              checked={value || false}
+                              ref={ref}
+                              className={classNames(styles.checkbox, errors[fields[key].name] ? styles.formFieldError : '')}
+                            />
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.checkboxLabel, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                          </div>
+                        );
+                      case 'radio':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                            <div className="flex space-x-4">
+                              {fields[key].options?.map((option) => (
+                                <label key={option.value} className="flex items-center space-x-2">
+                                  <input
+                                    type="radio"
+                                    name={fields[key].name}
+                                    value={option.value}
+                                    onChange={onChange}
+                                    onBlur={onBlur}
+                                    checked={value === option.value}
+                                    ref={ref}
+                                    className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                                  />
+                                  <span className="text-gray-800">{option.label}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </>
+                        );
+                      case 'datetime-local':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                            <input
+                              type="datetime-local"
+                              id={fields[key].name}
+                              placeholder={fields[key].placeholder}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              value={value || ''}
+                              ref={ref}
+                              className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                            />
+                          </>
+                        );
+                      default:
+                        return <></>;
+                    }
+                  }}
+                />
+
+                {errors[fields[key].name] && (
+                  <p className={styles.frontEndErrors}>{errors[fields[key].name]?.message}</p>
+                )}
+              </div>
+            )})}
 
           <button
             type="submit"
