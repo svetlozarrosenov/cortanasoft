@@ -40,9 +40,8 @@ export default function TasksPage() {
   const { tasks: rowData, mutate } = useTasks();
   const { userRole } = useUserRole();
   const { users } = useCompanyUsers();
-  const [backEndError, setBackEndError] = useState('');
-  const [successMessage, setSuccessMessage] = useState<any>();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [backEndError, setBackEndError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visible, setIsVisible] = useState(false);
 

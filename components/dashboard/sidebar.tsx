@@ -41,9 +41,6 @@ const Sidebar: React.FC<any> = () => {
       
       <button
         onClick={toggleProductsMenu}
-        className={`w-full flex items-center justify-between px-4 py-2 text-base rounded transition-colors duration-300 ${
-          isActive(permission.url) ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-        }`}
       >
         <div className="flex items-center gap-2">
           

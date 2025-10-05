@@ -10,6 +10,31 @@
     padding: 40px;
 }
 
+.sidebar li button {
+    padding: 0;
+    padding-right: 30px;
+    border: none;
+    position: relative
+} 
+
+.sidebar li button:hover {
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    box-shadow: none;
+} 
+
+.sidebar li button div {
+    font-size: 18px;
+}
+
+.sidebar li button svg {
+    position: absolute;
+    right: 0;
+    top: 5px;
+}
+
+
 .logo {
     margin-bottom: 30px;
 }

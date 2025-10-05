@@ -18,6 +18,15 @@
     margin-bottom: 30px;
 }
 
+.description {
+    margin-bottom: 30px;
+}
+
+.descriptionTitle {
+    margin-bottom: 30px;
+    font-size: 30px;
+}
+
 .boxes {
     display: flex;
     flex-wrap: wrap;

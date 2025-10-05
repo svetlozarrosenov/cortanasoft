@@ -11,6 +11,8 @@ import { fields } from './const';
 import DynamicForm from '@/components/form';
 import { useForm } from 'react-hook-form';
 import styles from '../dashboard-grid.module.css';
+import { FaEdit } from 'react-icons/fa';
+import SuccessMessage from '@/components/form/successMessage';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -29,10 +31,11 @@ export default function ClientsPage() {
   const { clients: rowData, mutate } = useClients();
   const { userRole } = useUserRole();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [backEndError, setBackEndError] = useState('');
   const [currentRow, setCurrentRow] = useState<Client>();
+  const [backEndError, setBackEndError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [visible, setIsVisible] = useState(false);
 
   const form = useForm({ mode: 'all' });
 
@@ -43,6 +46,7 @@ export default function ClientsPage() {
       } else {
         await createClient(data);
       }
+      setIsVisible(true);
       setIsModalOpen(false);
       mutate();
     } catch(e: any) {
@@ -78,12 +82,7 @@ export default function ClientsPage() {
         width: 150,
         pinned: 'right',
         cellRenderer: (params: any) => (
-          <button
-            onClick={() => handleEdit(params)}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-          >
-            Редактирай
-          </button>
+          <FaEdit className={styles.icon} onClick={() => handleEdit(params)} />
         ),
         sortable: false,
         filter: false,
@@ -93,10 +92,19 @@ export default function ClientsPage() {
     }
   }, [userRole]);
 
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setBackEndError('');
+  }
+
   return (
     <div className={styles.grid}>
+      {<SuccessMessage title="Успешно добавен клиент" message="Клиентът е добавен успешно" visible={visible} setIsVisible={setIsVisible} />}
+      {isModalOpen && <DynamicForm form={form} fields={fields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави клиент' />}
+
       <div className={styles.head}>
         <h3 className={styles.title}>Клиенти</h3>
+        <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>
           <AgGridReact

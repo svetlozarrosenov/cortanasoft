@@ -23,6 +23,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
     reset
   } = form;
 
+  console.log('crb_fields', fields);
   return createPortal (
     (<div className={styles.formContainer}>
       <div className={styles.overlay}></div>

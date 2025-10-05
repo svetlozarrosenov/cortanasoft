@@ -28,33 +28,35 @@ export default function TaskDetailsPage() {
         <div className={styles.head}>
           <ul className={styles.boxes}>
             <li className={styles.box}>
-              <h4>Deadline</h4>
+              <h4>Краен срок</h4>
               <p>{task.deadline}</p>
             </li>
 
             <li className={styles.box}>
-              <h4>Creator</h4>
+              <h4>Създател</h4>
               <p>{task.creator.name}</p>
             </li>
 
             <li className={styles.box}>
-              <h4>Responsible</h4>
+              <h4>Отговорник</h4>
               <p>{task.assignee.name}</p>
             </li>
 
             <li className={styles.box}>
-              <h4>Status</h4>
+              <h4>Статус</h4>
               <p>{statusMap[task.status]}</p>
             </li>
 
             <li className={styles.box}>
-              <h4>Recurring</h4>
+              <h4>Репортер</h4>
               <p>{task.reporter.name}</p>
             </li>
           </ul>
         </div>
 
         <div className={styles.description}>
+          <h3 className={styles.descriptionTitle}>Описание</h3>
+
           {task?.description}
         </div>
 

@@ -7,13 +7,18 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useClients } from '../clients/hooks';
 import { useProducts } from '../products/all/hooks';
-import { useOrders, createOrder } from './hooks';
+import { useOrders, createOrder, updateOrder } from './hooks';
 import { useAvailableLots } from '../products/lots/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import Link from 'next/link';
 import styles from '../dashboard-grid.module.css';
-// Регистриране на модули
+import { FaEdit } from 'react-icons/fa';
+import DynamicForm from '@/components/form';
+import SuccessMessage from '@/components/form/successMessage';
+import { useForm } from 'react-hook-form';
+import { fields } from './const';
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface Client {
@@ -59,12 +64,10 @@ interface Order {
   updatedAt: string;
 }
 
-// Функция за форматиране на цена в евро
 const formatPrice = (price: number) => {
   return price.toLocaleString('bg-BG', { style: 'currency', currency: 'EUR' });
 };
 
-// Опции за статус на поръчката
 const statusOptions = [
   { value: 'pending', label: 'В обработка' },
   { value: 'shipped', label: 'Изпратена' },
@@ -78,18 +81,12 @@ export default function OrdersPage() {
   const { lots } = useAvailableLots();
   const { orders: rowData, mutate } = useOrders();
   const { userRole } = useUserRole();
-
+  const [backEndError, setBackEndError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    clientId: '',
-    products: [] as OrderProduct[],
-    status: 'pending' as string,
-  });
-  const [formErrors, setFormErrors] = useState({
-    clientId: '',
-    products: '',
-    status: '',
-  });
+  const [visible, setIsVisible] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [currentRow, setCurrentRow] = useState<Client>();
+
 
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
 
@@ -154,176 +151,46 @@ export default function OrdersPage() {
     }
   }, [userRole]);
 
-  // Функция за отваряне на модала за добавяне
-  const handleAddOrder = () => {
-    setIsModalOpen(true);
-    setFormData({ clientId: '', products: [], status: 'pending' });
-    setFormErrors({ clientId: '', products: '', status: '' });
-  };
+  const form = useForm({ mode: 'all' });
 
-  // Функция за затваряне на модала за добавяне
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setFormData({ clientId: '', products: [], status: 'pending' });
-    setFormErrors({ clientId: '', products: '', status: '' });
-  };
-
-  // Функция за избор на клиент
-  const handleClientChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData((prev) => ({ ...prev, clientId: e.target.value }));
-    setFormErrors((prev) => ({ ...prev, clientId: '' }));
-  };
-
-  // Функция за избор на статус
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData((prev) => ({ ...prev, status: e.target.value }));
-    setFormErrors((prev) => ({ ...prev, status: '' }));
-  };
-
-  // Функция за добавяне на нов продукт
-  const addProduct = () => {
-    setFormData((prev) => ({
-      ...prev,
-      products: [
-        ...prev.products,
-        { productId: '', lotId: '', quantity: 1, productName: '', productPrice: 0, lotNumber: '', expiryDate: '' },
-      ],
-    }));
-  };
-
-  // Функция за премахване на продукт
-  const removeProduct = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      products: prev.products.filter((_, i) => i !== index),
-    }));
-  };
-
-  // Функция за промяна на продукт, партида или количество
-  const handleProductChange = (index: number, field: 'productId' | 'lotId' | 'quantity', value: string | number) => {
-    const updatedProducts = formData.products.map((p, i) => {
-      if (i === index) {
-        if (field === 'productId') {
-          const product = products.find((prod: any) => prod._id === value);
-          return {
-            ...p,
-            productId: value as string,
-            productName: product ? product.name : '',
-            productPrice: product ? product.price : 0,
-            lotId: '',
-            lotNumber: '',
-            expiryDate: '',
-          };
-        }
-        if (field === 'lotId') {
-          const lot = lots.find((lot: any) => lot._id === value);
-          return {
-            ...p,
-            lotId: value as string,
-            lotNumber: lot ? lot.lotNumber : '',
-            expiryDate: lot ? lot.expiryDate : '',
-          };
-        }
-        return { ...p, [field]: value };
-      }
-      return p;
-    });
-    setFormData((prev: any) => ({ ...prev, products: updatedProducts }));
-    setFormErrors((prev) => ({ ...prev, products: '' }));
-  };
-
-  // Функция за валидация на формата
-  const validateForm = () => {
-    const errors = { clientId: '', products: '', status: '' };
-    let isValid = true;
-
-    if (!formData.clientId) {
-      errors.clientId = 'Изборът на клиент е задължителен';
-      isValid = false;
-    }
-
-    if (formData.products.length === 0) {
-      errors.products = 'Добавете поне един продукт';
-      isValid = false;
-    } else {
-      for (const p of formData.products) {
-        if (!p.productId) {
-          errors.products = 'Изберете продукт за всеки ред';
-          isValid = false;
-        }
-        if (!p.lotId) {
-          errors.products = 'Изберете партида за всеки продукт';
-          isValid = false;
-        }
-        const selectedLot = lots.find((lot: any) => lot._id === p.lotId);
-        if (!selectedLot || p.quantity > selectedLot.quantity) {
-          errors.products = 'Количеството надвишава наличността на избраната партида';
-          isValid = false;
-        }
-        if (p.quantity <= 0 || isNaN(p.quantity)) {
-          errors.products = 'Въведете валидно количество за всеки продукт';
-          isValid = false;
-        }
-      }
-    }
-
-    if (!formData.status) {
-      errors.status = 'Изборът на статус е задължителен';
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    let totalPrice = 0;
-    const selectedProducts = formData.products.map((orderProd) => {
-      const product = products.find((p: any) => p._id === orderProd.productId);
-      if (product) {
-        totalPrice += product.price * orderProd.quantity;
-      }
-      return {
-        productId: orderProd.productId,
-        lotId: orderProd.lotId,
-        quantity: orderProd.quantity,
-      };
-    });
-
-    if (formData.products.length !== selectedProducts.length) {
-      setFormErrors((prev) => ({ ...prev, products: 'Невалидни продукти' }));
-      return;
-    }
-
+  const onSubmit = async (data: any) : Promise<any> => {
     try {
-      await createOrder({
-        clientId: formData.clientId,
-        products: selectedProducts,
-        totalPrice,
-        status: formData.status,
-      });
-      mutate();
-      closeModal();
-    } catch (error) {
-      console.error('Грешка при изпращане на заявката:', error);
-    }
-  };
-
-  const gridOptions = {
-    getRowStyle: (params: any) => {
-      if (params.node.rowIndex % 2 === 0) {
-        return { background: '#0092b5' };
+      if(editMode) {
+       await updateOrder(data);
+      } else {
+        await createOrder(data);
       }
+      setIsModalOpen(false);
+      mutate();
+    } catch(e: any) {
+      setBackEndError(e.message);
+    }
+  }
+
+  console.log('crb_kdjjfdsf', fields)
+  const newFields: any = {
+    ...fields,
+    clients: {
+      ...fields.clients,
+      options: clients?.map((user: any) => {
+        return {value: user._id, label: user.firstName + ' ' + user.lastName}
+      })
     },
-  };
+  }
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setBackEndError('');
+  }
 
   return (
     <div className={styles.grid}>
+      {<SuccessMessage title="Успешно добавена поръчка" message="Поръчката е добавена успешно" visible={visible} setIsVisible={setIsVisible} />}
+      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави поръчка' />}
+
       <div className={styles.head}>
         <h3 className={styles.title}>Поръчки</h3>
+        <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>
           <AgGridReact
