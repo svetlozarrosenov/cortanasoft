@@ -10,7 +10,6 @@ export default function TaskDetailsPage() {
   const id = params.id as string;
   const { task, isLoading, error, mutate } = useTask(id);
   const { users } = useUsers(id);
-  console.log('crb_task', task)
   const [commentText, setCommentText] = useState('');
   const [commentError, setCommentError] = useState('');
 

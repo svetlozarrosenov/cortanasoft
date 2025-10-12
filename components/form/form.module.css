@@ -22,14 +22,13 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 600px;
-    max-height: 800px; /* Запазваме максималната височина */
+    max-height: 800px;
     padding: 25px;
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.05);
     border-radius: 10px;
     z-index: 999;
-    overflow-y: auto; /* Добавено: позволява вертикален скрол, ако съдържанието превиши max-height */
-    /* Опционално: overflow-x: hidden; за да скрие хоризонтален скрол, ако не е нужен */
+    overflow-y: auto; 
 }
 
 .formTitle {

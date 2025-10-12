@@ -21,9 +21,7 @@ const CortanaChat: React.FC = () => {
     setMessages([...messages, { sender: 'user', text: input }]);
     const userMessage = input;
     setInput('');
-    console.log('crb_messages', messages);
     const newMessage = await askCortana(messages);
-    console.log('crb_newMessage', newMessage);
     // Добавяме отговора на Кортана
     setMessages((prev) => [...prev, { sender: newMessage.role, text: newMessage.content[0].text }]);
   };

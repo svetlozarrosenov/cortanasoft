@@ -44,7 +44,6 @@ export default function CompanyDetailsPage() {
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  console.log('crb_we_roleData', roleData)
   const [userFormData, setUserFormData] = useState<User>({
     firstName: '',
     middleName: '',
@@ -210,7 +209,6 @@ export default function CompanyDetailsPage() {
   };
 
   const handleEditRole = (role: Role) => {
-    console.log('crb_role', role)
     setIsEditMode(true);
     setRoleFormData(role);
     setRoleFormErrors({ name: '' });

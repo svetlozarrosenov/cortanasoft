@@ -1,7 +1,7 @@
 'use client';
 import { createPortal } from 'react-dom';
 import styles from './form.module.css';
-import { Controller } from 'react-hook-form';
+import { Controller, FormProvider } from 'react-hook-form';
 import { FieldsConfig } from '@/app/dashboard/tasks/const';
 import classNames from 'classnames';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -46,6 +46,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
           </div>
         )}
 
+        <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           {Object.keys(fields).map((key, index) => {
             return (
@@ -167,20 +168,26 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                             </select>
                           </>
                         );
-                      case 'multiselect':
-                        return (
-                          <>
-                            <label 
-                              htmlFor={fields[key].name} 
-                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
-                            >
-                              {fields[key].label}
-                              {fields[key].required && <span className="text-red-500">*</span>}
-                            </label>
-
-                            <MultiSelectButton fields={fields[key]} errors={errors} ref={ref}/>
-                          </>
-                        );
+                        case 'multiselect':
+                          return (
+                            <>
+                              <label 
+                                htmlFor={fields[key].name} 
+                                className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                              >
+                                {fields[key].label}
+                                {fields[key].required && <span className="text-red-500">*</span>}
+                              </label>
+                        
+                              <MultiSelectButton 
+                                control={control}
+                                name={fields[key].name} // Името на масива
+                                productOptions={fields[key]?.productOptions}
+                                lotsOptions={fields[key]?.lotsOptions}
+                                errors={errors}
+                              />
+                            </>
+                          );
                       case 'checkbox':
                         return (
                           <div className={styles.checkboxWrapper}>
@@ -272,6 +279,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
             Запази
           </button>
         </form>
+        </FormProvider>
       </div>
     </div>),
     document.body

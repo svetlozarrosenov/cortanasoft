@@ -1,89 +1,92 @@
 import classNames from 'classnames';
-import React, { useState } from 'react';
-import Select from 'react-select';
-import styles from './multiselect.module.css';
+import React from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 import { FaTrash } from 'react-icons/fa';
+import styles from './multiselect.module.css';
 
-interface Option {
-  value: string | number;
-  label: string;
-}
-
-interface MultiSelectProps {
-  options?: Option[];
-  defaultValue?: Option[];
-  onChange?: (selected: any) => any;
-  errors: any;
-  fields: any
-  ref: any
-  product: any
-  onProductChange: any;
-  onBatchChange: any;
-  onQuantityChange: any;
-  onDelete: any;
-}
-
-export default function MultiSelect({ fields, errors, ref, product, onProductChange, onBatchChange, onQuantityChange, onDelete }: MultiSelectProps) {
-  console.log('crb_fields', fields)
-  console.log('crb_product', product)
+export default function MultiSelect({ control, parentName, index, productOptions, lotOptions, errors, onDelete }) {
+  const { setValue, getValues } = useFormContext();
+  const selectedProduct = getValues(`${parentName}[${index}].product`);
 
   return (
-    <>
-      <div className={styles.multiselect}>
-        <div className={styles.head}>
-          <div className={styles.select}>
-            <label 
-              htmlFor={fields.name} 
-            >Продукт</label>
-
-            <select
-              id={fields.name}
-              onChange={() => onProductChange()}
-              // onBlur={onBlur}
-              value={''}
-              ref={ref}
-            >
-              <option value="" disabled>
-                Избери продукт...
-              </option>
-              {fields.productOptions?.map((option: any) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.select}>
-            <label 
-              htmlFor={fields.name} 
-            >Партида</label>
-
-            <select
-              id={fields.name}
-              onChange={() => onBatchChange()}
-              // onBlur={onBlur}
-              value={''}
-              ref={ref}
+    <div className={styles.multiselect}>
+      <div className={styles.head}>
+        <Controller
+          name={`${parentName}[${index}].product`}
+          control={control}
+          render={({ field: { onChange, value, ref } }) => (
+            <div className={styles.select}>
+              <label>Продукт</label>
+              <select
+                value={value || ''}
+                onChange={(e) => {
+                  onChange(e.target.value);
+                  setValue(`${parentName}[${index}].lotId`, e.target.value);
+                }}
+                ref={ref}
               >
-              <option value="" disabled>
-                Избери партида...
-              </option>
-              {fields.lotsOptions?.map((option: any) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+                <option value="" disabled>Избери продукт...</option>
+                {productOptions?.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        />
 
-        <div className={styles.body}>
-          <input onClick={onQuantityChange} type="number" placeholder={'Количество'} className={styles.quantity} />
-        </div>
-
-        <button onClick={onDelete}><FaTrash className={styles.icon} /><span>Изтрий</span></button>
+        <Controller
+          name={`${parentName}[${index}].lotId`}
+          control={control}
+          rules={{ required: 'Партида е задължителна' }}
+          render={({ field: { onChange, value, ref } }) => (
+            <div className={styles.select}>
+              <label>Партида</label>
+              <select
+                value={value || ''}
+                onChange={onChange}
+                ref={ref}
+              >
+                <option value="" disabled>Избери партида...</option>
+                {lotOptions
+                  ?.filter((opt) => opt.productId === selectedProduct)
+                  .map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+              </select>
+              {errors?.[parentName]?.[index]?.lotId && (
+                <p className={styles.frontEndErrors}>{errors[parentName][index].lotId.message}</p>
+              )}
+            </div>
+          )}
+        />
       </div>
-    </>
+
+      <div className={styles.body}>
+        <Controller
+          name={`${parentName}[${index}].quantity`}
+          control={control}
+          rules={{ required: 'Количество е задължително', min: { value: 1, message: 'Минимум 1' } }}
+          render={({ field: { onChange, value, ref } }) => (
+            <input
+              value={value || ''}
+              onChange={onChange}
+              type="number"
+              placeholder="Количество"
+              className={styles.quantity}
+              ref={ref}
+            />
+          )}
+        />
+        {errors?.[parentName]?.[index]?.quantity && (
+          <p className={styles.frontEndErrors}>{errors[parentName][index].quantity.message}</p>
+        )}
+      </div>
+
+      <button onClick={onDelete}><FaTrash className={styles.icon} /><span>Изтрий</span></button>
+    </div>
   );
 }

@@ -1,76 +1,38 @@
-import classNames from 'classnames';
-import React, { useState } from 'react';
-import Select from 'react-select';
-import styles from './multiselect.module.css';
-import { FaTrash } from 'react-icons/fa';
-import MultiSelect from './';
+import { useFieldArray } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
+import MultiSelect from './index';
 
-interface Option {
-  value: string | number;
-  label: string;
-}
+export default function MultiSelectButton({ control, name, lotsOptions, productOptions, errors }) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name,
+  });
 
-interface Product {
-  productId: string;
-  productBatchId: string;
-  productName: string;
-  quantity: number;
-}
-
-interface MultiSelectProps {
-  options?: Option[];
-  defaultValue?: Option[];
-  onChange?: (selected: any) => any;
-  errors: any;
-  fields: any;
-  ref: any;
-}
-
-export default function MultiSelectButton({ fields, errors, ref }: MultiSelectProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-
-  const handleOnClick = () => {
-    setProducts([...products, {
-      productId: '',
-      productBatchId: '',
-      productName: '',
-      quantity: 0
-    }]);
+  const handleAdd = () => {
+    append({ 
+      id: uuidv4(),
+      product: '', 
+      lotId: '', 
+      quantity: 0 
+    });
   };
 
   return (
     <>
-        {products.map((product, index) => (
-            <MultiSelect
-            key={index}
-            fields={fields}
-            errors={errors}
-            ref={ref}
-            product={product}
-            onProductChange={(idx: number, val: string) => {
-                const updated = [...products];
-                updated[idx].productId = val;
-                updated[idx].productName = val; 
-                setProducts(updated);
-            }}
-            onBatchChange={(idx: number, val: string) => {
-                const updated = [...products];
-                updated[idx].productBatchId = val;
-                setProducts(updated);
-            }}
-            onQuantityChange={(idx: number, val: number) => {
-                const updated = [...products];
-                updated[idx].quantity = val;
-                setProducts(updated);
-            }}
-            onDelete={(idx: number) => {
-                const updated = products.filter((_, i) => i !== idx);
-                setProducts(updated);
-            }}
-            />
-        ))}
+      {fields.map((field, index) => (
+        <MultiSelect
+          key={field.id}
+          control={control}
+          parentName={name}
+          index={index}
+          lotOptions={lotsOptions}
+          productOptions={productOptions || []}
+          errors={errors}
+          onDelete={() => remove(index)}
+        />
+      ))}
 
-        <button onClick={handleOnClick}>Добави</button>
+      <button type="button" onClick={handleAdd}>Добави</button>
     </>
   );
 }

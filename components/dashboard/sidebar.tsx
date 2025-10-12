@@ -14,7 +14,6 @@ import { createPortal } from 'react-dom';
 const Sidebar: React.FC<any> = () => {
     const { company } = useCurrentCompany();
     const { userRole } = useUserRole();
-    console.log('crb_userRole', userRole);
     const pathname = usePathname();
     const [isProductsOpen, setIsProductsOpen] = useState(false);
 

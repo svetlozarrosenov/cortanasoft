@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './orders.module.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
@@ -150,6 +150,7 @@ export default function OrdersPage() {
   const form = useForm({ mode: 'all' });
 
   const onSubmit = async (data: any) : Promise<any> => {
+    console.log('crb_data', data)
     try {
       if(editMode) {
        await updateOrder(data);
@@ -163,21 +164,31 @@ export default function OrdersPage() {
     }
   }
 
-  console.log('crb_products', products)
-  const newFields: any = {
-    ...fields,
-    clients: {
-      ...fields.clients,
-      options: clients?.map((user: any) => {
-        return {value: user._id, label: user.firstName + ' ' + user.lastName}
-      })
-    },
-    products: {
-      ...fields.products,
-      productOptions: products?.map((product: any) => {return {value: product._id, label: product.name}}),
-      lotsOptions: lots?.map((lot: any) => {return {value: lot._id, label: lot.name}})
-    }
-  }
+  const newFields = useMemo(() => {
+    return {
+      ...fields,
+      clients: {
+        ...fields.clients,
+        options: clients?.map((user: any) => ({
+          value: user._id,
+          label: `${user.firstName} ${user.lastName}`
+        })) || []  // Fallback за празно
+      },
+      products: {
+        ...fields.products,
+        productOptions: products?.map((product: any) => ({
+          value: product._id,
+          label: product.name
+        })) || [],
+        lotsOptions: lots?.map((lot: any) => ({  // lotsOptions, не lotsOptions
+          value: lot._id,
+          label: `${lot.name}, available: ${lot.quantity}, expiry: ${lot.expiryDate}`,
+          productId: lot.productId,
+          quantity: lot.quantity
+        })) || []
+      }
+    };
+  }, [fields, clients, products, lots]);  // Зависимости: преизчислява се само при промяна на тези
 
   const handleClose = () => {
     setIsModalOpen(false);

@@ -58,7 +58,7 @@ body {
 .bg-primary-dark:hover {
   background-color: var(--primary-dark);
 }
-h1, h2, h3, h4, h5, a, input, label { color: var(--text-on-primary-black); }
+h1, h2, h3, h4, h5, a, input, label, select, textarea, option { color: var(--text-on-primary-black); }
 
 p { color: var(--text-on-primary-grey); }
 
