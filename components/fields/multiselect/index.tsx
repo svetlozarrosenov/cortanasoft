@@ -1,12 +1,21 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { FaTrash } from 'react-icons/fa';
 import styles from './multiselect.module.css';
 
-export default function MultiSelect({ control, parentName, index, productOptions, lotOptions, errors, onDelete }) {
-  const { setValue, getValues } = useFormContext();
+export default function MultiSelect({ control, parentName, index, productOptions, lotOptions, errors, onDelete }: any): any {
+  const { setValue, getValues, watch } = useFormContext();
   const selectedProduct = getValues(`${parentName}[${index}].product`);
+  const [currentLots, setCurrentLots] = useState(lotOptions);
+
+  const productValue = watch(`${parentName}[${index}].product`);
+
+  useEffect(() => {
+    const filteredLots = lotOptions?.filter((opt: any) => opt.productId === selectedProduct)
+
+    setCurrentLots(filteredLots);
+  }, [productValue]);
 
   return (
     <div className={styles.multiselect}>
@@ -49,9 +58,7 @@ export default function MultiSelect({ control, parentName, index, productOptions
                 ref={ref}
               >
                 <option value="" disabled>Избери партида...</option>
-                {lotOptions
-                  ?.filter((opt) => opt.productId === selectedProduct)
-                  .map((opt) => (
+                {currentLots.map((opt: any) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>

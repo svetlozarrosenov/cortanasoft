@@ -2,7 +2,7 @@ import { useFieldArray } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import MultiSelect from './index';
 
-export default function MultiSelectButton({ control, name, lotsOptions, productOptions, errors }) {
+export default function MultiSelectButton({ control, name, lotsOptions, productOptions, errors }: any) {
   const { fields, append, remove } = useFieldArray({
     control,
     name,
