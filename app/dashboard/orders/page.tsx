@@ -181,10 +181,9 @@ export default function OrdersPage() {
           label: product.name
         })) || [],
         lotsOptions: lots?.map((lot: any) => ({  // lotsOptions, не lotsOptions
+          ...lot,
           value: lot._id,
           label: `${lot.name}, available: ${lot.quantity}, expiry: ${lot.expiryDate}`,
-          productId: lot.productId,
-          quantity: lot.quantity
         })) || []
       }
     };
