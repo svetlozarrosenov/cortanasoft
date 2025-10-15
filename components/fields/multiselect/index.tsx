@@ -11,7 +11,7 @@ export default function MultiSelect({ control, parentName, index, productOptions
 
   const productValue = watch(`${parentName}[${index}].product`);
   const lotValue = watch(`${parentName}[${index}].lotId`);
-  console.log('crb_currentLots', currentLots)
+
   useEffect(() => {
     const filteredLots = lotOptions?.filter((opt: any) => opt.productId === selectedProduct)
 
@@ -36,7 +36,7 @@ export default function MultiSelect({ control, parentName, index, productOptions
                 ref={ref}
               >
                 <option value="" disabled>Избери продукт...</option>
-                {productOptions?.map((opt) => (
+                {productOptions?.map((opt: any) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
@@ -55,7 +55,9 @@ export default function MultiSelect({ control, parentName, index, productOptions
               <label>Партида</label>
               <select
                 value={value || ''}
-                onChange={onChange}
+                onChange={(e) => {
+                  onChange(e);
+                }}
                 ref={ref}
               >
                 <option value="" disabled>Избери партида...</option>
@@ -83,12 +85,11 @@ export default function MultiSelect({ control, parentName, index, productOptions
               value={value || ''}
               onChange={(е) => {
                 const currentLot = currentLots.find((lot: any) => lot.value === lotValue);
-                console.log('crb_lotValue', lotValue)
-                if(value > currentLot.quantity) {
-                  onChange();
+                if(currentLot.quantity > value) {
+                  onChange(е);
+                } else {
+                  onChange(1);
                 }
-                onChange(е);
-                onDeleteLot(lotValue, value);
               }}
               type="number"
               placeholder="Количество"
