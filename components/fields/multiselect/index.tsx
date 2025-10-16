@@ -6,8 +6,9 @@ import styles from './multiselect.module.css';
 
 export default function MultiSelect({ control, parentName, index, productOptions, lotsOptions, errors, onDelete }: any): any {
   const { setValue, watch } = useFormContext();
-  const productValue = watch(`${parentName}[${index}].product`);
+  const productValue = watch(`${parentName}[${index}].productId`);
   const lotValue = watch(`${parentName}[${index}].lotId`);
+  const quantityValue = watch(`${parentName}[${index}].quantity`);
   const selectedLots = watch('products');
 
   const [currentLots, setCurrentLots] = useState([]);
@@ -26,12 +27,22 @@ export default function MultiSelect({ control, parentName, index, productOptions
 
   const currentLot = currentLots.find((lot: any) => lot.value === lotValue);
   const maxQuantity = currentLot?.quantity || 0;
+  const unitPrice = currentLot?.price || 0; // Предполагаме, че lotsOptions имат 'price' като единична цена
+
+  useEffect(() => {
+    if (quantityValue && unitPrice) {
+      const calculatedPrice = quantityValue * unitPrice;
+      setValue(`${parentName}[${index}].price`, calculatedPrice);
+    } else {
+      setValue(`${parentName}[${index}].price`, 0);
+    }
+  }, [quantityValue, unitPrice, setValue, parentName, index]);
 
   return (
     <div className={styles.multiselect}>
       <div className={styles.head}>
         <Controller
-          name={`${parentName}[${index}].product`}
+          name={`${parentName}[${index}].productId`}
           control={control}
           render={({ field: { onChange, value, ref } }) => (
             <div className={styles.select}>
@@ -40,7 +51,7 @@ export default function MultiSelect({ control, parentName, index, productOptions
                 value={value || ''}
                 onChange={(e) => {
                   onChange(e.target.value);
-                  setValue(`${parentName}[${index}].product`, e.target.value);
+                  setValue(`${parentName}[${index}].productId`, e.target.value);
                 }}
                 ref={ref}
               >
@@ -91,38 +102,58 @@ export default function MultiSelect({ control, parentName, index, productOptions
           control={control}
           rules={{ required: 'Количество е задължително', min: { value: 1, message: 'Минимум 1' } }}
           render={({ field: { onChange, value, ref } }) => (
-            <input
-              disabled={!lotValue}
-              value={value ?? ''}
-              onChange={(e) => {
-                const inputValue = e.target.value;
-                if (inputValue === '') {
-                  onChange('');
-                  return;
-                }
-                const newQuantity = parseInt(inputValue, 10);
-                if (isNaN(newQuantity)) {
-                  onChange('');
-                } else if (newQuantity < 1) {
-                  onChange(1);
-                } else if (newQuantity > maxQuantity && maxQuantity > 0) {
-                  onChange(maxQuantity);
-                } else {
-                  onChange(newQuantity);
-                }
-              }}
-              type="number"
-              min={1}
-              max={maxQuantity > 0 ? maxQuantity : undefined}
-              placeholder="Количество"
-              className={styles.quantity}
-              ref={ref}
-            />
+            <div>
+              <label>Брой</label>
+              <input
+                disabled={!lotValue}
+                value={value ?? ''}
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  if (inputValue === '') {
+                    onChange('');
+                    return;
+                  }
+                  const newQuantity = parseInt(inputValue, 10);
+                  if (isNaN(newQuantity)) {
+                    onChange('');
+                  } else if (newQuantity < 1) {
+                    onChange(1);
+                  } else if (newQuantity > maxQuantity && maxQuantity > 0) {
+                    onChange(maxQuantity);
+                  } else {
+                    onChange(newQuantity);
+                  }
+                }}
+                type="number"
+                min={1}
+                max={maxQuantity > 0 ? maxQuantity : undefined}
+                placeholder="Количество"
+                className={styles.quantity}
+                ref={ref}
+              />
+            </div>
           )}
         />
         {errors?.[parentName]?.[index]?.quantity && (
           <p className={styles.frontEndErrors}>{errors[parentName][index].quantity.message}</p>
         )}
+
+        <Controller
+          name={`${parentName}[${index}].price`}
+          control={control}
+          render={({ field: { value } }) => (
+            <div>
+              <label>Цена</label>
+              <input
+                disabled
+                value={value ?? 0}
+                type="number"
+                className={styles.quantity}
+                readOnly
+              />
+            </div>
+          )}
+        />
       </div>
 
       <button onClick={onDelete}><FaTrash className={styles.icon} /><span>Изтрий</span></button>

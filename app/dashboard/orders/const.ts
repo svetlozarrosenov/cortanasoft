@@ -21,9 +21,9 @@ export interface Field {
 export type FieldsConfig = Record<string, Field>;
 
 export const fields: FieldsConfig = {
-    clients: {
+    clientId: {
         type: 'select',
-        name: 'clients',
+        name: 'clientId',
         label: 'Клиент',
         required: true,
         options: [],

@@ -5,3 +5,26 @@
     font-size: 18px;
     margin-bottom: 10px;
 }
+
+.total {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #f3f3f3;
+    width: 100%;
+    margin-top: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.total label {
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.total input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+    background-color: #fff;
+}

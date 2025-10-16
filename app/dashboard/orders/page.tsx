@@ -138,6 +138,7 @@ export default function OrdersPage() {
           }
           if (col.field === 'createdAt') {
             colDef.valueFormatter = (params) => new Date(params.value).toLocaleString('bg-BG');
+            colDef.sort = 'desc';
           }
 
           return colDef;
@@ -149,30 +150,34 @@ export default function OrdersPage() {
 
   const form = useForm({ mode: 'all' });
 
-  const onSubmit = async (data: any) : Promise<any> => {
-    console.log('crb_data', data)
+  const onSubmit = async (data: any): Promise<any> => {
+    console.log('crb_data', data);
+  
+    const cleanedProducts = data.products.map(({ id, ...rest }) => rest);
+    const cleanedData = { ...data, products: cleanedProducts }; 
+  
     try {
-      if(editMode) {
-       await updateOrder(data);
+      if (editMode) {
+        await updateOrder(cleanedData);
       } else {
-        await createOrder(data);
+        await createOrder(cleanedData);
       }
       setIsModalOpen(false);
       mutate();
-    } catch(e: any) {
+    } catch (e: any) {
       setBackEndError(e.message);
     }
-  }
+  };
   
   const newFields = useMemo(() => {
     return {
       ...fields,
-      clients: {
-        ...fields.clients,
+      clientId: {
+        ...fields.clientId,
         options: clients?.map((user: any) => ({
           value: user._id,
           label: `${user.firstName} ${user.lastName}`
-        })) || []  // Fallback за празно
+        })) || [] 
       },
       products: {
         ...fields.products,
@@ -180,14 +185,14 @@ export default function OrdersPage() {
           value: product._id,
           label: product.name
         })) || [],
-        lotsOptions: lots?.map((lot: any) => ({  // lotsOptions, не lotsOptions
+        lotsOptions: lots?.map((lot: any) => ({
           ...lot,
           value: lot._id,
           label: `${lot.name}, available: ${lot.quantity}, expiry: ${lot.expiryDate}`,
         })) || []
       }
     };
-  }, [fields, clients, products, lots]);  // Зависимости: преизчислява се само при промяна на тези
+  }, [fields, clients, products, lots]);
 
   const handleClose = () => {
     setIsModalOpen(false);
