@@ -4,19 +4,28 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { FaTrash } from 'react-icons/fa';
 import styles from './multiselect.module.css';
 
-export default function MultiSelect({ control, parentName, index, productOptions, lotOptions, errors, onDelete, onDeleteLot }: any): any {
-  const { setValue, getValues, watch } = useFormContext();
-  const selectedProduct = getValues(`${parentName}[${index}].product`);
-  const [currentLots, setCurrentLots] = useState(lotOptions);
-
+export default function MultiSelect({ control, parentName, index, productOptions, lotsOptions, errors, onDelete }: any): any {
+  const { setValue, watch } = useFormContext();
   const productValue = watch(`${parentName}[${index}].product`);
   const lotValue = watch(`${parentName}[${index}].lotId`);
+  const selectedLots = watch('products');
+
+  const [currentLots, setCurrentLots] = useState([]);
 
   useEffect(() => {
-    const filteredLots = lotOptions?.filter((opt: any) => opt.productId === selectedProduct)
+    const filteredLots = lotsOptions?.filter((opt: any) => 
+      opt.productId === productValue && 
+      !selectedLots?.some((selected, sIndex) => 
+        sIndex !== index && 
+        selected.lotId === opt.value
+      )
+    ) || [];
 
     setCurrentLots(filteredLots);
-  }, [productValue]);
+  }, [productValue, JSON.stringify(selectedLots), lotsOptions]);
+
+  const currentLot = currentLots.find((lot: any) => lot.value === lotValue);
+  const maxQuantity = currentLot?.quantity || 0;
 
   return (
     <div className={styles.multiselect}>
@@ -54,6 +63,7 @@ export default function MultiSelect({ control, parentName, index, productOptions
             <div className={styles.select}>
               <label>Партида</label>
               <select
+                disabled={!productValue}
                 value={value || ''}
                 onChange={(e) => {
                   onChange(e);
@@ -62,10 +72,10 @@ export default function MultiSelect({ control, parentName, index, productOptions
               >
                 <option value="" disabled>Избери партида...</option>
                 {currentLots.map((opt: any) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
               </select>
               {errors?.[parentName]?.[index]?.lotId && (
                 <p className={styles.frontEndErrors}>{errors[parentName][index].lotId.message}</p>
@@ -82,16 +92,28 @@ export default function MultiSelect({ control, parentName, index, productOptions
           rules={{ required: 'Количество е задължително', min: { value: 1, message: 'Минимум 1' } }}
           render={({ field: { onChange, value, ref } }) => (
             <input
-              value={value || ''}
-              onChange={(е) => {
-                const currentLot = currentLots.find((lot: any) => lot.value === lotValue);
-                if(currentLot.quantity > value) {
-                  onChange(е);
-                } else {
+              disabled={!lotValue}
+              value={value ?? ''}
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                if (inputValue === '') {
+                  onChange('');
+                  return;
+                }
+                const newQuantity = parseInt(inputValue, 10);
+                if (isNaN(newQuantity)) {
+                  onChange('');
+                } else if (newQuantity < 1) {
                   onChange(1);
+                } else if (newQuantity > maxQuantity && maxQuantity > 0) {
+                  onChange(maxQuantity);
+                } else {
+                  onChange(newQuantity);
                 }
               }}
               type="number"
+              min={1}
+              max={maxQuantity > 0 ? maxQuantity : undefined}
               placeholder="Количество"
               className={styles.quantity}
               ref={ref}
