@@ -2,10 +2,10 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import MultiSelect from './index';
 import styles from './multiselect-button.module.css';
-import { useEffect } from 'react'; // Премахнах ненужния useState
+import { useEffect } from 'react';
 
 export default function MultiSelectButton({ control, name, lotsOptions, productOptions, errors }: any) {
-  const { watch, setValue, register } = useFormContext(); // Добавих register и setValue
+  const { watch, setValue, register } = useFormContext();
   const selectedProducts = watch(name);
 
   const { fields, append, remove } = useFieldArray({
@@ -13,12 +13,12 @@ export default function MultiSelectButton({ control, name, lotsOptions, productO
     name,
   });
 
-  const totalPrice = watch('totalPrice') || 0; // Взимаме от watch за показване
+  const totalPrice = watch('totalPrice') || 0;
 
   useEffect(() => {
     if (selectedProducts) {
-      const sum = selectedProducts.reduce((acc, product) => acc + (product.price || 0), 0);
-      setValue('totalPrice', sum); // Сетваме директно в формата
+      const sum = selectedProducts.reduce((acc: any, product: any) => acc + (product.price || 0), 0);
+      setValue('totalPrice', sum);
     } else {
       setValue('totalPrice', 0);
     }
@@ -61,7 +61,7 @@ export default function MultiSelectButton({ control, name, lotsOptions, productO
         />
       </div>}
 
-      <input type="hidden" {...register('totalPrice')} /> {/* Регистрираме полето в формата */}
+      <input type="hidden" {...register('totalPrice')} />
     </>
   );
 }

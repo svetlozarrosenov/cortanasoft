@@ -16,7 +16,7 @@ interface DynamicFormProps {
   onClose: () => void;
 }
 
-export default function DynamicForm({ fields, form, onSubmit, backEndError, onClose, title }: DynamicFormProps) {
+export default function DynamicForm({ fields, form, onSubmit, backEndError, onClose, title }: any) {
   const {
     control,
     handleSubmit,
@@ -159,7 +159,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                               <option value="" disabled>
                                 Избери...
                               </option>
-                              {fields[key].options?.map((option) => (
+                              {fields[key].options?.map((option: any) => (
                                 <option key={option.value} value={option.value}>
                                   {option.label}
                                 </option>
@@ -219,7 +219,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                               {fields[key].required && <span className="text-red-500">*</span>}
                             </label>
                             <div className="flex space-x-4">
-                              {fields[key].options?.map((option) => (
+                              {fields[key].options?.map((option: any) => (
                                 <label key={option.value} className="flex items-center space-x-2">
                                   <input
                                     type="radio"

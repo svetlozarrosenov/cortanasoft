@@ -11,12 +11,12 @@ export default function MultiSelect({ control, parentName, index, productOptions
   const quantityValue = watch(`${parentName}[${index}].quantity`);
   const selectedLots = watch('products');
 
-  const [currentLots, setCurrentLots] = useState([]);
+  const [currentLots, setCurrentLots] = useState<any>([]);
 
   useEffect(() => {
     const filteredLots = lotsOptions?.filter((opt: any) => 
       opt.productId === productValue && 
-      !selectedLots?.some((selected, sIndex) => 
+      !selectedLots?.some((selected: any, sIndex: any) => 
         sIndex !== index && 
         selected.lotId === opt.value
       )
@@ -27,7 +27,7 @@ export default function MultiSelect({ control, parentName, index, productOptions
 
   const currentLot = currentLots.find((lot: any) => lot.value === lotValue);
   const maxQuantity = currentLot?.quantity || 0;
-  const unitPrice = currentLot?.price || 0; // Предполагаме, че lotsOptions имат 'price' като единична цена
+  const unitPrice = currentLot?.price || 0;
 
   useEffect(() => {
     if (quantityValue && unitPrice) {

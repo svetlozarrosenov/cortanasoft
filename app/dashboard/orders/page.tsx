@@ -153,7 +153,7 @@ export default function OrdersPage() {
   const onSubmit = async (data: any): Promise<any> => {
     console.log('crb_data', data);
   
-    const cleanedProducts = data.products.map(({ id, ...rest }) => rest);
+    const cleanedProducts = data.products.map(({ id, ...rest }: any) => rest);
     const cleanedData = { ...data, products: cleanedProducts }; 
   
     try {
