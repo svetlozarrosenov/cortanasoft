@@ -8,6 +8,12 @@ import { useLocations, createLocation, updateLocation, deleteLocation } from './
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import styles from '../dashboard-grid.module.css'
+import SuccessMessage from '@/components/form/successMessage';
+import DynamicForm from '@/components/form';
+import { fields } from './const';
+import { useForm } from 'react-hook-form';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import classNames from 'classnames';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -27,219 +33,102 @@ export default function LocationsPage() {
   const { locations: rowData, mutate } = useLocations();
   const { userRole } = useUserRole();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [currentRow, setCurrentRow] = useState<Location>();
+  const [backEndError, setBackEndError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [locationToDelete, setLocationToDelete] = useState<Location | null>(null);
-  const [locationToEdit, setLocationToEdit] = useState<Location | null>(null);
-  const [formData, setFormData] = useState<Location>({
-    name: '',
-    type: 'warehouse',
-    address: '',
-    country: '',
-    city: '',
-    email: '',
-    phone: '',
-    description: '',
-  });
-  const [formErrors, setFormErrors] = useState({
-    name: '',
-    type: '',
-    address: '',
-    country: '',
-    city: '',
-    email: '',
-    phone: '',
-  });
+  const [visible, setIsVisible] = useState(false);
+
+  const form = useForm({ mode: 'all' });
+
+  const onSubmit = async (data: any) : Promise<any> => {
+    try {
+      if(editMode) {
+       await updateLocation(currentRow?._id, data);
+      } else {
+        await createLocation(data);
+      }
+      setIsVisible(true);
+      setIsModalOpen(false);
+      mutate();
+    } catch(e: any) {
+      setBackEndError(e.message);
+    }
+  }
+
+  const handleEdit = (row: any) => {
+    Object.keys(fields).map((fieldName: any) => {
+      form.setValue(fieldName, row.data[fieldName]);
+    })
+    setCurrentRow(row.data);
+    setEditMode(true);
+    setIsModalOpen(true);
+  }
+  
+  const handleDelete = async (params: any) => {
+    const orderId = params.data._id;
+    if (confirm('Сигурни ли сте, че искате да изтриете тази поръчка?')) {
+      await deleteLocation(orderId);
+      mutate();
+    }
+  };
 
   useEffect(() => {
     if (userRole) {
-      const table = findTableFields(userRole, "locationsSection", "locationsTable");
+      const table = findTableFields(userRole, 'locationsSection', 'locationsTable') || [];
+
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
           headerName: col.headerName,
           filter: col.filter || false,
           flex: col.flex || 1,
-          width: col.width,
-          minWidth: col.minWidth
         };
 
         if (col.field === 'type') {
           colDef.valueFormatter = (params) => {
             const typeMap: Record<string, string> = {
               warehouse: 'Склад',
-              store: 'Магазин',
+              shop: 'Магазин',
               bin: 'Позиция',
             };
             return typeMap[params.value] || params.value;
           };
         }
-
+        
+      
         if (col.field === 'actions') {
-          colDef.cellRenderer = (params: any) => (
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleEditLocation(params.data)}
-                className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-              >
-                Редактирай
-              </button>
-              <button
-                onClick={() => {
-                  setLocationToDelete(params.data);
-                  setIsDeleteConfirmOpen(true);
-                }}
-                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-              >
-                Изтрий
-              </button>
-            </div>
-          );
+            colDef.cellRenderer = (params: any) => (
+              <div className={styles.actions}>
+                <FaEdit className={styles.icon} onClick={() => handleEdit(params)} />
+                <FaTrash className={classNames(styles.icon, styles.iconTrash)} onClick={() => handleDelete(params)} />
+              </div>
+            );
+            colDef.sortable = false;
+            colDef.filter = false;
+            colDef.width = 150;
+            colDef.pinned = 'right';
         }
-
         return colDef;
       });
+
       setColDefs(modifiedColDefs);
     }
   }, [userRole]);
 
-  const gridOptions = {
-    getRowStyle: (params: any) => {
-      if (params.node.rowIndex % 2 === 0) {
-        return { background: '#0092b5' };
-      }
-    },
-  };
-
-  const handleAddLocation = () => {
-    setIsEditMode(false);
-    setFormData({
-      name: '',
-      type: 'warehouse',
-      address: '',
-      country: '',
-      city: '',
-      email: '',
-      phone: '',
-      description: '',
-    });
-    setFormErrors({ name: '', type: '', address: '', country: '', city: '', email: '', phone: '' });
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteLocation = async () => {
-    if (locationToDelete?._id) {
-      await deleteLocation(locationToDelete._id);
-      mutate();
-      setIsDeleteConfirmOpen(false);
-      setLocationToDelete(null);
-    }
-  };
-
-  const handleEditLocation = (location: Location) => {
-    setLocationToEdit(location);
-    setIsEditMode(true);
-    setFormData({
-      name: location.name,
-      type: location.type,
-      address: location.address || '',
-      country: location.country || '',
-      city: location.city || '',
-      email: location.email || '',
-      phone: location.phone || '',
-      description: location.description || '',
-    });
-    setFormErrors({ name: '', type: '', address: '', country: '', city: '', email: '', phone: '' });
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
+  const handleClose = () => {
     setIsModalOpen(false);
-    setFormErrors({ name: '', type: '', address: '', country: '', city: '', email: '', phone: '' });
-  };
+    setBackEndError('');
+  }
 
-  const closeDeleteConfirmModal = () => {
-    setIsDeleteConfirmOpen(false);
-    setLocationToDelete(null);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setFormErrors((prev) => ({ ...prev, [name]: '' }));
-  };
-
-  const validateForm = () => {
-    const errors = { name: '', type: '', address: '', country: '', city: '', email: '', phone: '' };
-    let isValid = true;
-
-    if (!formData.name.trim()) {
-      errors.name = 'Името е задължително';
-      isValid = false;
-    }
-
-    if (!formData.type) {
-      errors.type = 'Типът е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.address?.trim()) {
-      errors.address = 'Адресът е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.country?.trim()) {
-      errors.country = 'Държавата е задължителна';
-      isValid = false;
-    }
-
-    if (!formData.city?.trim()) {
-      errors.city = 'Градът е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Въведете валиден имейл';
-      isValid = false;
-    }
-
-    if (!formData.phone?.trim()) {
-      errors.phone = 'Телефонът е задължителен';
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    try {
-      const data = {
-        ...formData,
-      };
-      if (isEditMode) {
-        await updateLocation(locationToEdit?._id, data);
-      } else {
-        await createLocation(data);
-      }
-      mutate();
-      closeModal();
-    } catch (error) {
-      console.error('Грешка при изпращане на заявката:', error);
-    }
-  };
-
-    return (
+  return (
     <div className={styles.grid}>
+      {<SuccessMessage title="Успешно добавена локация" message="Локацията е добавена успешно" visible={visible} setIsVisible={setIsVisible} />}
+      {isModalOpen && <DynamicForm form={form} fields={fields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави клиент' />}
+
       <div className={styles.head}>
-        <h3 className={styles.title}>Локации</h3>
+        <h3 className={styles.title}>Клиенти</h3>
+        <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>
           <AgGridReact

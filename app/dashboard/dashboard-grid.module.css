@@ -26,9 +26,15 @@
 }
 
 .icon {
+    display: inline-block;
+    margin-right: 10px;
     padding-top: 10px;
     font-size: 30px;
     color: var(--text-on-primary-blue);
+}
+
+.iconTrash {
+    color: red;
 }
 
 .icon:hover {
