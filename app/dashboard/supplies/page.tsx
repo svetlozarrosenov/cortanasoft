@@ -11,8 +11,13 @@ import { useLocations } from '../locations/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import styles from '../dashboard-grid.module.css';
+import SuccessMessage from '@/components/form/successMessage';
+import DynamicForm from '@/components/form';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import classNames from 'classnames';
+import { fields } from './const';
+import { useForm } from 'react-hook-form';
 
-// Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface Supplier {
@@ -62,7 +67,6 @@ interface Supply {
   updatedAt: string;
 }
 
-// Функция за форматиране на цена с избрана валута
 const formatPrice = (price: number, currency: 'EUR' | 'BGN') => {
   return price.toLocaleString('bg-BG', { style: 'currency', currency });
 };
@@ -72,35 +76,42 @@ export default function SuppliesPage() {
   const { products } = useProducts();
   const { locations } = useLocations();
   const { supplies: rowData, mutate } = useSupplies();
-  const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
-
   const { userRole } = useUserRole();
   const [colDefs, setColDefs] = useState([]);
-
+  const [editMode, setEditMode] = useState(false);
+  const [currentRow, setCurrentRow] = useState<Location>();
+  const [backEndError, setBackEndError] = useState('');
+  const [visible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    supplierId: '',
-    locationId: '',
-    products: [] as SupplyProduct[],
-    status: 'pending',
-    deliveryDate: new Date().toISOString().split('T')[0],
-    price: 0,
-    currency: 'EUR' as 'EUR' | 'BGN',
-  });
-  const [formErrors, setFormErrors] = useState({
-    supplierId: '',
-    locationId: '',
-    products: '',
-    status: '',
-    deliveryDate: '',
-    price: '',
-    currency: '',
-  });
+
+  const form = useForm({ mode: 'all' });
+
+  const newFields: any = {
+    ...fields,
+    supplierId: {
+      ...fields.supplierId,
+      options: suppliers?.map((supplier: any) => {
+        return {value: supplier._id, label: supplier.companyName}
+      })
+    },
+    locationId: {
+      ...fields.locationId,
+      options: locations?.map((location: any) => {
+        return {value: location._id, label: location.name}
+      })
+    },
+    products: {
+      ...fields.products,
+      options: products?.map((product: any) => {
+        return {value: product._id, label: product.name}
+      })
+    },
+  }
 
   useEffect(() => {
-    if(userRole) {
+    if (userRole) {
       const table = findTableFields(userRole, "suppliesSection", "suppliesTable")
- 
+
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
@@ -108,8 +119,8 @@ export default function SuppliesPage() {
           filter: col.filter || false,
           flex: col.flex || 1,
         };
-
-        if (col.field === 'price') { // Поправка на грешката от 'price]' на 'price'
+        
+        if (col.field === 'price') {
           colDef.valueFormatter = (params) => formatPrice(params.data.price, params.data.currency);
         }
         
@@ -129,239 +140,69 @@ export default function SuppliesPage() {
         }
 
         if (col.field === 'actions') {
-          colDef.cellRenderer = (params: any) => (
-            <button
-              onClick={() => setSelectedSupply(params.data)}
-              className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-            >
-              Детайли
-            </button>
-          );
-        };
-      
+            colDef.cellRenderer = (params: any) => (
+              <div className={styles.actions}>
+                <FaEdit className={styles.icon} onClick={() => handleEdit(params)} />
+                <FaTrash className={classNames(styles.icon, styles.iconTrash)} onClick={() => handleDelete(params)} />
+              </div>
+            );
+            colDef.sortable = false;
+            colDef.filter = false;
+            colDef.width = 150;
+            colDef.pinned = 'right';
+        }
         return colDef;
       });
-      setColDefs(modifiedColDefs)
+
+      setColDefs(modifiedColDefs);
     }
-  }, [userRole])
+  }, [userRole]);
 
-  // Добавяне на gridOptions за стилизиране на редовете
-  const gridOptions = {
-    getRowStyle: (params: any) => {
-      if (params.node.rowIndex % 2 === 0) {
-        return { background: '#0092b5' };
-      }
-    },
-  };
-
-  const handleAddSupply = () => {
-    setIsModalOpen(true);
-    setFormData({
-      supplierId: '',
-      locationId: '',
-      products: [],
-      status: 'pending',
-      deliveryDate: new Date().toISOString().split('T')[0],
-      price: 0,
-      currency: 'EUR',
-    });
-    setFormErrors({
-      supplierId: '',
-      locationId: '',
-      products: '',
-      status: '',
-      deliveryDate: '',
-      price: '',
-      currency: '',
-    });
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setFormData({
-      supplierId: '',
-      locationId: '',
-      products: [],
-      status: 'pending',
-      deliveryDate: new Date().toISOString().split('T')[0],
-      price: 0,
-      currency: 'EUR',
-    });
-    setFormErrors({
-      supplierId: '',
-      locationId: '',
-      products: '',
-      status: '',
-      deliveryDate: '',
-      price: '',
-      currency: '',
-    });
-  };
-
-  const closeDetailPopup = () => {
-    setSelectedSupply(null);
-  };
-
-  const addProduct = () => {
-    setFormData((prev) => ({
-      ...prev,
-      products: [
-        ...prev.products,
-        { productId: '', quantity: 1, productName: '', productPrice: 0, lotNumber: '', expiryDate: '', serialNumber: '', isIndividual: false },
-      ],
-    }));
-  };
-
-  const removeProduct = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      products: prev.products.filter((_, i) => i !== index),
-    }));
-  };
-const statusOptions: any = []
-  const handleProductChange = (index: number, field: keyof SupplyProduct, value: string | number | boolean) => {
-    const updatedProducts = formData.products.map((p, i) => {
-      if (i === index) {
-        if (field === 'productId') {
-          const product = products.find((prod: any) => prod._id === value);
-          return {
-            ...p,
-            productId: value as string,
-            productName: product ? product.name : '',
-            productPrice: product ? product.price : 0,
-          };
-        }
-        if (field === 'isIndividual') {
-          return {
-            ...p,
-            isIndividual: value as boolean,
-            quantity: value ? 1 : p.quantity,
-            serialNumber: value ? p.serialNumber : '',
-          };
-        }
-        return { ...p, [field]: value };
-      }
-      return p;
-    });
-    setFormData((prev) => ({ ...prev, products: updatedProducts }));
-    setFormErrors((prev) => ({ ...prev, products: '' }));
-  };
-
-  const handleFieldChange = (field: keyof typeof formData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    setFormErrors((prev) => ({ ...prev, [field]: '' }));
-  };
-
-  const validateForm = () => {
-    const errors = { supplierId: '', locationId: '', products: '', status: '', deliveryDate: '', price: '', currency: '' };
-    let isValid = true;
-
-    if (!formData.supplierId) {
-      errors.supplierId = 'Изборът на доставчик е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.locationId) {
-      errors.locationId = 'Изборът на локация е задължителен';
-      isValid = false;
-    }
-
-    if (formData.products.length === 0) {
-      errors.products = 'Добавете поне един продукт';
-      isValid = false;
-    } else {
-      for (const p of formData.products) {
-        if (!p.productId) {
-          errors.products = 'Изберете продукт за всеки ред';
-          isValid = false;
-        }
-        if (p.quantity <= 0 || isNaN(p.quantity)) {
-          errors.products = 'Въведете валидно количество за всеки продукт';
-          isValid = false;
-        }
-        if (p.isIndividual && !p.serialNumber?.trim()) {
-          errors.products = 'Серийният номер е задължителен за индивидуални продукти';
-          isValid = false;
-        }
-      }
-    }
-
-    if (!formData.status) {
-      errors.status = 'Изборът на статус е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.deliveryDate) {
-      errors.deliveryDate = 'Датата на доставка е задължителна';
-      isValid = false;
-    }
-
-    if (formData.price < 0 || isNaN(formData.price)) {
-      errors.price = 'Цената на доставка не може да е отрицателна';
-      isValid = false;
-    }
-
-    if (!formData.currency) {
-      errors.currency = 'Изборът на валута е задължителен';
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
+  const onSubmit = async (data: any) : Promise<any> => {
     try {
-      const totalPrice = formData.products.reduce((sum, p) => {
-        const product = products.find((prod: any) => prod._id === p.productId);
-        return sum + (product ? product.price * p.quantity : 0);
-      }, 0);
-
-      const supplyData = {
-        supplierId: formData.supplierId,
-        locationId: formData.locationId,
-        products: formData.products.map((p) => ({
-          productId: p.productId,
-          quantity: p.quantity,
-          lotNumber: p.lotNumber,
-          expiryDate: p.expiryDate,
-          serialNumber: p.isIndividual ? p.serialNumber : undefined,
-        })),
-        totalPrice,
-        price: formData.price,
-        status: formData.status,
-        deliveryDate: formData.deliveryDate,
-        currency: formData.currency,
-      };
-
-      await createSupply(supplyData);
+      if(editMode) {
+      //  await updateSupplier(currentRow);
+      } else {
+        await createSupply(data);
+      }
+      setIsVisible(true);
+      setIsModalOpen(false);
       mutate();
-      closeModal();
-    } catch (error) {
-      console.error('Грешка при изпращане на заявката:', error);
+    } catch(e: any) {
+      setBackEndError(e.message);
+    }
+  }
+
+  const handleEdit = (row: any) => {
+    Object.keys(fields).map((fieldName: any) => {
+      form.setValue(fieldName, row.data[fieldName]);
+    })
+    setCurrentRow(row.data);
+    setEditMode(true);
+    setIsModalOpen(true);
+  }
+  
+  const handleDelete = async (params: any) => {
+    const orderId = params.data._id;
+    if (confirm('Сигурни ли сте, че искате да изтриете тази поръчка?')) {
+      // await deleteLocation(orderId);
+      mutate();
     }
   };
 
-  const detailColDefs: ColDef<SupplyProduct>[] = [
-    { field: 'productName', headerName: 'Продукт', filter: true },
-    { field: 'quantity', headerName: 'Количество', filter: true },
-    { field: 'lotNumber', headerName: 'Партиден номер', filter: true },
-    { field: 'serialNumber', headerName: 'Сериен номер', filter: true },
-    {
-      field: 'productPrice',
-      headerName: 'Цена',
-      filter: true,
-      valueFormatter: (params) => formatPrice(params.value, selectedSupply?.currency || 'EUR'),
-    },
-  ];
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setBackEndError('');
+  }
 
   return (
     <div className={styles.grid}>
+      {<SuccessMessage title="Успешно добавена доставка" message="Доставката е добавен успешно" visible={visible} setIsVisible={setIsVisible} />}
+      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави клиент' />}
+
       <div className={styles.head}>
-        <h3 className={styles.title}>Доставки</h3>
+        <h3 className={styles.title}>Клиенти</h3>
+        <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>
           <AgGridReact

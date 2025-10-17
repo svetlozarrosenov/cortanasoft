@@ -6,6 +6,7 @@ import { FieldsConfig } from '@/app/dashboard/tasks/const';
 import classNames from 'classnames';
 import { AiOutlineClose } from 'react-icons/ai';
 import MultiSelectButton from '../fields/multiselect/multiselectButton';
+import MultiSelectSecondaryButton from '../fields/MultiselectSecondary/MultiselectSecondaryButton';
 
 interface DynamicFormProps {
   fields: FieldsConfig;
@@ -187,6 +188,25 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                               />
                             </>
                           );
+                          case 'multiselectSecondary':
+                            return (
+                              <>
+                                <label 
+                                  htmlFor={fields[key].name} 
+                                  className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                                >
+                                  {fields[key].label}
+                                  {fields[key].required && <span className="text-red-500">*</span>}
+                                </label>
+                          
+                                <MultiSelectSecondaryButton 
+                                  control={control}
+                                  name={fields[key].name}
+                                  options={fields[key]?.options}
+                                  errors={errors}
+                                />
+                              </>
+                            );
                       case 'checkbox':
                         return (
                           <div className={styles.checkboxWrapper}>

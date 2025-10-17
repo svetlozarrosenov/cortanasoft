@@ -5,7 +5,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { createProduct, updateProduct, useProducts } from './hooks';
+import { createProductCategory, updateProductCategory, useProductCategories } from './hooks';
 import { findTableFields } from '@/utils/helpers';
 import { useUserRole } from '../../companies/[id]/hooks';
 import SuccessMessage from '@/components/form/successMessage';
@@ -14,7 +14,6 @@ import styles from '../../dashboard-grid.module.css';
 import { fields } from './const';
 import { useForm } from 'react-hook-form';
 import { FaEdit } from 'react-icons/fa';
-import { useProductCategories } from '../categories/hooks';
 
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -30,8 +29,8 @@ interface Product {
 }
 
 export default function ProductsPage() {
-  const { products: rowData, mutate } = useProducts();
-  const { categories } = useProductCategories();
+  const { categories: rowData, mutate } = useProductCategories();
+  const categories: any = [];
   const { userRole } = useUserRole();
   const [backEndError, setBackEndError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,7 +50,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     if(userRole) {
-      const table = findTableFields(userRole, "productsListSection", "productsListTable", 1)
+      const table = findTableFields(userRole, "productsCategoriesListSection", "productsCategoriesListTable", 1)
  
       const modifiedColDefs = table?.map((col: any) => {
         const colDef: ColDef = {
@@ -60,10 +59,6 @@ export default function ProductsPage() {
           filter: col.filter || false,
           flex: col.flex || 1,
         };
-
-        if (col.field === 'price') {
-          colDef.valueFormatter = (params) => `${params.value} лв.`;
-        }
 
         if (col.field === 'actions') {
           colDef.cellRenderer = (params: any) => (
@@ -75,7 +70,7 @@ export default function ProductsPage() {
           colDef.filter = false;
           colDef.width = 150;
           colDef.pinned = 'right';
-      }
+        }
       
         return colDef;
       });
@@ -88,9 +83,11 @@ export default function ProductsPage() {
   const onSubmit = async (data: any): Promise<any> => {  
     try {
       if (editMode) {
-        await updateProduct(data);
+        await updateProductCategory(data);
       } else {
-        await createProduct(data);
+        console.log('crb_data', data);
+
+        await createProductCategory(data);
       }
       setIsModalOpen(false);
       mutate();
@@ -99,19 +96,6 @@ export default function ProductsPage() {
     }
   };
 
-  const newFields = useMemo(() => {
-    return {
-      ...fields,
-      categoryId: {
-        ...fields.categoryId,
-        options: categories?.map((user: any) => ({
-          value: user._id,
-          label: `${user.name}`
-        })) || [] 
-      },
-    };
-  }, [fields, categories]);
-
   const handleClose = () => {
     setIsModalOpen(false);
     setBackEndError('');
@@ -119,12 +103,12 @@ export default function ProductsPage() {
 
   return (
     <div className={styles.grid}>
-      {<SuccessMessage title="Успешно добавен продукт" message="Продуктът е добавен успешно" visible={visible} setIsVisible={setIsVisible} />}
-      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави продукт' />}
+      {<SuccessMessage title="Успешно добавена категория" message="Категорията е добавена успешно" visible={visible} setIsVisible={setIsVisible} />}
+      {isModalOpen && <DynamicForm form={form} fields={fields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави категория' />}
 
       <div className={styles.head}>
-        <h3 className={styles.title}>Видове продукти</h3>
-        <button onClick={() => setIsModalOpen(true)}>Добави вид продукт</button>
+        <h3 className={styles.title}>Категории</h3>
+        <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>
           <AgGridReact

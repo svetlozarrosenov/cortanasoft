@@ -5,11 +5,16 @@ import type { ColDef } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useSuppliers, createSupplier, updateSupplier } from '../suppliers/hooks';
-import { useUserRole } from '../companies/[id]/hooks';
+import { useCompanyUsers, useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import styles from '../dashboard-grid.module.css';
+import SuccessMessage from '@/components/form/successMessage';
+import DynamicForm from '@/components/form';
+import { useForm } from 'react-hook-form';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import classNames from 'classnames';
+import { fields } from './const';
 
-// Регистриране на AG Grid модули
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface Supplier {
@@ -27,198 +32,102 @@ export default function SuppliersPage() {
   const { suppliers: rowData, mutate } = useSuppliers();
   const { userRole } = useUserRole();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [currentRow, setCurrentRow] = useState<Location>();
+  const [backEndError, setBackEndError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // Track if editing or creating
-  const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null); // Store ID of supplier being edited
-  const [formData, setFormData] = useState({
-    companyName: '',
-    responsiblePerson: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    country: '',
-  });
-  const [formErrors, setFormErrors] = useState({
-    companyName: '',
-    responsiblePerson: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    country: '',
-  });
+  const [visible, setIsVisible] = useState(false);
+  const { users } = useCompanyUsers();
+
+  const newFields: any = {
+    ...fields,
+    responsiblePerson: {
+      ...fields.responsiblePerson,
+      options: users?.map((user: any) => {
+        return {value: user._id, label: user.firstName + ' ' + user.lastName}
+      })
+    },
+  }
+
+  const form = useForm({ mode: 'all' });
+
+  const onSubmit = async (data: any) : Promise<any> => {
+    try {
+      if(editMode) {
+       await updateSupplier(currentRow);
+      } else {
+        await createSupplier(data);
+      }
+      setIsVisible(true);
+      setIsModalOpen(false);
+      mutate();
+    } catch(e: any) {
+      setBackEndError(e.message);
+    }
+  }
+
+  const handleEdit = (row: any) => {
+    Object.keys(fields).map((fieldName: any) => {
+      form.setValue(fieldName, row.data[fieldName]);
+    })
+    setCurrentRow(row.data);
+    setEditMode(true);
+    setIsModalOpen(true);
+  }
+  
+  const handleDelete = async (params: any) => {
+    const orderId = params.data._id;
+    if (confirm('Сигурни ли сте, че искате да изтриете тази поръчка?')) {
+      // await deleteLocation(orderId);
+      mutate();
+    }
+  };
 
   useEffect(() => {
     if (userRole) {
       const table = findTableFields(userRole, 'suppliersSection', 'suppliersTable');
-      setColDefs(table);
+
+      const modifiedColDefs = table.map((col: any) => {
+        const colDef: ColDef = {
+          field: col.field || col.headerName,
+          headerName: col.headerName,
+          filter: col.filter || false,
+          flex: col.flex || 1,
+        };
+        
+        if (col.field === 'actions') {
+            colDef.cellRenderer = (params: any) => (
+              <div className={styles.actions}>
+                <FaEdit className={styles.icon} onClick={() => handleEdit(params)} />
+                <FaTrash className={classNames(styles.icon, styles.iconTrash)} onClick={() => handleDelete(params)} />
+              </div>
+            );
+            colDef.sortable = false;
+            colDef.filter = false;
+            colDef.width = 150;
+            colDef.pinned = 'right';
+        }
+        return colDef;
+      });
+
+      setColDefs(modifiedColDefs);
     }
   }, [userRole]);
-
-  // Add action column for editing
-  const actionColumn: ColDef = {
-    headerName: 'Действия',
-    cellRenderer: (params: any) => (
-      <button
-        onClick={() => handleEditSupplier(params.data)}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-1 px-2 rounded transition duration-200"
-      >
-        Редактирай
-      </button>
-    ),
-    width: 120,
-    pinned: 'right',
-  };
-
-  useEffect(() => {
-    if (colDefs.length > 0 && !colDefs.some((col) => col.headerName === 'Действия')) {
-      setColDefs([...colDefs, actionColumn]);
-    }
-  }, [colDefs]);
-
-  const gridOptions = {
-    getRowStyle: (params: any) => {
-      if (params.node.rowIndex % 2 === 0) {
-        return { background: '#0092b5' };
-      }
-    },
-  };
-
-  // Функция за отваряне на модал за добавяне
-  const handleAddSupplier = () => {
-    setFormData({
-      companyName: '',
-      responsiblePerson: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      country: '',
-    });
-    setIsEditing(false);
-    setSelectedSupplierId(null);
-    setIsModalOpen(true);
-  };
-
-  // Функция за отваряне на модал за редактиране
-  const handleEditSupplier = (supplier: Supplier) => {
-    setFormData({
-      companyName: supplier.companyName,
-      responsiblePerson: supplier.responsiblePerson,
-      email: supplier.email,
-      phone: supplier.phone,
-      address: supplier.address,
-      city: supplier.city,
-      country: supplier.country,
-    });
-    setIsEditing(true);
-    setSelectedSupplierId(supplier._id);
-    setIsModalOpen(true);
-  };
-
-  // Функция за затваряне на модала
-  const closeModal = () => {
+  
+  const handleClose = () => {
     setIsModalOpen(false);
-    setIsEditing(false);
-    setSelectedSupplierId(null);
-    setFormErrors({
-      companyName: '',
-      responsiblePerson: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      country: '',
-    });
-  };
+    setBackEndError('');
+  }
 
-  // Функция за обработка на промените във формата
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setFormErrors((prev) => ({ ...prev, [name]: '' }));
-  };
 
-  // Функция за валидация на формата
-  const validateForm = () => {
-    const errors = {
-      companyName: '',
-      responsiblePerson: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      country: '',
-    };
-    let isValid = true;
-
-    if (!formData.companyName.trim()) {
-      errors.companyName = 'Името на компанията е задължително';
-      isValid = false;
-    }
-
-    if (!formData.responsiblePerson.trim()) {
-      errors.responsiblePerson = 'Отговорното лице е задължително';
-      isValid = false;
-    }
-
-    if (!formData.email.trim()) {
-      errors.email = 'Имейлът е задължителен';
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Въведете валиден имейл';
-      isValid = false;
-    }
-
-    if (!formData.phone.trim()) {
-      errors.phone = 'Телефонът е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.address.trim()) {
-      errors.address = 'Адресът е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.city.trim()) {
-      errors.city = 'Градът е задължителен';
-      isValid = false;
-    }
-
-    if (!formData.country.trim()) {
-      errors.country = 'Държавата е задължителна';
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
-  // Функция за изпращане на формата
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    try {
-      if (isEditing && selectedSupplierId) {
-        // Update existing supplier
-        await updateSupplier(selectedSupplierId);
-      } else {
-        // Create new supplier
-        await createSupplier(formData);
-      }
-      mutate();
-      closeModal();
-    } catch (error) {
-      console.error('Грешка при изпращане на заявката:', error);
-    }
-  };
-
- return (
+  return (
     <div className={styles.grid}>
+      {<SuccessMessage title="Успешно добавен Доставчик" message="Доставчикът е добавен успешно" visible={visible} setIsVisible={setIsVisible} />}
+      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави клиент' />}
+
       <div className={styles.head}>
-        <h3 className={styles.title}>Доставчици</h3>
+        <h3 className={styles.title}>Клиенти</h3>
+        <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>
           <AgGridReact
