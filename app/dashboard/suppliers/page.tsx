@@ -123,10 +123,10 @@ export default function SuppliersPage() {
   return (
     <div className={styles.grid}>
       {<SuccessMessage title="Успешно добавен Доставчик" message="Доставчикът е добавен успешно" visible={visible} setIsVisible={setIsVisible} />}
-      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави клиент' />}
+      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави доставчик' />}
 
       <div className={styles.head}>
-        <h3 className={styles.title}>Клиенти</h3>
+        <h3 className={styles.title}>Доставчици</h3>
         <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>

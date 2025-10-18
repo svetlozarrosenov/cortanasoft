@@ -100,8 +100,8 @@ export const createUser = async (clientData: any) => {
     };
   }
 
-  export function useUsers(companyId: string) {
-    const { data: users, error, mutate } = useSWR(urls.fetchUsers(companyId), fetcher);
+  export function useUsers(companyId: string | null) {
+    const { data: users, error, mutate } = useSWR(companyId ? urls.fetchUsers(companyId) : null, fetcher);
   
     return {
       users,

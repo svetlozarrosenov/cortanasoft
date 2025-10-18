@@ -10,6 +10,8 @@ import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import Link from 'next/link';
 import styles from '../dashboard-grid.module.css';
+import { useOrders } from '../orders/hooks';
+import { FaFilePdf } from 'react-icons/fa';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -35,90 +37,74 @@ interface Order {
 }
 
 export default function InvoicesPage() {
-  const { invoices: rowData, mutate } = useInvoices();
+  const { orders: rowData, mutate } = useOrders();
   const { userRole } = useUserRole();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
-  const router = useRouter();
 
+  const handlePdf = () => {
+    console.log('crb_show_pdf')
+  }
   useEffect(() => {
     if (userRole) {
-      // Предполагам, че има таблица за фактури в конфигурацията на userRole
-      const table = findTableFields(userRole, 'invoicesSection', 'invoicesTable');
+      const table = findTableFields(userRole, 'ordersSection', 'ordersTable');
 
-      const modifiedColDefs: ColDef[] = table.map((col: any) => {
-        const colDef: ColDef = {
-          field: col.field || col.headerName,
-          headerName: col.headerName,
-          filter: col.filter || false,
-          flex: col.flex || 1,
-        };
-
-        // Форматиране на полета
-        if (col.field === 'invoiceNumber') {
-          colDef.cellRenderer = (params: any) => (
+      const modifiedColDefs = [
+        {
+          field: '_id',
+          headerName: 'ID на поръчка',
+          flex: 1,
+          cellRenderer: (params: any) => (
             <Link
-              href={`/invoices/${params.data._id}`}
+              href={`/dashboard/orders/${params.data._id}`}
               className="text-cyan-500 hover:text-cyan-600 underline"
             >
-              {`FAK-${params.data._id}-${Math.floor(100000 + Math.random() * 900000)}`}
+              {params.value}
             </Link>
-          );
-        }
-        if (col.field === 'clientName') {
-          colDef.valueFormatter = (params) => params.value || '-';
-        }
-        if (col.field === 'totalPrice') {
-          colDef.valueFormatter = (params) =>
-            params.value ? params.value.toLocaleString('bg-BG', { style: 'currency', currency: 'EUR' }) : '-';
-        }
-        if (col.field === 'status') {
-          colDef.valueFormatter = (params) => params.value || '-';
-        }
-        if (col.field === 'createdAt') {
-          colDef.valueFormatter = (params) =>
-            params.value ? new Date(params.value).toLocaleDateString('bg-BG') : '-';
-        }
+          ),
+        },
+        ...table.map((col: any) => {
+          const colDef: ColDef = {
+            field: col.field || col.headerName,
+            headerName: col.headerName,
+            filter: col.filter || false,
+            flex: col.flex || 1,
+          };
 
-        return colDef;
-      });
+          if (col.field === 'recurrenceInterval') {
+            colDef.valueFormatter = (params) => {
+              const intervalMap: Record<string, string> = {
+                daily: 'Дневно',
+                weekly: 'Седмично',
+                monthly: 'Месечно',
+              };
+              return params.value ? intervalMap[params.value] || params.value : '-';
+            };
+          }
+          if (col.field === 'createdAt') {
+            colDef.valueFormatter = (params) => new Date(params.value).toLocaleString('bg-BG');
+            colDef.sort = 'desc';
+          }
 
-      // Добавяне на колона за действия
-      modifiedColDefs.push({
-        headerName: 'Действия',
-        width: 150,
-        pinned: 'right',
-        cellRenderer: (params: any) => (
-          <button
-            onClick={() => router.push(`/invoices/${params.data._id}`)}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-          >
-            Преглед
-          </button>
-        ),
-        sortable: false,
-        filter: false,
-      });
+          if (col.field === 'actions') {
+              colDef.cellRenderer = (params: any) => (
+                <div className={styles.actions}>
+                  <FaFilePdf className={styles.icon} onClick={() => handlePdf(params)} />
+                </div>
+              );
+              colDef.sortable = false;
+              colDef.filter = false;
+              colDef.width = 150;
+              colDef.pinned = 'right';
+          }
 
+          return colDef;
+        }),
+      ];
       setColDefs(modifiedColDefs);
     }
-  }, [userRole, router]);
+  }, [userRole]);
 
-  // Стилизиране на редовете
-  const gridOptions = {
-    getRowStyle: (params: any) => {
-      if (params.node.rowIndex % 2 === 0) {
-        return { background: '#0092b5' };
-      }
-    },
-  };
-
-  const handleAddInvoice = () => {
-    // Placeholder за добавяне на нова фактура
-    // Може да добавиш модал или редирект към страница за създаване на фактура
-    alert('Функция за добавяне на фактура не е имплементирана още.');
-  };
-
-return (
+  return (
     <div className={styles.grid}>
       <div className={styles.head}>
         <h3 className={styles.title}>Фактури</h3>

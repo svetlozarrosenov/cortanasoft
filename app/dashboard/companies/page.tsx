@@ -5,10 +5,16 @@ import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import Link from 'next/link';
-import { useCompanies, createCompany, updateCompany } from './hooks';
-import { useUserRole } from './[id]/hooks';
+import { useCompanies, createCompany, updateCompany, useCompanySystemRoles } from './hooks';
+import { useCompanyUsers, useUserRole, useUsers } from './[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import styles from '../dashboard-grid.module.css';
+import DynamicForm from '@/components/form';
+import SuccessMessage from '@/components/form/successMessage';
+import { FaEdit } from 'react-icons/fa';
+import { useForm } from 'react-hook-form';
+import { fields } from './const';
+import { useCurrency } from '../supplies/hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -33,44 +39,32 @@ interface Company {
 export default function CompaniesPage() {
   const { companies: rowData, mutate } = useCompanies();
   const { userRole } = useUserRole();
-  const [colDefs, setColDefs] = useState([]);
-
+  const { systemRoles } = useCompanySystemRoles();
+  const { currency } = useCurrency();
+  const [currentCompanyId, setCurrentCompanyId] = useState<string | null>(null);
+  const { users } = useUsers(currentCompanyId);
+  const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [currentRow, setCurrentRow] = useState<Company>();
+  const [backEndError, setBackEndError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<Company>({
-    name: '',
-    personInCharge: '',
-    vatNumber: '',
-    eik: '',
-    country: '',
-    city: '',
-    address: '',
-    email: '',
-    phone: '',
-    description: '',
-    industry: '',
-    price: '',
-    charging: 'monthly',
-    roleInTheSystem: 'client',
-  });
-  const [formErrors, setFormErrors] = useState({
-    name: '',
-    personInCharge: '',
-    eik: '',
-  });
+  const [visible, setIsVisible] = useState(false);
+
+  const form = useForm({ mode: 'all' });
 
   useEffect(() => {
-    if(userRole) {
-      const table = findTableFields(userRole, "companiesSection", "companiesTable")
- 
+    if (userRole) {
+      const table = findTableFields(userRole, "companiesSection", "companiesTable");
+
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
           headerName: col.headerName,
           filter: col.filter || false,
-          flex: col.flex || 1,
+          flex: col.flex, // Без || 1 – оставям undefined ако няма col.flex, за да работи width
+          width: col.width || 200,
         };
-
+        console.log('crb_colDef', colDef);
         if (col.field === 'name') {
           colDef.cellRenderer = (params: any) => (
             <Link
@@ -91,122 +85,97 @@ export default function CompaniesPage() {
             return chargingMap[params.value] || params.value;
           };
         }
-
+        
         if (col.field === 'actions') {
           colDef.cellRenderer = (params: any) => (
-            <button
-              onClick={() => handleEditCompany(params.data)}
-              className="bg-[#0092b5] hover:bg-[#007a99] text-white font-semibold py-1 px-2 rounded text-sm transition duration-200"
-            >
-              Редактирай
-            </button>
+            <div className={styles.actions}>
+              <FaEdit className={styles.icon} onClick={() => handleEdit(params)} />
+            </div>
           );
-        };
-      
+          colDef.sortable = false;
+          colDef.filter = false;
+          colDef.width = 150;
+          colDef.flex = 0; // Експлицитно 0, за да се фиксира width
+          colDef.pinned = 'right';
+        }
         return colDef;
       });
-      setColDefs(modifiedColDefs)
+
+      setColDefs(modifiedColDefs);
     }
-  }, [userRole])
+  }, [userRole]);
 
-  const handleAddCompany = () => {
-    setIsEditMode(false);
-    setFormData({
-      name: '',
-      personInCharge: '',
-      vatNumber: '',
-      eik: '',
-      country: '',
-      city: '',
-      address: '',
-      email: '',
-      phone: '',
-      description: '',
-      industry: '',
-      price: '',
-      charging: 'monthly',
-      roleInTheSystem: 'client',
-    });
-    setFormErrors({ name: '', personInCharge: '', eik: '' });
-    setIsModalOpen(true);
-  };
-
-  const handleEditCompany = (company: Company) => {
-    setIsEditMode(true);
-    setFormData(company);
-    setFormErrors({ name: '', personInCharge: '', eik: '' });
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
+  const handleClose = () => {
     setIsModalOpen(false);
-    setFormErrors({ name: '', personInCharge: '', eik: '' });
+    setBackEndError('');
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setFormErrors((prev) => ({ ...prev, [name]: '' }));
+  const handleEdit = (row: any) => {
+    console.log('crb_row', row.data._id);
+    setCurrentCompanyId(row.data._id);
+    Object.keys(fields).map((fieldName: any) => {
+      form.setValue(fieldName, row.data[fieldName]);
+    });
+    setCurrentRow(row.data);
+    setEditMode(true);
+    setIsModalOpen(true);
   };
 
-  const validateForm = () => {
-    const errors = { name: '', personInCharge: '', eik: '' };
-    let isValid = true;
-
-    if (!formData.name.trim()) {
-      errors.name = 'Името на компанията е задължително';
-      isValid = false;
-    }
-
-    if (!formData.personInCharge.trim()) {
-      errors.personInCharge = 'МОЛ е задължителен';
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
+  const onSubmit = async (data: any): Promise<any> => {
     try {
-      const data = { ...formData };
-      if (isEditMode) {
-        await updateCompany(data);
+      if (editMode) {
+        await updateCompany(currentCompanyId, data);
       } else {
         await createCompany(data);
       }
+      setIsVisible(true);
+      setIsModalOpen(false);
       mutate();
-      closeModal();
-    } catch (error) {
-      console.error('Грешка при изпращане на заявката:', error);
+    } catch (e: any) {
+      setBackEndError(e.message);
     }
+  };
+
+  const newFields: any = {
+    ...fields,
+    personInCharge: {
+      ...fields.personInCharge,
+      options: users?.map((user: any) => {
+        return {value: user._id, label: `${user.firstName} ${user.lastName} (${user.email})`};
+      }),
+    },
+    currencyId: {
+      ...fields.currencyId,
+      options: currency?.map((cur: any) => {return {value: cur._id, label: `${cur.code}, ${cur.country}`};}),
+    },
+    roleInTheSystem: {
+      ...fields.roleInTheSystem,
+      options: systemRoles?.map((role: any) => {
+        return {value: role._id, label: `${role.name}`};
+      }),
+    },
   };
 
   return (
     <div className={styles.grid}>
+      {<SuccessMessage title="Успешно добавена Компания" message="Компанията е добавена успешно" visible={visible} setIsVisible={setIsVisible} />}
+      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави компания' />}
+
       <div className={styles.head}>
         <h3 className={styles.title}>Компании</h3>
+        <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
-        <div className={styles.table}>
-          <AgGridReact
-            rowData={rowData}
-            columnDefs={colDefs}
-            pagination={true}
-            paginationPageSize={10}
-            defaultColDef={{
-              flex: 1,
-              minWidth: 100,
-            }}
-          />
-        </div>
+      <div className={styles.table}>
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={colDefs}
+          pagination={true}
+          paginationPageSize={10}
+          defaultColDef={{
+            minWidth: 100, // Премахнах flex: 1
+          }}
+        />
+      </div>
     </div>
   );
 }

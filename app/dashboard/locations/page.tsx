@@ -124,10 +124,10 @@ export default function LocationsPage() {
   return (
     <div className={styles.grid}>
       {<SuccessMessage title="Успешно добавена локация" message="Локацията е добавена успешно" visible={visible} setIsVisible={setIsVisible} />}
-      {isModalOpen && <DynamicForm form={form} fields={fields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави клиент' />}
+      {isModalOpen && <DynamicForm form={form} fields={fields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави локация' />}
 
       <div className={styles.head}>
-        <h3 className={styles.title}>Клиенти</h3>
+        <h3 className={styles.title}>Локации</h3>
         <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>

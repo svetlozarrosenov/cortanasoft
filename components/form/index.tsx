@@ -181,7 +181,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                         
                               <MultiSelectButton 
                                 control={control}
-                                name={fields[key].name} // Името на масива
+                                name={fields[key].name}
                                 productOptions={fields[key]?.productOptions}
                                 lotsOptions={fields[key]?.lotsOptions}
                                 errors={errors}
@@ -200,10 +200,11 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                                 </label>
                           
                                 <MultiSelectSecondaryButton 
-                                  control={control}
-                                  name={fields[key].name}
-                                  options={fields[key]?.options}
-                                  errors={errors}
+                                   control={control}
+                                   name={fields[key].name}
+                                   filterOptions={fields[key]?.filterOptions}
+                                   dataOptions={fields[key]?.dataOptions}
+                                   errors={errors}
                                 />
                               </>
                             );

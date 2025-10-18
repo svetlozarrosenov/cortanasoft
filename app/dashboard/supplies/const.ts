@@ -6,12 +6,14 @@ export interface Field {
   label: string;
   type: FieldType;
   placeholder?: string;
+  filterOptions?: any;
+  dataOptions?: any;
   value?: any;
-  options?: { value: string; label: string }[]; // За select и radio
+  options?: { value: string; label: string }[];
   required?: boolean;
-  pattern?: RegExp; // За валидация (напр. email)
-  min?: number; // За number и date
-  max?: number; // За number и date
+  pattern?: RegExp;
+  min?: number;
+  max?: number;
   minLength?: number;
   maxLength?: number;
 }
@@ -40,28 +42,16 @@ export const fields: FieldsConfig = {
         name: 'products',
         label: 'Продукти',
         required: true,
-        options: [],
+        filterOptions: [],
+        dataOptions: [],
     },
-    status: {
-        type: 'text',
-        name: 'status',
-        label: 'Статус',
-        required: true,
-        placeholder: 'Статус',
-    },
-    price: {
-        type: 'text',
-        name: 'price',
-        label: 'Цена',
-        required: true,
-        placeholder: 'Цена',
-    },
-    currency: {
-        type: 'text',
-        name: 'currency',
+    currencyId: {
+        type: 'select',
+        name: 'currencyId',
         label: 'Валута',
         required: true,
         placeholder: 'Валута',
+        options: []
     },
     deliveryDate: {
         type: 'datetime-local',
@@ -69,5 +59,17 @@ export const fields: FieldsConfig = {
         label: 'Дата на доставката',
         required: true,
         placeholder: 'Дата на доставката',
+    },
+    status: {
+        type: 'select',
+        name: 'status',
+        label: 'Статус',
+        required: true,
+        placeholder: 'Статус',
+        options: [
+            {value: 'pending', label: 'Очакваща'},
+            {value: 'received', label: 'Получена'},
+            {value: 'canceled', label: 'Отменена'},
+        ]
     },
 };

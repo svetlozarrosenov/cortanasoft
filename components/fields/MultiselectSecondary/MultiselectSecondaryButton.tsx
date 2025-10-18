@@ -1,10 +1,10 @@
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
+import MultiSelect from './index';
 import styles from '../multiselect/multiselect-button.module.css';
 import { useEffect } from 'react';
-import MultiSelectSecondary from './index';
 
-export default function MultiSelectSecondaryButton({ control, name, options, errors }: any) {
+export default function MultiSelectButton({ control, name, dataOptions, filterOptions, errors }: any) {
   const { watch, setValue, register } = useFormContext();
   const selectedProducts = watch(name);
 
@@ -24,12 +24,11 @@ export default function MultiSelectSecondaryButton({ control, name, options, err
     }
   }, [JSON.stringify(selectedProducts), setValue]);
 
-  console.log('crb_totalPrice', selectedProducts)
   const handleAdd = () => {
     append({ 
       id: uuidv4(),
       productId: '', 
-      lotId: '', 
+      categoryId: '', 
       quantity: 0,
       price: 0,
     });
@@ -38,12 +37,13 @@ export default function MultiSelectSecondaryButton({ control, name, options, err
   return (
     <>
       {fields.map((field, index) => (
-        <MultiSelectSecondary
+        <MultiSelect
           key={field.id}
           control={control}
           parentName={name}
           index={index}
-          options={options}
+          dataOptions={dataOptions}
+          filterOptions={filterOptions || []}
           errors={errors}
           onDelete={() => remove(index)}
         />

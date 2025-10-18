@@ -6,7 +6,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useProducts } from '../products/all/hooks';
 import { useSuppliers } from '../suppliers/hooks';
-import { useSupplies, createSupply } from './hooks';
+import { useSupplies, createSupply, useCurrency } from './hooks';
 import { useLocations } from '../locations/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
@@ -17,6 +17,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import classNames from 'classnames';
 import { fields } from './const';
 import { useForm } from 'react-hook-form';
+import { useProductCategories } from '../products/categories/hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -67,12 +68,14 @@ interface Supply {
   updatedAt: string;
 }
 
-const formatPrice = (price: number, currency: 'EUR' | 'BGN') => {
-  return price.toLocaleString('bg-BG', { style: 'currency', currency });
+const formatPrice = (totalPrice: number, currency: 'EUR' | 'BGN') => {
+  // return totalPrice.toLocaleString('bg-BG', { style: 'currency', currency });
 };
 
 export default function SuppliesPage() {
+  const { currency } = useCurrency();
   const { suppliers } = useSuppliers();
+  const { categories } = useProductCategories();
   const { products } = useProducts();
   const { locations } = useLocations();
   const { supplies: rowData, mutate } = useSupplies();
@@ -102,10 +105,20 @@ export default function SuppliesPage() {
     },
     products: {
       ...fields.products,
-      options: products?.map((product: any) => {
-        return {value: product._id, label: product.name}
-      })
+      filterOptions: categories?.map((product: any) => ({
+        value: product._id,
+        label: product.name
+      })) || [],
+      dataOptions: products?.map((product: any) => ({
+        ...product,
+        value: product._id,
+        label: product.name,
+      })) || []
     },
+    currencyId: {
+      ...fields.currencyId,
+      options: currency?.map((cur: any) => {return {value: cur._id, label: `${cur.code}, ${cur.country}`}})
+    }
   }
 
   useEffect(() => {
@@ -119,10 +132,6 @@ export default function SuppliesPage() {
           filter: col.filter || false,
           flex: col.flex || 1,
         };
-        
-        if (col.field === 'price') {
-          colDef.valueFormatter = (params) => formatPrice(params.data.price, params.data.currency);
-        }
         
         if (col.field === 'status') {
           colDef.valueFormatter = (params) => {
@@ -159,11 +168,15 @@ export default function SuppliesPage() {
   }, [userRole]);
 
   const onSubmit = async (data: any) : Promise<any> => {
+    console.log('crb_data', data);
+  
+    const cleanedProducts = data.products.map(({ id, ...rest }: any) => rest);
+    const cleanedData = { ...data, products: cleanedProducts }; 
     try {
       if(editMode) {
       //  await updateSupplier(currentRow);
       } else {
-        await createSupply(data);
+        await createSupply(cleanedData);
       }
       setIsVisible(true);
       setIsModalOpen(false);
@@ -198,10 +211,10 @@ export default function SuppliesPage() {
   return (
     <div className={styles.grid}>
       {<SuccessMessage title="Успешно добавена доставка" message="Доставката е добавен успешно" visible={visible} setIsVisible={setIsVisible} />}
-      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави клиент' />}
+      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави доставка' />}
 
       <div className={styles.head}>
-        <h3 className={styles.title}>Клиенти</h3>
+        <h3 className={styles.title}>Доставки</h3>
         <button onClick={() => setIsModalOpen(true)}>Добави</button>
       </div>
         <div className={styles.table}>
