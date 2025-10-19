@@ -280,6 +280,31 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                             />
                           </>
                         );
+                      case 'number':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                            <input
+                              type="number"
+                              id={fields[key].name}
+                              placeholder={fields[key].placeholder}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              value={value || ''}
+                              ref={ref}
+                              step={fields[key].step || 'any'} // За цена: step='0.01' в fields
+                              min={fields[key].min}
+                              max={fields[key].max}
+                              className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                            />
+                          </>
+                        );
                       default:
                         return <></>;
                     }

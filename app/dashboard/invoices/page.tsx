@@ -7,11 +7,12 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useInvoices } from './hooks';
 import { useUserRole } from '../companies/[id]/hooks';
-import { findTableFields } from '@/utils/helpers';
+import { findTableFields, formatPrice } from '@/utils/helpers';
 import Link from 'next/link';
 import styles from '../dashboard-grid.module.css';
 import { useOrders } from '../orders/hooks';
 import { FaFilePdf } from 'react-icons/fa';
+import { useCurrentCompany } from '../hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -39,6 +40,7 @@ interface Order {
 export default function InvoicesPage() {
   const { orders: rowData, mutate } = useOrders();
   const { userRole } = useUserRole();
+  const { company } = useCurrentCompany();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
 
   const handlePdf = () => {
@@ -80,6 +82,11 @@ export default function InvoicesPage() {
               return params.value ? intervalMap[params.value] || params.value : '-';
             };
           }
+
+          if (col.field === 'totalPrice') {
+            colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
+          }
+      
           if (col.field === 'createdAt') {
             colDef.valueFormatter = (params) => new Date(params.value).toLocaleString('bg-BG');
             colDef.sort = 'desc';
@@ -102,7 +109,7 @@ export default function InvoicesPage() {
       ];
       setColDefs(modifiedColDefs);
     }
-  }, [userRole]);
+  }, [userRole, company]);
 
   return (
     <div className={styles.grid}>

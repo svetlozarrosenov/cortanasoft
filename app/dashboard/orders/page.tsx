@@ -13,11 +13,12 @@ import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import Link from 'next/link';
 import styles from '../dashboard-grid.module.css';
-import { FaEdit } from 'react-icons/fa';
 import DynamicForm from '@/components/form';
 import SuccessMessage from '@/components/form/successMessage';
 import { useForm } from 'react-hook-form';
 import { fields } from './const';
+import { useCurrentCompany } from '../hooks';
+import { formatPrice } from '@/utils/helpers'
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -64,10 +65,6 @@ interface Order {
   updatedAt: string;
 }
 
-const formatPrice = (price: number) => {
-  return price.toLocaleString('bg-BG', { style: 'currency', currency: 'EUR' });
-};
-
 const statusOptions = [
   { value: 'pending', label: 'В обработка' },
   { value: 'shipped', label: 'Изпратена' },
@@ -77,6 +74,7 @@ const statusOptions = [
 
 export default function OrdersPage() {
   const { clients } = useClients();
+  const { company } = useCurrentCompany();
   const { products } = useProducts();
   const { lots } = useAvailableLots();
   const { orders: rowData, mutate } = useOrders();
@@ -117,7 +115,7 @@ export default function OrdersPage() {
           };
 
           if (col.field === 'totalPrice') {
-            colDef.valueFormatter = (params) => formatPrice(params.value);
+            colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
           }
 
           if (col.field === 'recurrenceInterval') {
@@ -146,7 +144,7 @@ export default function OrdersPage() {
       ];
       setColDefs(modifiedColDefs);
     }
-  }, [userRole]);
+  }, [userRole, company]);
 
   const form = useForm({ mode: 'all' });
 
@@ -183,12 +181,12 @@ export default function OrdersPage() {
         ...fields.products,
         productOptions: products?.map((product: any) => ({
           value: product._id,
-          label: product.name
+          label:  `${product.name} ${product.model}`,
         })) || [],
         lotsOptions: lots?.map((lot: any) => ({
           ...lot,
           value: lot._id,
-          label: `${lot.name}, available: ${lot.quantity}, expiry: ${lot.expiryDate}`,
+          label: `${lot.name} ${lot.model}, available: ${lot.quantity}, expiry: ${lot.expiryDate}`,
         })) || []
       }
     };

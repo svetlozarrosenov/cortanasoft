@@ -9,7 +9,7 @@ import { useSuppliers } from '../suppliers/hooks';
 import { useSupplies, createSupply, useCurrency, updateSupply } from './hooks';
 import { useLocations } from '../locations/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
-import { findTableFields } from '@/utils/helpers';
+import { findTableFields, formatPrice } from '@/utils/helpers';
 import styles from '../dashboard-grid.module.css';
 import SuccessMessage from '@/components/form/successMessage';
 import DynamicForm from '@/components/form';
@@ -110,7 +110,7 @@ export default function SuppliesPage() {
       dataOptions: products?.map((product: any) => ({
         ...product,
         value: product._id,
-        label: product.name,
+        label: `${product.name} ${product.model}`
       })) || []
     },
     currencyId: {
@@ -122,7 +122,7 @@ export default function SuppliesPage() {
   useEffect(() => {
     if (userRole) {
       const table = findTableFields(userRole, "suppliesSection", "suppliesTable")
-
+      console.log('crb_table', table)
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
@@ -146,6 +146,10 @@ export default function SuppliesPage() {
           colDef.valueFormatter = (params) => new Date(params.value).toLocaleString('bg-BG');
         }
 
+        if (col.field === 'totalPrice') {
+          colDef.valueFormatter = (params) => `${formatPrice(params.value, params.data.currency)}`;
+        }
+      
         if (col.field === 'actions') {
             colDef.cellRenderer = (params: any) => (
               <div className={styles.actions}>
@@ -167,8 +171,7 @@ export default function SuppliesPage() {
   const onSubmit = async (data: any) : Promise<any> => {  
     const cleanedProducts = data.products.map(({ id, ...rest }: any) => rest);
     const cleanedData = { ...data, products: cleanedProducts };
-    console.log('crb_data', data)
-    console.log('crb_currentRow', currentRow)
+
     try {
       if(editMode) {
        await updateSupply(currentRow?._id, cleanedData);
@@ -217,8 +220,8 @@ export default function SuppliesPage() {
       {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави доставка' />}
 
       <div className={styles.head}>
-        <h3 className={styles.title}>Доставки</h3>
-        <button onClick={() => setIsModalOpen(true)}>Добави</button>
+        <h3 className={styles.title}>Доставки/разходи</h3>
+        <button onClick={() => setIsModalOpen(true)}>Добави доставка/разход</button>
       </div>
         <div className={styles.table}>
           <AgGridReact

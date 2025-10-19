@@ -15,6 +15,8 @@ import { fields } from './const';
 import { useForm } from 'react-hook-form';
 import { FaEdit } from 'react-icons/fa';
 import { useProductCategories } from '../categories/hooks';
+import { formatPrice } from '@/utils/helpers'
+import { useCurrentCompany } from '../../hooks';
 
 // Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -31,6 +33,7 @@ interface Product {
 
 export default function ProductsPage() {
   const { products: rowData, mutate } = useProducts();
+  const { company } = useCurrentCompany();
   const { categories } = useProductCategories();
   const { userRole } = useUserRole();
   const [backEndError, setBackEndError] = useState('');
@@ -62,7 +65,7 @@ export default function ProductsPage() {
         };
 
         if (col.field === 'price') {
-          colDef.valueFormatter = (params) => `${params.value} лв.`;
+          colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
         }
 
         if (col.field === 'actions') {
@@ -81,7 +84,7 @@ export default function ProductsPage() {
       });
       setColDefs(modifiedColDefs)
     }
-  }, [userRole])
+  }, [userRole, company])
 
   const form = useForm({ mode: 'all' });
 

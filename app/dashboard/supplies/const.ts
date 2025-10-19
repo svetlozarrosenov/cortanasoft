@@ -53,6 +53,13 @@ export const fields: FieldsConfig = {
         placeholder: 'Валута',
         options: []
     },
+    currencyRate: {
+        type: 'number',
+        name: 'currencyRate',
+        label: 'Курс на валута',
+        required: true,
+        placeholder: 'Курс на валута',
+    },
     deliveryDate: {
         type: 'datetime-local',
         name: 'deliveryDate',

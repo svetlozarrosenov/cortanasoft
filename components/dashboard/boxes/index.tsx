@@ -5,25 +5,27 @@ import { useActiveTasks } from '@/app/dashboard/tasks/hooks';
 import { useActiveOrders, useRevenue } from '@/app/dashboard/orders/hooks';
 import { useClients } from '@/app/dashboard/clients/hooks';
 import Link from 'next/link';
-import { FaDollarSign, FaChartLine, FaUsers, FaTasks, FaShoppingCart } from 'react-icons/fa';
+import { FaDollarSign, FaChartLine, FaUsers, FaTasks, FaShoppingCart, FaMoneyCheck } from 'react-icons/fa';
 import classNames from 'classnames';
+import { useCurrentCompany } from '@/app/dashboard/hooks';
 
 const DashboardBoxes: React.FC = () => {
   const { tasks } = useActiveTasks();
   const { clients } = useClients();
   const { orders } = useActiveOrders();
   const { revenue } =  useRevenue();
+  const {company} = useCurrentCompany();
 
   return (
     <ul className={styles.boxes}>
       <li className={styles.box} >
         <Link className={styles.link} href='/dashboard/orders'></Link>
         
-        <FaDollarSign className={styles.icon} />
+        <FaMoneyCheck className={styles.icon} />
         
         <h4 className={styles.title}>Месечна печалба</h4>
         
-        <p className={styles.value}>{revenue?.totalRevenue}</p>
+        <p className={styles.value}>{revenue?.totalRevenue} {company?.currency}</p>
         
         <p className={styles.content} >Оборот за месеца</p>
       </li>
@@ -35,7 +37,7 @@ const DashboardBoxes: React.FC = () => {
         
         <h4 className={styles.title}>Годишна печалба</h4>
         
-        <p className={styles.value}>2131$</p>
+        <p className={styles.value}>{revenue?.totalRevenue} {company?.currency}</p>
         
         <p className={styles.content} >Печалба от началото на годината.</p>
       </li>

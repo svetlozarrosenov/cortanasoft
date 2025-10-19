@@ -5,10 +5,11 @@ import type { ColDef } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useLots } from './hooks';
-import { findTableFields } from '@/utils/helpers';
+import { findTableFields, formatPrice } from '@/utils/helpers';
 import { useUserRole } from '../../companies/[id]/hooks';
 import styles from '../../dashboard-grid.module.css';
 import { useForm } from 'react-hook-form';
+import { useCurrentCompany } from '../../hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -27,6 +28,7 @@ interface Lot {
 
 export default function LotsPage() {
   const { lots: rowData } = useLots();
+  const { company } = useCurrentCompany();
   const { userRole } = useUserRole();
   const [colDefs, setColDefs] = useState([]);
 
@@ -43,12 +45,17 @@ export default function LotsPage() {
           filter: col.filter || false,
           flex: col.flex || 1,
         };
-      
+        
+        if (col.field === 'price') {
+          console.log('crb_we_are_here_we')
+          colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
+        }
+        
         return colDef;
       });
       setColDefs(modifiedColDefs)
     }
-  }, [userRole])
+  }, [userRole, company])
 
   return (
     <div className={styles.grid}>
