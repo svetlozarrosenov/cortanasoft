@@ -11,7 +11,7 @@ export function useCurrentCompany() {
   const { data: company, error, mutate } = useSWR(urls.fetchCurrentCompany, fetcher);
 
   return {
-    company,
+    company: company?.length ? company[0] : null,
     isLoading: !error && !company,
     error,
     mutate,

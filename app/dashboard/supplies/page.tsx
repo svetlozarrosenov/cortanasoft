@@ -6,7 +6,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useProducts } from '../products/all/hooks';
 import { useSuppliers } from '../suppliers/hooks';
-import { useSupplies, createSupply, useCurrency } from './hooks';
+import { useSupplies, createSupply, useCurrency, updateSupply } from './hooks';
 import { useLocations } from '../locations/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
@@ -18,6 +18,7 @@ import classNames from 'classnames';
 import { fields } from './const';
 import { useForm } from 'react-hook-form';
 import { useProductCategories } from '../products/categories/hooks';
+import { useCurrentCompany } from '../hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -64,15 +65,12 @@ interface Supply {
   price: number;
   status: string;
   deliveryDate: string;
-  currency: 'EUR' | 'BGN';
+  currency: string;
   updatedAt: string;
 }
 
-const formatPrice = (totalPrice: number, currency: 'EUR' | 'BGN') => {
-  // return totalPrice.toLocaleString('bg-BG', { style: 'currency', currency });
-};
-
 export default function SuppliesPage() {
+  const { company } = useCurrentCompany();
   const { currency } = useCurrency();
   const { suppliers } = useSuppliers();
   const { categories } = useProductCategories();
@@ -152,7 +150,6 @@ export default function SuppliesPage() {
             colDef.cellRenderer = (params: any) => (
               <div className={styles.actions}>
                 <FaEdit className={styles.icon} onClick={() => handleEdit(params)} />
-                <FaTrash className={classNames(styles.icon, styles.iconTrash)} onClick={() => handleDelete(params)} />
               </div>
             );
             colDef.sortable = false;
@@ -167,14 +164,14 @@ export default function SuppliesPage() {
     }
   }, [userRole]);
 
-  const onSubmit = async (data: any) : Promise<any> => {
-    console.log('crb_data', data);
-  
+  const onSubmit = async (data: any) : Promise<any> => {  
     const cleanedProducts = data.products.map(({ id, ...rest }: any) => rest);
-    const cleanedData = { ...data, products: cleanedProducts }; 
+    const cleanedData = { ...data, products: cleanedProducts };
+    console.log('crb_data', data)
+    console.log('crb_currentRow', currentRow)
     try {
       if(editMode) {
-      //  await updateSupplier(currentRow);
+       await updateSupply(currentRow?._id, cleanedData);
       } else {
         await createSupply(cleanedData);
       }
@@ -182,25 +179,31 @@ export default function SuppliesPage() {
       setIsModalOpen(false);
       mutate();
     } catch(e: any) {
-      setBackEndError(e.message);
+      setBackEndError(e?.response?.data?.message);
     }
   }
 
   const handleEdit = (row: any) => {
-    Object.keys(fields).map((fieldName: any) => {
-      form.setValue(fieldName, row.data[fieldName]);
-    })
+    console.log('crb_we_are_editing')
+    Object.keys(fields).map((fieldName: any) => {      
+      let value = row.data[fieldName];
+      
+      if (fieldName === 'deliveryDate' && value) {
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+          const formattedDate = date.toISOString().slice(0, 16);
+          value = formattedDate;
+        } else {
+          value = '';
+        }
+      }
+      
+      form.setValue(fieldName, value);
+    });
+    
     setCurrentRow(row.data);
     setEditMode(true);
     setIsModalOpen(true);
-  }
-  
-  const handleDelete = async (params: any) => {
-    const orderId = params.data._id;
-    if (confirm('Сигурни ли сте, че искате да изтриете тази поръчка?')) {
-      // await deleteLocation(orderId);
-      mutate();
-    }
   };
 
   const handleClose = () => {

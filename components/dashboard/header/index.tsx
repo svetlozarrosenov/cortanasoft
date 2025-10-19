@@ -6,6 +6,7 @@ import Profile from '../profile';
 
 const DashboardHeader: React.FC = () => {
   const {company} = useCurrentCompany();
+
   return (
     <div className={styles.header}>
       <p className={styles.company}>{company?.name}</p>

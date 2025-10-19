@@ -20,9 +20,9 @@ export const createSupply = async (supplyData: any) => {
     }
   };
 
-  export const updateSupply = async (supplyData: any) => {
+  export const updateSupply = async (id: any, supplyData: any) => {
     try {
-      const result = await axios.put(urls.updateSupply(supplyData._id), supplyData, { withCredentials: true });
+      const result = await axios.put(urls.updateSupply(id), supplyData, { withCredentials: true });
       return result.data;
     } catch (error) {
       console.error('Error registering user:', error);
