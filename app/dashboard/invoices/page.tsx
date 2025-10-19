@@ -88,7 +88,7 @@ export default function InvoicesPage() {
           if (col.field === 'actions') {
               colDef.cellRenderer = (params: any) => (
                 <div className={styles.actions}>
-                  <FaFilePdf className={styles.icon} onClick={() => handlePdf(params)} />
+                  <FaFilePdf className={styles.icon} onClick={() => handlePdf()} />
                 </div>
               );
               colDef.sortable = false;
