@@ -25,12 +25,12 @@ export const fields: FieldsConfig = {
       required: true,
       placeholder: 'Име',
     },
-    personInCharge: {
+    personInChargeId: {
         type: 'select',
-        name: 'personInCharge',
-        label: 'Отговорник/управител',
+        name: 'personInChargeId',
+        label: 'МОЛ',
         options: [],
-        placeholder: 'отговорник/управител',
+        placeholder: 'МОЛ',
     },
     eik: {
         type: 'text',
@@ -94,10 +94,14 @@ export const fields: FieldsConfig = {
         placeholder: 'Бележки',
     },
     industry: {
-        type: 'text',
+        type: 'select',
         name: 'industry',
         label: 'Индустрия',
         placeholder: 'Индустрия',
+        options: [
+            {value: 'trade', label: 'Търговия'},
+            {value: 'services', label: 'Услуги'}
+        ]
     },
     price: {
         type: 'text',
@@ -106,9 +110,9 @@ export const fields: FieldsConfig = {
         placeholder: 'Такса',
         required: true,
     },
-    charting: {
+    charging: {
         type: 'select',
-        name: 'charting',
+        name: 'charging',
         label: 'Период на таксуване',
         placeholder: 'Период на таксуване',
         required: true,

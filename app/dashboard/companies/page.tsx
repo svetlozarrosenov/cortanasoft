@@ -21,7 +21,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 interface Company {
   _id?: string;
   name: string;
-  personInCharge: string;
+  personInChargeId?: string;
   vatNumber?: string;
   eik: string;
   country: string;
@@ -61,10 +61,10 @@ export default function CompaniesPage() {
           field: col.field || col.headerName,
           headerName: col.headerName,
           filter: col.filter || false,
-          flex: col.flex, // Без || 1 – оставям undefined ако няма col.flex, за да работи width
+          flex: col.flex,
           width: col.width || 200,
         };
-        console.log('crb_colDef', colDef);
+
         if (col.field === 'name') {
           colDef.cellRenderer = (params: any) => (
             <Link
@@ -86,6 +86,16 @@ export default function CompaniesPage() {
           };
         }
         
+        if (col.field === 'industry') {
+          colDef.valueFormatter = (params) => {
+            const chargingMap: Record<string, string> = {
+              services: 'Услуги',
+              trade: 'Продажби',
+            };
+            return chargingMap[params.value] || params.value;
+          };
+        }
+
         if (col.field === 'actions') {
           colDef.cellRenderer = (params: any) => (
             <div className={styles.actions}>
@@ -95,7 +105,7 @@ export default function CompaniesPage() {
           colDef.sortable = false;
           colDef.filter = false;
           colDef.width = 150;
-          colDef.flex = 0; // Експлицитно 0, за да се фиксира width
+          colDef.flex = 0;
           colDef.pinned = 'right';
         }
         return colDef;
@@ -123,6 +133,7 @@ export default function CompaniesPage() {
 
   const onSubmit = async (data: any): Promise<any> => {
     try {
+      console.log('crb_data', data)
       if (editMode) {
         await updateCompany(currentCompanyId, data);
       } else {
@@ -138,8 +149,8 @@ export default function CompaniesPage() {
 
   const newFields: any = {
     ...fields,
-    personInCharge: {
-      ...fields.personInCharge,
+    personInChargeId: {
+      ...fields.personInChargeId,
       options: users?.map((user: any) => {
         return {value: user._id, label: `${user.firstName} ${user.lastName} (${user.email})`};
       }),
@@ -172,7 +183,7 @@ export default function CompaniesPage() {
           pagination={true}
           paginationPageSize={10}
           defaultColDef={{
-            minWidth: 100, // Премахнах flex: 1
+            minWidth: 100,
           }}
         />
       </div>
