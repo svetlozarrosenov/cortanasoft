@@ -19,3 +19,13 @@ export const findTableFields = (userRole: any, sectionId: any, tableId: any, lev
 
   return table?.fields;
 }
+
+export const formatPrice = (price: number, companyCurrencyCode: string) => {
+  if(!companyCurrencyCode ) {
+    return price;
+  }
+  console.log('crb_price', price);
+  console.log('crb_companyCurrencyCode', companyCurrencyCode)
+
+  return Number(price)?.toLocaleString('bg-BG', { style: 'currency', currency: companyCurrencyCode });
+};
