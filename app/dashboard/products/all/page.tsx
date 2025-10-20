@@ -29,7 +29,7 @@ export default function ProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visible, setIsVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [currentRow, setCurrentRow] = useState<`ny`>();
+  const [currentRow, setCurrentRow] = useState<any>();
   const [colDefs, setColDefs] = useState([]);
 
   const handleEdit = (row: any) => {
@@ -89,7 +89,6 @@ export default function ProductsPage() {
     console.log('crb_data', data)
     try {
       if (editMode) {
-        console.log('crb_currentRow', currentRow)
         await updateProduct(currentRow?._id, data);
       } else {
         await createProduct(data);
