@@ -20,16 +20,6 @@ import { useCurrentCompany } from '../../hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-interface Product {
-  _id?: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  companyId: string;
-  quantity: number;
-}
-
 export default function ProductsPage() {
   const { products: rowData, mutate } = useProducts();
   const { company } = useCurrentCompany();
@@ -39,7 +29,7 @@ export default function ProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visible, setIsVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [currentRow, setCurrentRow] = useState<Product>();
+  const [currentRow, setCurrentRow] = useState<`ny`>();
   const [colDefs, setColDefs] = useState([]);
 
   const handleEdit = (row: any) => {
