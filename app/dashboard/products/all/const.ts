@@ -40,16 +40,35 @@ export const fields: FieldsConfig = {
       required: true,
     },
     categoryId: {
-        type: 'select',
-        name: 'categoryId',
-        label: 'Категория',
+      type: 'select',
+      name: 'categoryId',
+      label: 'Категория',
+      required: true,
+      options: [],
+    },
+    salePrice: {
+        type: 'number',
+        name: 'salePrice',
+        label: 'Продажна цена',
         required: true,
-        options: [],
-      },
-    price: {
-        type: 'text',
-        name: 'price',
-        label: 'Цена',
-        required: true,
+    },
+    vat: {
+      type: 'select',
+      name: 'vat',
+      label: 'ДДС',
+      required: true,
+      options: [
+        {value: '0', label: '0%'},
+        {value: '5', label: '5%'},
+        {value: '9', label: '9%'},
+        {value: '10', label: '10%'},
+        {value: '20', label: '20%'}
+      ],
+    },
+    costPrice: {
+      type: 'number',
+      name: 'costPrice',
+      label: 'Доставна цена',
+      required: true,
     },
   };

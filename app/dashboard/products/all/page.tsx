@@ -18,7 +18,6 @@ import { useProductCategories } from '../categories/hooks';
 import { formatPrice } from '@/utils/helpers'
 import { useCurrentCompany } from '../../hooks';
 
-// Регистриране на модули
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface Product {
@@ -64,8 +63,16 @@ export default function ProductsPage() {
           flex: col.flex || 1,
         };
 
-        if (col.field === 'price') {
+        if (col.field === 'salePrice') {
           colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
+        }
+
+        if (col.field === 'costPrice') {
+          colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
+        }
+
+        if (col.field === 'vat') {
+          colDef.valueFormatter = (params) => `${params.value}%`;
         }
 
         if (col.field === 'actions') {
@@ -89,9 +96,11 @@ export default function ProductsPage() {
   const form = useForm({ mode: 'all' });
 
   const onSubmit = async (data: any): Promise<any> => {  
+    console.log('crb_data', data)
     try {
       if (editMode) {
-        await updateProduct(data);
+        console.log('crb_currentRow', currentRow)
+        await updateProduct(currentRow?._id, data);
       } else {
         await createProduct(data);
       }

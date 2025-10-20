@@ -115,14 +115,13 @@ export default function SuppliesPage() {
     },
     currencyId: {
       ...fields.currencyId,
-      options: currency?.map((cur: any) => {return {value: cur._id, label: `${cur.code}, ${cur.country}`}})
+      options: currency?.map((cur: any) => {return {value: cur._id, label: `${cur.code}, ${cur.country} ${cur.trade_share}`}})
     }
   }
 
   useEffect(() => {
     if (userRole) {
       const table = findTableFields(userRole, "suppliesSection", "suppliesTable")
-      console.log('crb_table', table)
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
@@ -187,7 +186,6 @@ export default function SuppliesPage() {
   }
 
   const handleEdit = (row: any) => {
-    console.log('crb_we_are_editing')
     Object.keys(fields).map((fieldName: any) => {      
       let value = row.data[fieldName];
       

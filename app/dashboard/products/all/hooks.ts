@@ -3,7 +3,7 @@ import useSWR from 'swr';
 
 const urls = {
     addProduct: `${process.env.NEXT_PUBLIC_BACK_END_URL}/products/create`,
-    updateProduct: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/products/update/${id}`,
+    updateProduct: (id: string | null) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/products/update/${id}`,
     fetchProducts: `${process.env.NEXT_PUBLIC_BACK_END_URL}/products`,
 };
 
@@ -19,9 +19,9 @@ export const createProduct = async (productData: any) => {
     }
   };
 
-  export const updateProduct = async (productData: any) => {
+  export const updateProduct = async (id: string | null, productData: any) => {
     try {
-      const result = await axios.put(urls.updateProduct(productData._id), productData, { withCredentials: true });
+      const result = await axios.put(urls.updateProduct(id), productData, { withCredentials: true });
       return result.data;
     } catch (error) {
       console.error('Error registering user:', error);

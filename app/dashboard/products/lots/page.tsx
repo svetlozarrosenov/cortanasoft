@@ -47,7 +47,6 @@ export default function LotsPage() {
         };
         
         if (col.field === 'price') {
-          console.log('crb_we_are_here_we')
           colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
         }
         

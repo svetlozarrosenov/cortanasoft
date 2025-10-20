@@ -11,7 +11,6 @@ const fetcher = (url: string) => axios.get(url, { withCredentials: true }).then(
 
 export const createProductCategory = async (productCategoryData: any) => {
     try {
-      console.log('crb_categoryData', productCategoryData)
       const result = await axios.post(urls.addCategory, productCategoryData, { withCredentials: true });
       return result.data;
     } catch (error) {

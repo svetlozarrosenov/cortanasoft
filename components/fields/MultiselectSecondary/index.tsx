@@ -1,80 +1,50 @@
 import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { FaTrash } from 'react-icons/fa';
+import Select from 'react-select'; // Импорт на React Select
 import styles from '../multiselect/multiselect.module.css';
+import classNames from 'classnames';
 
-export default function MultiSelect({ control, parentName, index, filterOptions, dataOptions, errors, onDelete }: any): any {
+export default function MultiSelect({ control, parentName, index, dataOptions, errors, onDelete }: any): any {
   const { setValue, watch } = useFormContext();
-  const productValue = watch(`${parentName}[${index}].categoryId`);
-  const lotValue = watch(`${parentName}[${index}].productId`);
-  const selectedLots = watch('products');
+  const lotValue = watch(`${parentName}[${index}].lotId`);
+  const selectedLots = watch(parentName); // watch(parentName) за да наблюдаваме целия array от селектирани lots
 
   const [currentLots, setCurrentLots] = useState<any>([]);
 
   useEffect(() => {
     const filteredLots = dataOptions?.filter((opt: any) => 
-      opt.categoryId === productValue && 
       !selectedLots?.some((selected: any, sIndex: any) => 
         sIndex !== index && 
-        selected.productId === opt.value
+        selected.lotId === opt.value
       )
     ) || [];
 
     setCurrentLots(filteredLots);
-  }, [productValue, JSON.stringify(selectedLots), dataOptions]);
+  }, [JSON.stringify(selectedLots), dataOptions]);
 
   return (
     <div className={styles.multiselect}>
       <div className={styles.head}>
         <Controller
-          name={`${parentName}[${index}].categoryId`}
+          name={`${parentName}[${index}].lotId`} // Промених на lotId
           control={control}
-          render={({ field: { onChange, value, ref } }) => (
+          rules={{ required: 'Партида е задължителна' }}
+          render={({ field: { onChange, value } }) => (
             <div className={styles.select}>
-              <label>Категория продукти</label>
-              <select
-                value={value || ''}
-                onChange={(e) => {
-                  onChange(e.target.value);
-                  setValue(`${parentName}[${index}].categoryId`, e.target.value);
-                }}
-                ref={ref}
-              >
-                <option value="" disabled>Избери категория...</option>
-                {filterOptions?.map((opt: any) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-        />
-
-        <Controller
-          name={`${parentName}[${index}].productId`}
-          control={control}
-          rules={{ required: 'Продукт е задължителен' }}
-          render={({ field: { onChange, value, ref } }) => (
-            <div className={styles.select}>
-              <label>Продукт</label>
-              <select
-                disabled={!productValue}
-                value={value || ''}
-                onChange={(e) => {
-                  onChange(e);
-                }}
-                ref={ref}
-              >
-                <option value="" disabled>Избери продукт...</option>
-                {currentLots.map((opt: any) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              {errors?.[parentName]?.[index]?.productId && (
-                <p className={styles.frontEndErrors}>{errors[parentName][index].productId.message}</p>
+              <label>Партида</label>
+              <Select
+                value={currentLots.find((opt: any) => opt.value === value) || null}
+                onChange={(selectedOption) => onChange(selectedOption?.value || '')}
+                options={currentLots}
+                getOptionLabel={(opt: any) => opt.label}
+                getOptionValue={(opt: any) => opt.value}
+                isSearchable={true}
+                placeholder="Избери партида..."
+                className={classNames(styles.reactSelect, errors?.[parentName]?.[index]?.lotId ? styles.formFieldError : '')}
+              />
+              {errors?.[parentName]?.[index]?.lotId && (
+                <p className={styles.frontEndErrors}>{errors[parentName][index].lotId.message}</p>
               )}
             </div>
           )}
@@ -118,45 +88,6 @@ export default function MultiSelect({ control, parentName, index, filterOptions,
         />
         {errors?.[parentName]?.[index]?.quantity && (
           <p className={styles.frontEndErrors}>{errors[parentName][index].quantity.message}</p>
-        )}
-
-        <Controller
-          name={`${parentName}[${index}].price`}
-          control={control}
-          rules={{ required: 'Цена е задължителна', min: { value: 0.01, message: 'Минимум 0.01' } }}
-          render={({ field: { onChange, value, ref } }) => (
-            <div>
-              <label>Цена</label>
-              <input
-                disabled={!lotValue}
-                value={value ?? ''}
-                onChange={(e) => {
-                  const inputValue = e.target.value;
-                  if (inputValue === '') {
-                    onChange('');
-                    return;
-                  }
-                  const newPrice = parseFloat(inputValue);
-                  if (isNaN(newPrice)) {
-                    onChange('');
-                  } else if (newPrice < 0.01) {
-                    onChange(0.01);
-                  } else {
-                    onChange(newPrice);
-                  }
-                }}
-                type="number"
-                step="0.01"
-                min={0.01}
-                placeholder="Цена"
-                className={styles.quantity}
-                ref={ref}
-              />
-            </div>
-          )}
-        />
-        {errors?.[parentName]?.[index]?.price && (
-          <p className={styles.frontEndErrors}>{errors[parentName][index].price.message}</p>
         )}
       </div>
 

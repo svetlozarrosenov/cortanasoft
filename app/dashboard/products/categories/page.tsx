@@ -85,8 +85,6 @@ export default function ProductsPage() {
       if (editMode) {
         await updateProductCategory(data);
       } else {
-        console.log('crb_data', data);
-
         await createProductCategory(data);
       }
       setIsModalOpen(false);

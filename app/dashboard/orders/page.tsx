@@ -148,9 +148,7 @@ export default function OrdersPage() {
 
   const form = useForm({ mode: 'all' });
 
-  const onSubmit = async (data: any): Promise<any> => {
-    console.log('crb_data', data);
-  
+  const onSubmit = async (data: any): Promise<any> => {  
     const cleanedProducts = data.products.map(({ id, ...rest }: any) => rest);
     const cleanedData = { ...data, products: cleanedProducts }; 
   

@@ -121,7 +121,6 @@ export default function CompaniesPage() {
   };
 
   const handleEdit = (row: any) => {
-    console.log('crb_row', row.data._id);
     setCurrentCompanyId(row.data._id);
     Object.keys(fields).map((fieldName: any) => {
       form.setValue(fieldName, row.data[fieldName]);
@@ -133,7 +132,6 @@ export default function CompaniesPage() {
 
   const onSubmit = async (data: any): Promise<any> => {
     try {
-      console.log('crb_data', data)
       if (editMode) {
         await updateCompany(currentCompanyId, data);
       } else {
