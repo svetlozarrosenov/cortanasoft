@@ -204,7 +204,9 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                                    name={fields[key].name}
                                    filterOptions={fields[key]?.filterOptions}
                                    dataOptions={fields[key]?.dataOptions}
+                                   currencyOptions={fields[key]?.currencyOptions}
                                    errors={errors}
+                                   company={fields[key]?.company}
                                 />
                               </>
                             );

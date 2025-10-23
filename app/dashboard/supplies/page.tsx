@@ -19,6 +19,7 @@ import { fields } from './const';
 import { useForm } from 'react-hook-form';
 import { useProductCategories } from '../products/categories/hooks';
 import { useCurrentCompany } from '../hooks';
+import { useAvailableLots } from '../products/lots/hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -71,6 +72,7 @@ interface Supply {
 
 export default function SuppliesPage() {
   const { company } = useCurrentCompany();
+  const { lots } = useAvailableLots();
   const { currency } = useCurrency();
   const { suppliers } = useSuppliers();
   const { categories } = useProductCategories();
@@ -84,7 +86,7 @@ export default function SuppliesPage() {
   const [backEndError, setBackEndError] = useState('');
   const [visible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  console.log('crb_lots', lots)
   const form = useForm({ mode: 'all' });
 
   const newFields: any = {
@@ -107,16 +109,14 @@ export default function SuppliesPage() {
         value: product._id,
         label: product.name
       })) || [],
+      currencyOptions: currency?.map((cur: any) => ({ value: cur._id, label: `${cur.code}, ${cur.country}` })) || [],
       dataOptions: products?.map((product: any) => ({
         ...product,
         value: product._id,
-        label: `${product.name} ${product.model}`
-      })) || []
+        label: `${product.name} ${product.model} (наличност: ${product.quantity})`
+      })) || [],
+      company: company
     },
-    currencyId: {
-      ...fields.currencyId,
-      options: currency?.map((cur: any) => {return {value: cur._id, label: `${cur.code}, ${cur.country} ${cur.trade_share}`}})
-    }
   }
 
   useEffect(() => {

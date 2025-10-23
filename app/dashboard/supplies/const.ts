@@ -45,21 +45,6 @@ export const fields: FieldsConfig = {
         filterOptions: [],
         dataOptions: [],
     },
-    currencyId: {
-        type: 'select',
-        name: 'currencyId',
-        label: 'Валута',
-        required: true,
-        placeholder: 'Валута',
-        options: []
-    },
-    currencyRate: {
-        type: 'number',
-        name: 'currencyRate',
-        label: 'Курс на валута',
-        required: true,
-        placeholder: 'Курс на валута',
-    },
     deliveryDate: {
         type: 'datetime-local',
         name: 'deliveryDate',
