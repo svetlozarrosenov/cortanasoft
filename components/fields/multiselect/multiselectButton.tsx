@@ -12,7 +12,7 @@ export default function MultiSelectButton({ control, name, dataOptions, filterOp
     control,
     name,
   });
-
+  console.log('crb_dataOptions', dataOptions)
   const isVatRegistered = company?.vatNumber?.trim() !== ''; // Проверка за регистрация по ДДС
 
   // Изчисляване на общи суми

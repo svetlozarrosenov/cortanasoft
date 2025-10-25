@@ -23,6 +23,15 @@ const Sidebar: React.FC<any> = () => {
       setMounted(true);
     }, []);
 
+    useEffect(() => {
+      if (userRole && pathname) {
+        const productsPermission = userRole.permissions.find(p => p.children && p.children.some(c => pathname === c.url));
+        if (productsPermission) {
+          setIsProductsOpen(true);
+        }
+      }
+    }, [userRole, pathname]);
+
     if (!mounted) {
       return null;
     }
@@ -57,7 +66,7 @@ const Sidebar: React.FC<any> = () => {
       </button>
       <ul className={`${isProductsOpen ? 'block' : 'hidden'}`}>
       {permission.children.map((childPermission: any) => {
-         return (<li key={childPermission.sectionId}>
+         return (<li key={childPermission.sectionId} className={classNames(styles.item, isActive(childPermission.url) ? styles.current : '')}>
          <Link
            href={childPermission?.url || ''}
          >

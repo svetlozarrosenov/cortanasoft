@@ -17,7 +17,7 @@ interface DynamicFormProps {
   onClose: () => void;
 }
 
-export default function DynamicForm({ fields, form, onSubmit, backEndError, onClose, title }: any) {
+export default function DynamicFormFullWidth({ fields, form, onSubmit, backEndError, onClose, title }: any) {
   const {
     control,
     handleSubmit,

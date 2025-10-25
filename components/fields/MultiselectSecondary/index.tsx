@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { FaTrash } from 'react-icons/fa';
 import Select from 'react-select';
-import styles from '../multiselect/multiselect.module.css';
+import styles from './multiselectFields.module.css';
 import classNames from 'classnames';
 import { formatPrice } from '@/utils/helpers';
 
@@ -11,6 +11,12 @@ const addPercent = (number: number, percentage: number) => {
   const result = number + (number * percent);
   return result;
 }
+
+const removePercent = (result: number, percentage: number) => {
+  const percent = percentage / 100;
+  const original = result / (1 + percent);
+  return original;
+};
 
 export default function MultiSelect({ control, parentName, index, dataOptions, errors, onDelete, isVatRegistered, currencyOptions, company }: any): any {
   const { setValue, watch, register } = useFormContext();
@@ -24,8 +30,15 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
   const currentCurrencyRate = watch(`${parentName}[${index}].currencyRate`);
   const currenetQuantity =  watch(`${parentName}[${index}].quantity`);
   const currenetVat =  watch(`${parentName}[${index}].vatRate`);
-  
+  const [selectedCurrency, setSelectedCurrency] = useState(company?.currency)
+
   const isDifferentCurrency = selectedCurrencyId && selectedCurrencyId !== company.currencyId;
+
+  useEffect(() => {
+    setValue(`${parentName}[${index}].currencyRate`, 0);
+    selectedCurrencyId
+    setSelectedCurrency(currencyOptions.find((options: any) => options.value === selectedCurrencyId))
+  }, [selectedCurrencyId])
 
   useEffect(() => {
     const currentProduct = dataOptions.find((product: any) => product._id === productValue)
@@ -33,15 +46,16 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
   }, [productValue]);
 
   useEffect(() => {
-    let price = currentPrice * currenetQuantity;
-
+    let price = currentPrice;
     if(currentCurrencyRate && isDifferentCurrency) {
-      price = price * currentCurrencyRate;
+      price = currentPrice * currentCurrencyRate;
     }
 
-    if(currenetVat) {
-      price = addPercent(price, currenetVat);
-    }
+    price = price * currenetQuantity;
+
+    // if(currenetVat) {
+    //   price = removePercent(price, currenetVat);
+    // }
 
     if (!isNaN(price)) {
       setTotal(price);
@@ -99,27 +113,35 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
             </div>
           )}
         />
-      </div>
 
-      <div className={styles.body}>
         <div>
-          <label>Цена<span className="text-red-500">*</span></label>
-          <input
-            disabled={!productValue}
-            type="number"
-            min={0.01}
-            step={0.01}
-            {...register(`${parentName}[${index}].costPrice`, {
+          <Controller
+            name={`${parentName}[${index}].costPrice`}
+            control={control}
+            rules={{
               required: 'Цена е задължителна',
               min: { value: 0.01, message: 'Минимална цена 0.01' },
-              valueAsNumber: true,
-            })}
-            className={styles.quantity}
+            }}
+            render={({ field: { onChange, value, ref } }) => (
+              <div>
+                <label>Цена в {selectedCurrency.code}<span className="text-red-500">*</span></label>
+                <input
+                  disabled={!productValue}
+                  type="number"
+                  min={0.01}
+                  step={0.01}
+                  value={value ?? ''}
+                  onChange={onChange}
+                  className={styles.quantity}
+                  ref={ref}
+                />
+              </div>
+            )}
           />
+          {errors?.[parentName]?.[index]?.price && (
+            <p className={styles.frontEndErrors}>{errors[parentName][index].price.message}</p>
+          )}
         </div>
-        {errors?.[parentName]?.[index]?.price && (
-          <p className={styles.frontEndErrors}>{errors[parentName][index].price.message}</p>
-        )}
 
         <Controller
           name={`${parentName}[${index}].quantity`}
@@ -134,12 +156,12 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
                 onChange={(e) => {
                   const inputValue = e.target.value;
                   if (inputValue === '') {
-                    onChange('');
+                    onChange(1);
                     return;
                   }
                   const newQuantity = parseInt(inputValue, 10);
                   if (isNaN(newQuantity)) {
-                    onChange('');
+                    onChange(1);
                   } else if (newQuantity < 1) {
                     onChange(1);
                   } else {
@@ -218,54 +240,57 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
         {errors?.[parentName]?.[index]?.vatRate && (
           <p className={styles.frontEndErrors}>{errors[parentName][index].vatRate.message}</p>
         )}
-      </div>
 
-      <div className={styles.currencyField}> {/* Добави клас в CSS */}
-        <label>Валута<span className="text-red-500">*</span></label>
-        <Controller
-          name={`${parentName}[${index}].currencyId`}
-          control={control}
-          rules={{ required: 'Валута е задължителна' }}
-          render={({ field: { onChange, value } }) => {
-            return (
-            <Select
-              value={currencyOptions.find((opt: any) => opt.value === value) || null}
-              onChange={(selectedOption) => onChange(selectedOption?.value || '')}
-              options={currencyOptions}
-              getOptionLabel={(opt: any) => opt.label}
-              getOptionValue={(opt: any) => opt.value}
-              isSearchable={true}
-              placeholder="Избери валута..."
-              className={classNames(styles.reactSelect, errors?.currencyId ? styles.formFieldError : '')}
-            />
-          )}}
-        />
-        {errors?.currencyId && <p className={styles.frontEndErrors}>{errors.currencyId.message}</p>}
+        <div className={styles.currencyField}> {/* Добави клас в CSS */}
+          <label>Валута<span className="text-red-500">*</span></label>
+          <Controller
+            name={`${parentName}[${index}].currencyId`}
+            control={control}
+            rules={{ required: 'Валута е задължителна' }}
+            render={({ field: { onChange, value } }) => {
+              return (
+              <Select
+                value={currencyOptions.find((opt: any) => opt.value === value) || null}
+                onChange={(selectedOption) => onChange(selectedOption?.value || '')}
+                options={currencyOptions}
+                getOptionLabel={(opt: any) => opt.label}
+                getOptionValue={(opt: any) => opt.value}
+                isSearchable={true}
+                placeholder="Избери валута..."
+                className={classNames(styles.reactSelect, errors?.currencyId ? styles.formFieldError : '')}
+              />
+            )}}
+          />
+          {errors?.currencyId && <p className={styles.frontEndErrors}>{errors.currencyId.message}</p>}
+        </div>
+        
+        {isDifferentCurrency && <div className={styles.currencyField}>
+          <label>Валутен курс<span className="text-red-500">*</span></label>
+          <Controller
+            name={`${parentName}[${index}].currencyRate`}
+            control={control}
+            rules={{ required: 'Валутен курс е задължителен' }}
+            render={({ field: { onChange, value } }) => (
+              <input
+                placeholder="Въведи курс"
+                className={classNames(styles.quantity)}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+              />
+            )}
+          />
+          {errors?.currencyId && <p className={styles.frontEndErrors}>{errors.currencyId.message}</p>}
+        </div>}
+
+        <FaTrash onClick={onDelete} className={styles.icon} />
       </div>
-      
-      {isDifferentCurrency && <div className={styles.currencyField}>
-        <label>Валутен курс<span className="text-red-500">*</span></label>
-        <Controller
-          name={`${parentName}[${index}].currencyRate`}
-          control={control}
-          rules={{ required: 'Валутен курс е задължителен' }}
-          render={({ field: { onChange, value } }) => (
-            <input
-              placeholder="Въведи курс"
-              className={classNames(styles.quantity)}
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-            />
-          )}
-        />
-        {errors?.currencyId && <p className={styles.frontEndErrors}>{errors.currencyId.message}</p>}
-      </div>}
-      
-      <p>Крайна цена без ДДС: {formatPrice(currentPrice * currenetQuantity, company.currency)}</p>
-      <p>{currenetVat}% ДДС: {formatPrice(total - currentPrice * currenetQuantity, company.currency)}</p>
-      <p>Крайна цена {formatPrice(total, company.currency)}</p>
-      
-      <button onClick={onDelete}><FaTrash className={styles.icon} /><span>Изтрий</span></button>
+      <div className={styles.total}>
+        <p>Крайна цена с ДДС за брой: {formatPrice(currentPrice, selectedCurrency.code)}</p>
+        {company.currency != selectedCurrency.code && <p>Крайна цена с ДДС за брой в {company?.currency}: {formatPrice(currentPrice * currentCurrencyRate, company.currency)}</p>}
+        <p>| {currenetVat}% ДДС: {formatPrice(total - removePercent(total, currenetVat), company.currency)}</p>
+        <p>| Крайна Цена без ДДС:{formatPrice(removePercent(total, currenetVat), company.currency)}</p>
+        <p>| Крайна цена {formatPrice(total, company.currency)}</p>
+      </div>
     </div>
   );
 }

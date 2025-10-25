@@ -9,6 +9,7 @@
     color: #fff;
     background-color: #00AFEF;
     padding: 40px;
+    overflow-y: auto;
 }
 
 .sidebar li button {
@@ -56,6 +57,15 @@
 .sidebar li a {
     font-size: 18px;
     color: #fff;
+}
+
+.sidebar li ul {
+    padding-top: 20px;
+}
+.sidebar li ul li {
+    min-width: 180px;
+    padding: 10px 10px 10px 15px;
+    margin-bottom: 20px;
 }
 
 .current {

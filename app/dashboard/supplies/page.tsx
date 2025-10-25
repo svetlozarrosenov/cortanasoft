@@ -12,14 +12,12 @@ import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields, formatPrice } from '@/utils/helpers';
 import styles from '../dashboard-grid.module.css';
 import SuccessMessage from '@/components/form/successMessage';
-import DynamicForm from '@/components/form';
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import classNames from 'classnames';
+import DynamicFormFullWidth from '@/components/DynamicFormFullWidth';
+import { FaEdit } from 'react-icons/fa';
 import { fields } from './const';
 import { useForm } from 'react-hook-form';
 import { useProductCategories } from '../products/categories/hooks';
 import { useCurrentCompany } from '../hooks';
-import { useAvailableLots } from '../products/lots/hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -72,7 +70,6 @@ interface Supply {
 
 export default function SuppliesPage() {
   const { company } = useCurrentCompany();
-  const { lots } = useAvailableLots();
   const { currency } = useCurrency();
   const { suppliers } = useSuppliers();
   const { categories } = useProductCategories();
@@ -109,7 +106,7 @@ export default function SuppliesPage() {
         value: product._id,
         label: product.name
       })) || [],
-      currencyOptions: currency?.map((cur: any) => ({ value: cur._id, label: `${cur.code}, ${cur.country}` })) || [],
+      currencyOptions: currency?.map((cur: any) => ({ value: cur._id, label: `${cur.code}, ${cur.country}`, code: cur.code })) || [],
       dataOptions: products?.map((product: any) => ({
         ...product,
         value: product._id,
@@ -218,7 +215,7 @@ export default function SuppliesPage() {
   return (
     <div className={styles.grid}>
       {<SuccessMessage title="Успешно добавена доставка" message="Доставката е добавен успешно" visible={visible} setIsVisible={setIsVisible} />}
-      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави доставка' />}
+      {isModalOpen && <DynamicFormFullWidth form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави доставка' />}
 
       <div className={styles.head}>
         <h3 className={styles.title}>Доставки/разходи</h3>

@@ -38,14 +38,6 @@ export const fields: FieldsConfig = {
         options: [],
         placeholder: 'Локация',
     },
-    products: {
-        type: 'multiselectSecondary',
-        name: 'products',
-        label: 'Продукти',
-        required: true,
-        filterOptions: [],
-        dataOptions: [],
-    },
     deliveryDate: {
         type: 'datetime-local',
         name: 'deliveryDate',
@@ -66,5 +58,13 @@ export const fields: FieldsConfig = {
             {value: 'received', label: 'Получена'},
             {value: 'canceled', label: 'Отменена'},
         ]
+    },
+    products: {
+        type: 'multiselectSecondary',
+        name: 'products',
+        label: 'Продукти',
+        required: true,
+        filterOptions: [],
+        dataOptions: [],
     },
 };

@@ -1,0 +1,53 @@
+.success {
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    min-width: 340px;
+    padding: 30px 20px;
+    background-color: #fff;
+    border-radius: 30px;
+    border-left: 6px solid #00BA00;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 200;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    animation: fadeInSlide 0.5s ease-out forwards;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0); 
+    }
+}
+
+.title { 
+    font-size: 18px;
+}
+
+.icon { 
+    display: block;
+    margin-right: 20px;
+    font-size: 30px;
+    color: #00BA00; 
+    animation: iconBounce 0.5s ease-out; 
+}
+
+@keyframes iconBounce {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}

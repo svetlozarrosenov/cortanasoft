@@ -15,7 +15,7 @@ export interface Field {
   batchOptions?: { value: string; label: string }[];
   minLength?: number;
   maxLength?: number;
-  lotsOptions?: { value: string; label: string }[];
+  dataOptions?: { value: string; label: string }[];
 }
 
 export type FieldsConfig = Record<string, Field>;
@@ -33,8 +33,7 @@ export const fields: FieldsConfig = {
       name: 'products',
       label: 'Продукти',
       required: true,
-      productOptions: [],
-      lotsOptions: [],
+      dataOptions: [],
     },
     status: {
         type: 'select',

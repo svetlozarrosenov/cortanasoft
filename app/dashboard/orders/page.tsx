@@ -177,11 +177,7 @@ export default function OrdersPage() {
       },
       products: {
         ...fields.products,
-        productOptions: products?.map((product: any) => ({
-          value: product._id,
-          label:  `${product.name} ${product.model}`,
-        })) || [],
-        lotsOptions: lots?.map((lot: any) => ({
+        dataOptions: lots?.map((lot: any) => ({
           ...lot,
           value: lot._id,
           label: `${lot.name} ${lot.model}, available: ${lot.quantity}, expiry: ${lot.expiryDate}`,

@@ -6,7 +6,7 @@ import styles from '../multiselect/multiselect.module.css';
 import classNames from 'classnames';
 
 export default function MultiSelect({ control, parentName, index, dataOptions, errors, onDelete, isVatRegistered }: any): any {
-  const { setValue, watch, register } = useFormContext(); // Добави register за vatRate
+  const { setValue, watch, register } = useFormContext();
   const lotValue = watch(`${parentName}[${index}].lotId`);
   const selectedLots = watch(parentName);
 
@@ -22,6 +22,12 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
 
     setCurrentLots(filteredLots);
   }, [JSON.stringify(selectedLots), dataOptions]);
+
+  // Добавен useEffect за автоматично set-ване на цена от избрания lot
+  useEffect(() => {
+    const currentLot = dataOptions.find((lot: any) => lot._id === lotValue);
+    setValue(`${parentName}[${index}].salePrice`, currentLot?.salePrice || 0);
+  }, [lotValue, dataOptions, parentName, index, setValue]);
 
   return (
     <div className={styles.multiselect}>
@@ -52,6 +58,26 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
       </div>
 
       <div className={styles.body}>
+        {/* Добавено поле за цена */}
+        <div>
+          <label>Цена<span className="text-red-500">*</span></label>
+          <input
+            disabled={!lotValue}
+            type="number"
+            min={0.01}
+            step={0.01}
+            {...register(`${parentName}[${index}].salePrice`, {
+              required: 'Цена е задължителна',
+              min: { value: 0.01, message: 'Минимална цена 0.01' },
+              valueAsNumber: true,
+            })}
+            className={styles.quantity}
+          />
+        </div>
+        {errors?.[parentName]?.[index]?.salePrice && (
+          <p className={styles.frontEndErrors}>{errors[parentName][index].salePrice.message}</p>
+        )}
+
         <Controller
           name={`${parentName}[${index}].quantity`}
           control={control}
