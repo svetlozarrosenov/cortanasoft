@@ -86,7 +86,7 @@ export default function SuppliesPage() {
   const [backEndError, setBackEndError] = useState('');
   const [visible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log('crb_lots', lots)
+
   const form = useForm({ mode: 'all' });
 
   const newFields: any = {
@@ -113,7 +113,7 @@ export default function SuppliesPage() {
       dataOptions: products?.map((product: any) => ({
         ...product,
         value: product._id,
-        label: `${product.name} ${product.model} (наличност: ${product.quantity})`
+        label: `${product.name} ${product.model}`
       })) || [],
       company: company
     },
@@ -146,7 +146,10 @@ export default function SuppliesPage() {
         }
 
         if (col.field === 'totalPrice') {
-          colDef.valueFormatter = (params) => `${formatPrice(params.value, params.data.currency)}`;
+          colDef.valueFormatter = (params) => { 
+            console.log('crb_params.value', params.value)
+            return `${formatPrice(params.value, company?.currency)}`
+          };
         }
       
         if (col.field === 'actions') {

@@ -153,7 +153,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                               id={fields[key].name}
                               onChange={onChange}
                               onBlur={onBlur}
-                              value={value || ''}
+                              value={value || fields[key].defaultValue || ''}
                               ref={ref}
                               className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                             >
@@ -276,7 +276,7 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                               placeholder={fields[key].placeholder}
                               onChange={onChange}
                               onBlur={onBlur}
-                              value={value || ''}
+                              value={value || fields[key].defaultValue || ''}
                               ref={ref}
                               className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
                             />

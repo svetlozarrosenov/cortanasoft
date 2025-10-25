@@ -14,18 +14,23 @@ const addPercent = (number: number, percentage: number) => {
 
 export default function MultiSelect({ control, parentName, index, dataOptions, errors, onDelete, isVatRegistered, currencyOptions, company }: any): any {
   const { setValue, watch, register } = useFormContext();
-  const selectedLots = watch(parentName);
-  const [currentLots, setCurrentLots] = useState<any>([]);
+  const selectedProducts = watch(parentName);
+  const [currentProducts, setcurrentProducts] = useState<any>([]);
   const [total, setTotal] = useState(0);
   
-  const lotValue = watch(`${parentName}[${index}].lotId`);
+  const productValue = watch(`${parentName}[${index}].productId`);
   const selectedCurrencyId = watch(`${parentName}[${index}].currencyId`);
-  const currentPrice = watch(`${parentName}[${index}].productPrice`);
+  const currentPrice = watch(`${parentName}[${index}].costPrice`);
   const currentCurrencyRate = watch(`${parentName}[${index}].currencyRate`);
   const currenetQuantity =  watch(`${parentName}[${index}].quantity`);
   const currenetVat =  watch(`${parentName}[${index}].vatRate`);
   
   const isDifferentCurrency = selectedCurrencyId && selectedCurrencyId !== company.currencyId;
+
+  useEffect(() => {
+    const currentProduct = dataOptions.find((product: any) => product._id === productValue)
+    setValue(`${parentName}[${index}].costPrice`, currentProduct?.costPrice);
+  }, [productValue]);
 
   useEffect(() => {
     let price = currentPrice * currenetQuantity;
@@ -40,20 +45,20 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
 
     if (!isNaN(price)) {
       setTotal(price);
-      setValue(`${parentName}[${index}].totalProductPrice`, price);
+      setValue(`${parentName}[${index}].totalCostPrice`, price);
     }
   }, [currentPrice, currentCurrencyRate, currenetVat, currenetQuantity, isDifferentCurrency]);
 
   useEffect(() => {
-    const filteredLots = dataOptions?.filter((opt: any) => 
-      !selectedLots?.some((selected: any, sIndex: any) => 
+    const filteredProducts = dataOptions?.filter((opt: any) => 
+      !selectedProducts?.some((selected: any, sIndex: any) => 
         sIndex !== index && 
-        selected.lotId === opt.value
+        selected.productId === opt.value
       )
     ) || [];
 
-    setCurrentLots(filteredLots);
-  }, [JSON.stringify(selectedLots), dataOptions]);
+    setcurrentProducts(filteredProducts);
+  }, [JSON.stringify(selectedProducts), dataOptions]);
 
   useEffect(() => {
     if (company?.currencyId && !watch(`${parentName}[${index}].currencyId`)) {
@@ -72,24 +77,24 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
     <div className={styles.multiselect}>
       <div className={styles.head}>
         <Controller
-          name={`${parentName}[${index}].lotId`}
+          name={`${parentName}[${index}].productId`}
           control={control}
-          rules={{ required: 'Партида е задължителна' }}
+          rules={{ required: 'Продукт е задължително поле' }}
           render={({ field: { onChange, value } }) => (
             <div className={styles.select}>
-              <label>Партида</label>
+              <label>Продукт</label>
               <Select
-                value={currentLots.find((opt: any) => opt.value === value) || null}
+                value={currentProducts.find((opt: any) => opt.value === value) || null}
                 onChange={(selectedOption) => onChange(selectedOption?.value || '')}
-                options={currentLots}
+                options={currentProducts}
                 getOptionLabel={(opt: any) => opt.label}
                 getOptionValue={(opt: any) => opt.value}
                 isSearchable={true}
-                placeholder="Избери партида..."
-                className={classNames(styles.reactSelect, errors?.[parentName]?.[index]?.lotId ? styles.formFieldError : '')}
+                placeholder="Избери продукт..."
+                className={classNames(styles.reactSelect, errors?.[parentName]?.[index]?.productId ? styles.formFieldError : '')}
               />
-              {errors?.[parentName]?.[index]?.lotId && (
-                <p className={styles.frontEndErrors}>{errors[parentName][index].lotId.message}</p>
+              {errors?.[parentName]?.[index]?.productId && (
+                <p className={styles.frontEndErrors}>{errors[parentName][index].productId.message}</p>
               )}
             </div>
           )}
@@ -97,14 +102,14 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
       </div>
 
       <div className={styles.body}>
-        {/* Ново поле за цена */}
         <div>
           <label>Цена<span className="text-red-500">*</span></label>
           <input
+            disabled={!productValue}
             type="number"
             min={0.01}
             step={0.01}
-            {...register(`${parentName}[${index}].productPrice`, {
+            {...register(`${parentName}[${index}].costPrice`, {
               required: 'Цена е задължителна',
               min: { value: 0.01, message: 'Минимална цена 0.01' },
               valueAsNumber: true,
@@ -124,7 +129,7 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
             <div>
               <label>Брой</label>
               <input
-                disabled={!lotValue}
+                disabled={!productValue}
                 value={value ?? ''}
                 onChange={(e) => {
                   const inputValue = e.target.value;
@@ -154,7 +159,40 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
           <p className={styles.frontEndErrors}>{errors[parentName][index].quantity.message}</p>
         )}
 
-        {/* ДДС като select */}
+        <Controller
+          name={`${parentName}[${index}].expiryDate`}
+          control={control}
+          rules={{}}
+          render={({ field: { onChange, value } }) => (
+            <div>
+              <label>Срок на годност до:</label>
+              <input
+                type="date"
+                value={value || ''}
+                onChange={onChange}
+                className={styles.quantity}
+              />
+            </div>
+          )}
+        />
+
+        <Controller
+          name={`${parentName}[${index}].serialNumber`}
+          control={control}
+          rules={{}}
+          render={({ field: { onChange, value } }) => (
+            <div>
+              <label>Сериен номер</label>
+              <input
+                type="text"
+                value={value || ''}
+                onChange={onChange}
+                className={styles.quantity}
+              />
+            </div>
+          )}
+        />
+
         <div>
           <label>ДДС (%){isVatRegistered && <span className="text-red-500">*</span>}</label>
           <Controller
@@ -223,7 +261,9 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
         {errors?.currencyId && <p className={styles.frontEndErrors}>{errors.currencyId.message}</p>}
       </div>}
       
-      <p>Крайна цена с {currenetVat}% ДДС: {formatPrice(total, company.currency)}</p>
+      <p>Крайна цена без ДДС: {formatPrice(currentPrice * currenetQuantity, company.currency)}</p>
+      <p>{currenetVat}% ДДС: {formatPrice(total - currentPrice * currenetQuantity, company.currency)}</p>
+      <p>Крайна цена {formatPrice(total, company.currency)}</p>
       
       <button onClick={onDelete}><FaTrash className={styles.icon} /><span>Изтрий</span></button>
     </div>

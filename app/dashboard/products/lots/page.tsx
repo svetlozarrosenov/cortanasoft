@@ -43,13 +43,28 @@ export default function LotsPage() {
           field: col.field || col.headerName,
           headerName: col.headerName,
           filter: col.filter || false,
-          flex: col.flex || 1,
+          width: Number(col.width) || 150,
+          resizable: true,
         };
         
-        if (col.field === 'price') {
+        if (col.field === 'salePrice') {
+          colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
+        }
+
+        if (col.field === 'costPrice') {
+          colDef.valueFormatter = (params) => {
+            return `${formatPrice(params.value, params.data.currency)}`
+          };
+        }
+
+        if (col.field === 'totalCostPrice') {
           colDef.valueFormatter = (params) => `${formatPrice(params.value, company?.currency)}`;
         }
         
+        if (col.field === 'vatRate') {
+          colDef.valueFormatter = (params) => `${params.value}%`;
+        }
+
         return colDef;
       });
       setColDefs(modifiedColDefs)
@@ -68,7 +83,6 @@ export default function LotsPage() {
             pagination={true}
             paginationPageSize={10}
             defaultColDef={{
-              flex: 1,
               minWidth: 100,
             }}
           />

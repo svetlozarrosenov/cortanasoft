@@ -76,18 +76,19 @@ const SectionItem: React.FC<SectionProps> = ({
             <div key={table.id}>
               <h4 className="text-white text-sm font-medium mb-2">Колони за {table.id}</h4>
               <ul className="space-y-1">
-                {table.fields.map((field) => {
+                {table.fields.map((field, fieldIndex) => {
                   const identifier = field.field || field.headerName;
+                  const uniqueKey = `${identifier}-${fieldIndex}`;
                   return (
-                    <li key={identifier} className="flex items-center">
+                    <li key={uniqueKey} className="flex items-center">
                       <input
                         type="checkbox"
-                        id={`${table.id}.${identifier}`}
+                        id={`${table.id}.${uniqueKey}`}
                         checked={roleData.visibleColumns?.[table.id]?.includes(identifier) || false}
                         onChange={(e) => handleColumnChange(table.id, identifier, e.target.checked)}
                         className="h-4 w-4 text-[#0092b5] focus:ring-[#0092b5] border-gray-600 rounded"
                       />
-                      <label htmlFor={`${table.id}.${identifier}`} className="ml-2 text-sm text-white">
+                      <label htmlFor={`${table.id}.${uniqueKey}`} className="ml-2 text-sm text-white">
                         {field.headerName}
                       </label>
                     </li>
@@ -124,14 +125,19 @@ export default function RoleForm({ initialRole, isEditMode = false, onSave, onCa
   const [roleData, setRoleData] = useState<Role>(() => {
     // Рекурсивна функция за събиране на sectionId-та от всички нива
     const collectSectionIds = (sections: Section[]): string[] => {
-      let ids: string[] = [];
-      sections.forEach((section) => {
-        ids.push(section.sectionId);
-        if (section.children) {
-          ids = ids.concat(collectSectionIds(section.children));
-        }
-      });
-      return ids;
+      const ids = new Set<string>();
+      const addIds = (secs: Section[]) => {
+        secs.forEach((section) => {
+          if (!ids.has(section.sectionId)) {
+            ids.add(section.sectionId);
+          }
+          if (section.children) {
+            addIds(section.children);
+          }
+        });
+      };
+      addIds(sections);
+      return Array.from(ids);
     };
 
     const selectedSections: string[] = initialRole?.permissions

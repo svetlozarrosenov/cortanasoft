@@ -11,6 +11,7 @@ export interface Field {
   value?: any;
   options?: { value: string; label: string }[];
   required?: boolean;
+  defaultValue?: any;
   pattern?: RegExp;
   min?: number;
   max?: number;
@@ -51,6 +52,7 @@ export const fields: FieldsConfig = {
         label: 'Дата на доставката',
         required: true,
         placeholder: 'Дата на доставката',
+        defaultValue: new Date().toISOString().slice(0, 16),
     },
     status: {
         type: 'select',
@@ -58,6 +60,7 @@ export const fields: FieldsConfig = {
         label: 'Статус',
         required: true,
         placeholder: 'Статус',
+        defaultValue: 'received',
         options: [
             {value: 'pending', label: 'Очакваща'},
             {value: 'received', label: 'Получена'},
