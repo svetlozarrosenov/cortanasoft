@@ -119,6 +119,7 @@ export default function SuppliesPage() {
   useEffect(() => {
     if (userRole) {
       const table = findTableFields(userRole, "suppliesSection", "suppliesTable")
+      console.log('crb_table', table)
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
@@ -165,7 +166,7 @@ export default function SuppliesPage() {
 
       setColDefs(modifiedColDefs);
     }
-  }, [userRole]);
+  }, [userRole, company]);
 
   const onSubmit = async (data: any) : Promise<any> => {  
     const cleanedProducts = data.products.map(({ id, ...rest }: any) => rest);
