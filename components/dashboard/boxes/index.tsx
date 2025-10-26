@@ -5,9 +5,10 @@ import { useActiveTasks } from '@/app/dashboard/tasks/hooks';
 import { useActiveOrders, useRevenue } from '@/app/dashboard/orders/hooks';
 import { useClients } from '@/app/dashboard/clients/hooks';
 import Link from 'next/link';
-import { FaDollarSign, FaChartLine, FaUsers, FaTasks, FaShoppingCart, FaMoneyCheck } from 'react-icons/fa';
+import { FaCalendarAlt, FaCalendar, FaMinusCircle, FaChartBar, FaCheckCircle, FaUserFriends, FaClipboardList, FaBox, FaDollarSign, FaChartLine, FaUsers, FaTasks, FaShoppingCart, FaMoneyCheck } from 'react-icons/fa';
 import classNames from 'classnames';
 import { useCurrentCompany } from '@/app/dashboard/hooks';
+import { formatPrice } from '@/utils/helpers';
 
 const DashboardBoxes: React.FC = () => {
   const { tasks } = useActiveTasks();
@@ -21,11 +22,11 @@ const DashboardBoxes: React.FC = () => {
       <li className={styles.box} >
         <Link className={styles.link} href='/dashboard/orders'></Link>
         
-        <FaMoneyCheck className={styles.icon} />
+        <FaCalendarAlt className={styles.icon} />
         
-        <h4 className={styles.title}>Месечна печалба</h4>
+        <h4 className={styles.title}>Месечен оборот</h4>
         
-        <p className={styles.value}>{revenue?.totalRevenue} {company?.currency}</p>
+        <p className={styles.value}>{formatPrice(revenue?.totalRevenue, company?.currency)}</p>
         
         <p className={styles.content} >Оборот за месеца</p>
       </li>
@@ -33,19 +34,55 @@ const DashboardBoxes: React.FC = () => {
       <li className={classNames(styles.box, styles.boxOrange)} >
         <Link className={styles.link} href='/dashboard/orders'></Link>
         
-        <FaChartLine className={styles.icon} />
+        <FaCalendar className={styles.icon} />
         
-        <h4 className={styles.title}>Годишна печалба</h4>
+        <h4 className={styles.title}>Годишен оборот</h4>
         
-        <p className={styles.value}>{revenue?.totalRevenue} {company?.currency}</p>
+        <p className={styles.value}>{formatPrice(revenue?.totalRevenue, company?.currency)}</p>
         
-        <p className={styles.content} >Печалба от началото на годината.</p>
+        <p className={styles.content} >Оборот от началото на годината.</p>
       </li>
+
+      <li className={classNames(styles.box, styles.boxOrange1)} >
+        <Link className={styles.link} href='/dashboard/supplies'></Link>
+        
+        <FaMinusCircle className={styles.icon} />
+        
+        <h4 className={styles.title}>Месечни пазходи</h4>
+        
+        <p className={styles.value}>{formatPrice(revenue?.expenses?.monthly, company?.currency)}</p>
+        
+        <p className={styles.content} >Разходи за месеца.</p>
+      </li>
+
+      <li className={classNames(styles.box, styles.boxOrange2)} >
+        <Link className={styles.link} href='/dashboard/supplies'></Link>
+        
+        <FaChartBar className={styles.icon} />
+        
+        <h4 className={styles.title}>Годишни разходи</h4>
+        
+        <p className={styles.value}>{formatPrice(revenue?.expenses?.yearly, company?.currency)}</p>
+        
+        <p className={styles.content} >Разходи за цялата година.</p>
+      </li>
+
+      {revenue?.totalRevenue - revenue?.expenses?.yearly > 0 && <li className={classNames(styles.box, styles.boxOrange)} >
+        <Link className={styles.link} href='/dashboard/supplies'></Link>
+        
+        <FaCheckCircle className={styles.icon} />
+        
+        <h4 className={styles.title}>Чиста печалба</h4>
+        
+        <p className={styles.value}>{formatPrice(revenue?.totalRevenue - revenue?.expenses?.yearly, company?.currency)}</p>
+        
+        <p className={styles.content} >Чиста печалба за година</p>
+      </li>}
 
       <li className={classNames(styles.box, styles.boxYellow)} >
         <Link className={styles.link} href='/dashboard/clients'></Link>
         
-        <FaUsers className={styles.icon} />
+        <FaUserFriends className={styles.icon} />
         
         <h4 className={styles.title}>Клиенти</h4>
         
@@ -57,7 +94,7 @@ const DashboardBoxes: React.FC = () => {
       <li className={classNames(styles.box, styles.boxGreen)} >
         <Link className={styles.link} href='/dashboard/tasks'></Link>
         
-        <FaTasks className={styles.icon} />
+        <FaClipboardList className={styles.icon} />
         
         <h4 className={styles.title}>Активни задачи</h4>
         
@@ -69,7 +106,7 @@ const DashboardBoxes: React.FC = () => {
       <li className={classNames(styles.box, styles.boxBlue)} >
         <Link className={styles.link} href='/dashboard/orders'></Link>
         
-        <FaShoppingCart className={styles.icon} />
+        <FaBox className={styles.icon} />
         
         <h4 className={styles.title}>Активни поръчки</h4>
         

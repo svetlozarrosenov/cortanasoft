@@ -25,7 +25,7 @@ const Sidebar: React.FC<any> = () => {
 
     useEffect(() => {
       if (userRole && pathname) {
-        const productsPermission = userRole.permissions.find(p => p.children && p.children.some(c => pathname === c.url));
+        const productsPermission = userRole.permissions.find((p: any) => p.children && p.children.some((c: any) => pathname === c.url));
         if (productsPermission) {
           setIsProductsOpen(true);
         }

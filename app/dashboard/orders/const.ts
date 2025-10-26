@@ -28,9 +28,9 @@ export const fields: FieldsConfig = {
         required: true,
         options: [],
       },
-    products: {
+    lots: {
       type: 'multiselect',
-      name: 'products',
+      name: 'lots',
       label: 'Продукти',
       required: true,
       dataOptions: [],

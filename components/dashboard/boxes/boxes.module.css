@@ -11,6 +11,7 @@
     position: relative;
     min-width: 19%;
     padding: 20px;
+    margin-bottom: 20px;
     border-radius: 10px;
     background-color: #A261F50D;
 }
@@ -53,6 +54,18 @@
 }
 .boxOrange .icon { color: #FF8102 }
 
+/*orange variant 1*/
+.boxOrange1 {
+    background-color: #DC26260D;
+}
+.boxOrange1 .icon { color: #DC2626 }
+
+/*orange variant 2*/
+.boxOrange2 {
+    background-color: #F59E0B0D;
+}
+.boxOrange2 .icon { color: #F59E0B }
+
 /*yellow*/
 
 .boxYellow {
@@ -63,6 +76,10 @@
 /*green*/
 .boxGreen { background-color: #04D1790D; }
 .boxGreen .icon { color: #04D178; }
+
+/*green variant for profit*/
+.boxGreenProfit { background-color: #10B9810D; }
+.boxGreenProfit .icon { color: #10B981; }
 
 /*blue*/
 .boxBlue { background-color: #487AFF0D; }

@@ -13,12 +13,13 @@ import { useUserRole } from '../companies/[id]/hooks';
 import { findTableFields } from '@/utils/helpers';
 import Link from 'next/link';
 import styles from '../dashboard-grid.module.css';
-import DynamicForm from '@/components/form';
+import DynamicFormFullWidth from '@/components/DynamicFormFullWidth';
 import SuccessMessage from '@/components/form/successMessage';
 import { useForm } from 'react-hook-form';
 import { fields } from './const';
 import { useCurrentCompany } from '../hooks';
 import { formatPrice } from '@/utils/helpers'
+import { useCurrency } from '../supplies/hooks';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -45,24 +46,12 @@ interface Lot {
 }
 
 interface OrderProduct {
-  productId: string;
   lotId: string;
   quantity: number;
   productName: string;
   productPrice: number;
   lotNumber: string;
   expiryDate?: string;
-}
-
-interface Order {
-  _id: string;
-  clientId: string;
-  clientName: string;
-  products: OrderProduct[];
-  totalPrice: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 const statusOptions = [
@@ -75,7 +64,7 @@ const statusOptions = [
 export default function OrdersPage() {
   const { clients } = useClients();
   const { company } = useCurrentCompany();
-  const { products } = useProducts();
+  const { currency } = useCurrency();
   const { lots } = useAvailableLots();
   const { orders: rowData, mutate } = useOrders();
   const { userRole } = useUserRole();
@@ -149,8 +138,8 @@ export default function OrdersPage() {
   const form = useForm({ mode: 'all' });
 
   const onSubmit = async (data: any): Promise<any> => {  
-    const cleanedProducts = data.products.map(({ id, ...rest }: any) => rest);
-    const cleanedData = { ...data, products: cleanedProducts }; 
+    const cleanedLots = data.lots.map(({ id, ...rest }: any) => rest);
+    const cleanedData = { ...data, lots: cleanedLots }; 
   
     try {
       if (editMode) {
@@ -175,16 +164,18 @@ export default function OrdersPage() {
           label: `${user.firstName} ${user.lastName}`
         })) || [] 
       },
-      products: {
-        ...fields.products,
+      lots: {
+        ...fields.lots,
+        currencyOptions: currency?.map((cur: any) => ({ value: cur._id, label: `${cur.code}, ${cur.country}`, code: cur.code })) || [],
+        company: company,
         dataOptions: lots?.map((lot: any) => ({
           ...lot,
           value: lot._id,
-          label: `${lot.name} ${lot.model}, available: ${lot.quantity}, expiry: ${lot.expiryDate}`,
+          label: `${lot.name} ${lot.model}, наличност: ${lot.quantity}`,
         })) || []
       }
     };
-  }, [fields, clients, products, lots]);
+  }, [fields, clients, lots, lots]);
 
   const handleClose = () => {
     setIsModalOpen(false);
@@ -194,7 +185,7 @@ export default function OrdersPage() {
   return (
     <div className={styles.grid}>
       {<SuccessMessage title="Успешно добавена поръчка" message="Поръчката е добавена успешно" visible={visible} setIsVisible={setIsVisible} />}
-      {isModalOpen && <DynamicForm form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави поръчка' />}
+      {isModalOpen && <DynamicFormFullWidth form={form} fields={newFields} onSubmit={onSubmit} backEndError={backEndError} onClose={() => handleClose()} title='Добави поръчка' />}
 
       <div className={styles.head}>
         <h3 className={styles.title}>Поръчки</h3>

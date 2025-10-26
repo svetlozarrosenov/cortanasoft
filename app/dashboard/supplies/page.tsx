@@ -119,7 +119,6 @@ export default function SuppliesPage() {
   useEffect(() => {
     if (userRole) {
       const table = findTableFields(userRole, "suppliesSection", "suppliesTable")
-      console.log('crb_table', table)
       const modifiedColDefs = table.map((col: any) => {
         const colDef: ColDef = {
           field: col.field || col.headerName,
@@ -145,7 +144,6 @@ export default function SuppliesPage() {
 
         if (col.field === 'totalPrice') {
           colDef.valueFormatter = (params) => { 
-            console.log('crb_params.value', params.value)
             return `${formatPrice(params.value, company?.currency)}`
           };
         }

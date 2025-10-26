@@ -5,7 +5,7 @@ import { Controller, FormProvider } from 'react-hook-form';
 import { FieldsConfig } from '@/app/dashboard/tasks/const';
 import classNames from 'classnames';
 import { AiOutlineClose } from 'react-icons/ai';
-import MultiSelectButton from '../fields/multiselect/multiselectButton';
+import MultiSelectButton from '../fields/multiselect/MultiselectSecondaryButton';
 import MultiSelectSecondaryButton from '../fields/MultiselectSecondary/MultiselectSecondaryButton';
 
 interface DynamicFormProps {
