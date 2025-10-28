@@ -53,10 +53,6 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
 
     price = price * currenetQuantity;
 
-    // if(currenetVat) {
-    //   price = removePercent(price, currenetVat);
-    // }
-
     if (!isNaN(price)) {
       setTotal(price);
       setValue(`${parentName}[${index}].totalCostPrice`, price);

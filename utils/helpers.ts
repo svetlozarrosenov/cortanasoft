@@ -26,3 +26,16 @@ export const formatPrice = (price: number, companyCurrencyCode: string) => {
   }
   return Number(price)?.toLocaleString('bg-BG', { style: 'currency', currency: companyCurrencyCode });
 };
+
+export const getDefaultValues = (fields: any) => {
+  const defaults: any = {};
+  Object.keys(fields).forEach(key => {
+    const field = fields[key];
+    if (field.defaultValue !== undefined) {
+      defaults[field.name] = field.defaultValue;
+    }
+  });
+
+  defaults.deliveryDate = new Date().toISOString().slice(0, 16);
+  return defaults;
+};

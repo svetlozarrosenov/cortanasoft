@@ -18,6 +18,7 @@ import { fields } from './const';
 import { useForm } from 'react-hook-form';
 import { useProductCategories } from '../products/categories/hooks';
 import { useCurrentCompany } from '../hooks';
+import { getDefaultValues } from '@/utils/helpers';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -84,7 +85,10 @@ export default function SuppliesPage() {
   const [visible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const form = useForm({ mode: 'all' });
+  const form = useForm({ 
+    mode: 'all',
+    defaultValues: getDefaultValues(fields) 
+  });
 
   const newFields: any = {
     ...fields,
@@ -179,6 +183,7 @@ export default function SuppliesPage() {
       setIsVisible(true);
       setIsModalOpen(false);
       mutate();
+      form.reset();
     } catch(e: any) {
       setBackEndError(e?.response?.data?.message);
     }
@@ -209,6 +214,7 @@ export default function SuppliesPage() {
   const handleClose = () => {
     setIsModalOpen(false);
     setBackEndError('');
+    form.reset();
   }
 
   return (
