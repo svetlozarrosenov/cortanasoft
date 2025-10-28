@@ -125,7 +125,7 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
             }}
             render={({ field: { onChange, value, ref } }) => (
               <div>
-                <label>Цена в {selectedCurrency.code}<span className="text-red-500">*</span></label>
+                <label>Цена в {selectedCurrency?.code}<span className="text-red-500">*</span></label>
                 <input
                   disabled={!productValue}
                   type="number"

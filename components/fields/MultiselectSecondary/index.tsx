@@ -120,7 +120,7 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
             }}
             render={({ field: { onChange, value, ref } }) => (
               <div>
-                <label>Цена в {selectedCurrency.code}<span className="text-red-500">*</span></label>
+                <label>Цена в {selectedCurrency?.code}<span className="text-red-500">*</span></label>
                 <input
                   disabled={!productValue}
                   type="number"
@@ -281,8 +281,8 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
         <FaTrash onClick={onDelete} className={styles.icon} />
       </div>
       <div className={styles.total}>
-        <p>Крайна цена с ДДС за брой: {formatPrice(currentPrice, selectedCurrency.code)}</p>
-        {company.currency != selectedCurrency.code && <p>Крайна цена с ДДС за брой в {company?.currency}: {formatPrice(currentPrice * currentCurrencyRate, company.currency)}</p>}
+        <p>Крайна цена с ДДС за брой: {formatPrice(currentPrice, selectedCurrency?.code)}</p>
+        {company.currency != selectedCurrency?.code && <p>Крайна цена с ДДС за брой в {company?.currency}: {formatPrice(currentPrice * currentCurrencyRate, company.currency)}</p>}
         <p>| {currenetVat}% ДДС: {formatPrice(total - removePercent(total, currenetVat), company.currency)}</p>
         <p>| Крайна Цена без ДДС:{formatPrice(removePercent(total, currenetVat), company.currency)}</p>
         <p>| Крайна цена {formatPrice(total, company.currency)}</p>
