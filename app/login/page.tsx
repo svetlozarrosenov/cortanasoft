@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from './hooks';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.css';
@@ -14,10 +14,16 @@ const Login: React.FC = () => {
   const router = useRouter();
   const { control, handleSubmit, formState: { errors } } = useForm({ mode: 'all' });
 
+  useEffect(() => {
+    if (user) {
+      console.log('User logged in, redirecting...'); 
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
   const onSubmit = async (data: any) => {
     try {
       await login({ ...data });
-      router.push('/dashboard');
     } catch (e: any) {
       setBackEndError(e.message);
     }
