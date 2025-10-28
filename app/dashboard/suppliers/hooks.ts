@@ -2,9 +2,9 @@ import axios from 'axios';
 import useSWR from 'swr';
 
 const urls = {
-    addSupplier: `${process.env.NEXT_PUBLIC_BACK_END_URL}/supplies/supplier/create`,
-    updateSupplier: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/supplies/suppliers/update/${id}`,
-    fetchSuppliers: `${process.env.NEXT_PUBLIC_BACK_END_URL}/supplies/suppliers`,
+    addSupplier: `${process.env.NEXT_PUBLIC_BACK_END_URL}/suppliers/create`,
+    updateSupplier: (id: string) => `${process.env.NEXT_PUBLIC_BACK_END_URL}/suppliers/update/${id}`,
+    fetchSuppliers: `${process.env.NEXT_PUBLIC_BACK_END_URL}/suppliers`,
 };
 
 const fetcher = (url: string) => axios.get(url, { withCredentials: true }).then(res => res.data);

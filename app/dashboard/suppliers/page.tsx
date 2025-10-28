@@ -33,7 +33,7 @@ export default function SuppliersPage() {
   const { userRole } = useUserRole();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [editMode, setEditMode] = useState(false);
-  const [currentRow, setCurrentRow] = useState<Location>();
+  const [currentRow, setCurrentRow] = useState<Supplier>();
   const [backEndError, setBackEndError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visible, setIsVisible] = useState(false);
@@ -54,13 +54,14 @@ export default function SuppliersPage() {
   const onSubmit = async (data: any) : Promise<any> => {
     try {
       if(editMode) {
-       await updateSupplier(currentRow);
+       await updateSupplier({_id: currentRow?._id, ...data});
       } else {
         await createSupplier(data);
       }
       setIsVisible(true);
       setIsModalOpen(false);
       mutate();
+      form.reset();
     } catch(e: any) {
       setBackEndError(e.message);
     }
@@ -99,7 +100,7 @@ export default function SuppliersPage() {
             colDef.cellRenderer = (params: any) => (
               <div className={styles.actions}>
                 <FaEdit className={styles.icon} onClick={() => handleEdit(params)} />
-                <FaTrash className={classNames(styles.icon, styles.iconTrash)} onClick={() => handleDelete(params)} />
+                {/* <FaTrash className={classNames(styles.icon, styles.iconTrash)} onClick={() => handleDelete(params)} /> */}
               </div>
             );
             colDef.sortable = false;
@@ -117,6 +118,7 @@ export default function SuppliersPage() {
   const handleClose = () => {
     setIsModalOpen(false);
     setBackEndError('');
+    form.reset();
   }
 
 

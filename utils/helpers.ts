@@ -39,3 +39,22 @@ export const getDefaultValues = (fields: any) => {
   defaults.deliveryDate = new Date().toISOString().slice(0, 16);
   return defaults;
 };
+
+export type FieldType = 'text' | 'email' | 'password' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'number' | 'datetime-local';
+
+export interface Field {
+  name: string;
+  label: string;
+  type: FieldType;
+  placeholder?: string;
+  value?: any;
+  options?: { value: string; label: string }[];
+  required?: boolean;
+  pattern?: RegExp;
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+}
+
+export type FieldsConfig = Record<string, Field>;
