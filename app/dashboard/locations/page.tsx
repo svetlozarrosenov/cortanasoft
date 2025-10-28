@@ -46,11 +46,13 @@ export default function LocationsPage() {
       if(editMode) {
        await updateLocation(currentRow?._id, data);
       } else {
+        console.log('crb_data', data)
         await createLocation(data);
       }
       setIsVisible(true);
       setIsModalOpen(false);
       mutate();
+      form.reset();
     } catch(e: any) {
       setBackEndError(e.message);
     }
@@ -119,6 +121,7 @@ export default function LocationsPage() {
   const handleClose = () => {
     setIsModalOpen(false);
     setBackEndError('');
+    form.reset();
   }
 
   return (
