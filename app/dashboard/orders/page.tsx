@@ -171,7 +171,7 @@ export default function OrdersPage() {
         dataOptions: lots?.map((lot: any) => ({
           ...lot,
           value: lot._id,
-          label: `${lot.name} ${lot.model}, наличност: ${lot.quantity}`,
+          label: `${lot.name} ${lot.model}, наличност: ${lot.quantity}, Сериен номер: ${lot.serialNumber}`,
         })) || []
       }
     };
