@@ -19,10 +19,10 @@ const styles = StyleSheet.create({
 
 interface InvoicePdfProps {
   order: any;
-  companyName: string;
+  company: any;
 }
 
-export const InvoicePdf = ({ order, companyName }: InvoicePdfProps) => (
+export const InvoicePdf = ({ order, company }: InvoicePdfProps) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.title}>Фактура</Text>
@@ -30,7 +30,7 @@ export const InvoicePdf = ({ order, companyName }: InvoicePdfProps) => (
       <View style={styles.section}>
         <View style={styles.row}>
           <Text style={styles.label}>Фирма:</Text>
-          <Text style={styles.value}>{companyName}</Text>
+          <Text style={styles.value}>{company.name}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>Клиент:</Text>
@@ -46,7 +46,6 @@ export const InvoicePdf = ({ order, companyName }: InvoicePdfProps) => (
         </View>
       </View>
 
-      {/* Таблица с продукти */}
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           <Text style={styles.colProduct}>Продукт</Text>
@@ -55,7 +54,7 @@ export const InvoicePdf = ({ order, companyName }: InvoicePdfProps) => (
           <Text style={styles.colTotal}>Общо</Text>
         </View>
 
-        {order?.products?.map((p, i) => (
+        {order?.products?.map((p: any, i: any) => (
           <View key={i} style={styles.tableRow}>
             <Text style={styles.colProduct}>{p.productName}</Text>
             <Text style={styles.colQty}>{p.quantity}</Text>
@@ -72,9 +71,9 @@ export const InvoicePdf = ({ order, companyName }: InvoicePdfProps) => (
   </Document>
 );
 
-export const generateAndOpenPdf = async (order: any, companyName: string) => {
+export const generateAndOpenPdf = async (order: any, company: string) => {
   try {
-    const blob = await pdf(<InvoicePdf order={order} companyName={companyName} />).toBlob();
+    const blob = await pdf(<InvoicePdf order={order.data} company={company} />).toBlob();
 
     const url = URL.createObjectURL(blob);
 

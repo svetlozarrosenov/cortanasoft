@@ -171,11 +171,20 @@ export default function OrdersPage() {
         ...fields.lots,
         currencyOptions: currency?.map((cur: any) => ({ value: cur._id, label: `${cur.code}, ${cur.country}`, code: cur.code })) || [],
         company: company,
-        dataOptions: lots?.map((lot: any) => ({
+        dataOptions: lots?.map((lot: any) => {
+          let label = `${lot.name} ${lot.model}`;
+          if(lot.quantity) {
+            label += `, наличност: ${lot.quantity}`;
+          }
+          if(lot.serialNumber) {
+            label += `, Сериен номер: ${lot.serialNumber}`;
+          }
+          console.log('crb_title')
+          return ({
           ...lot,
           value: lot._id,
-          label: `${lot.name} ${lot.model}, наличност: ${lot.quantity}, Сериен номер: ${lot.serialNumber}`,
-        })) || []
+          label,
+        })}) || []
       }
     };
   }, [fields, clients, lots, lots]);
