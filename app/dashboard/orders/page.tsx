@@ -10,7 +10,7 @@ import { useProducts } from '../products/all/hooks';
 import { useOrders, createOrder, updateOrder } from './hooks';
 import { useAvailableLots } from '../products/lots/hooks';
 import { useUserRole } from '../companies/[id]/hooks';
-import { findTableFields } from '@/utils/helpers';
+import { findTableFields, getDefaultValues } from '@/utils/helpers';
 import Link from 'next/link';
 import styles from '../dashboard-grid.module.css';
 import DynamicFormFullWidth from '@/components/DynamicFormFullWidth';
@@ -135,7 +135,10 @@ export default function OrdersPage() {
     }
   }, [userRole, company]);
 
-  const form = useForm({ mode: 'all' });
+  const form = useForm({ 
+    mode: 'all',  
+    defaultValues: getDefaultValues(fields)  
+  });
 
   const onSubmit = async (data: any): Promise<any> => {  
     const cleanedLots = data.lots.map(({ id, ...rest }: any) => rest);

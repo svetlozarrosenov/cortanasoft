@@ -13,6 +13,7 @@ import styles from '../dashboard-grid.module.css';
 import { useOrders } from '../orders/hooks';
 import { FaFilePdf } from 'react-icons/fa';
 import { useCurrentCompany } from '../hooks';
+import { generateAndOpenPdf } from '@/components/invoice/invoicePDF';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -43,8 +44,8 @@ export default function InvoicesPage() {
   const { company } = useCurrentCompany();
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
 
-  const handlePdf = () => {
-    console.log('crb_show_pdf')
+  const handlePdf = (params: any) => {
+    generateAndOpenPdf(params, company);
   }
   useEffect(() => {
     if (userRole) {
@@ -93,11 +94,13 @@ export default function InvoicesPage() {
           }
 
           if (col.field === 'actions') {
-              colDef.cellRenderer = (params: any) => (
+              colDef.cellRenderer = (params: any) => {
+                console.log('crb_params', params)
+                return (
                 <div className={styles.actions}>
-                  <FaFilePdf className={styles.icon} onClick={() => handlePdf()} />
+                  <FaFilePdf className={styles.icon} onClick={() => handlePdf(params)} />
                 </div>
-              );
+              )};
               colDef.sortable = false;
               colDef.filter = false;
               colDef.width = 150;

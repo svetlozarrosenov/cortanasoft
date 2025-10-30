@@ -1,33 +1,34 @@
-export type FieldType = 'text' | 'email' | 'password' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'number' | 'datetime-local';
-
-export interface Field {
-  name: string;
-  label: string;
-  type: FieldType;
-  placeholder?: string;
-  value?: any;
-  options?: { value: string; label: string }[];
-  required?: boolean;
-  pattern?: RegExp;
-  min?: number;
-  max?: number;
-  productOptions?: { value: string; label: string }[];
-  batchOptions?: { value: string; label: string }[];
-  minLength?: number;
-  maxLength?: number;
-  dataOptions?: { value: string; label: string }[];
-}
-
-export type FieldsConfig = Record<string, Field>;
+import { FieldsConfig } from "@/utils/helpers";
 
 export const fields: FieldsConfig = {
     clientId: {
-        type: 'select',
-        name: 'clientId',
-        label: 'Клиент',
-        required: true,
-        options: [],
-      },
+      type: 'select',
+      name: 'clientId',
+      label: 'Клиент',
+      required: true,
+      options: [],
+    },
+    orderDate: {
+      type: 'datetime-local',
+      name: 'orderDate',
+      label: 'Дата на доставката',
+      required: true,
+      placeholder: 'Дата на доставката',
+      defaultValue: new Date().toISOString().slice(0, 16),
+    },
+    status: {
+      type: 'select',
+      name: 'status',
+      label: 'Статус',
+      required: true,
+      defaultValue: 'delivered',
+      options: [
+        { value: 'pending', label: 'В процес' },
+        { value: 'shipped', label: 'Доставя се' },
+        { value: 'delivered', label: 'Доставена' },
+        { value: 'canceled', label: 'Отказана' },
+      ],
+    },
     lots: {
       type: 'multiselect',
       name: 'lots',
@@ -35,16 +36,4 @@ export const fields: FieldsConfig = {
       required: true,
       dataOptions: [],
     },
-    status: {
-        type: 'select',
-        name: 'status',
-        label: 'Статус',
-        required: true,
-        options: [
-          { value: 'pending', label: 'В процес' },
-          { value: 'shipped', label: 'Доставя се' },
-          { value: 'delivered', label: 'Доставена' },
-          { value: 'canceled', label: 'Отказана' },
-        ],
-      },
   };

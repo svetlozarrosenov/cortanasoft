@@ -55,6 +55,8 @@ export interface Field {
   max?: number;
   minLength?: number;
   maxLength?: number;
+  defaultValue?: any;
+  dataOptions?: any;
 }
 
 export type FieldsConfig = Record<string, Field>;
