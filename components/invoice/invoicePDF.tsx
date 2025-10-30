@@ -54,7 +54,7 @@ export const InvoicePdf = ({ order, company }: InvoicePdfProps) => (
           <Text style={styles.colTotal}>Общо</Text>
         </View>
 
-        {order?.products?.map((p: any, i: any) => (
+        {order?.lots?.map((p: any, i: any) => (
           <View key={i} style={styles.tableRow}>
             <Text style={styles.colProduct}>{p.productName}</Text>
             <Text style={styles.colQty}>{p.quantity}</Text>
