@@ -7,7 +7,7 @@ import { AgGridReact } from 'ag-grid-react';
 import Link from 'next/link';
 import { useCompanies, createCompany, updateCompany, useCompanySystemRoles } from './hooks';
 import { useCompanyUsers, useUserRole, useUsers } from './[id]/hooks';
-import { findTableFields } from '@/utils/helpers';
+import { findTableFields, getDefaultValues } from '@/utils/helpers';
 import styles from '../dashboard-grid.module.css';
 import DynamicForm from '@/components/form';
 import SuccessMessage from '@/components/form/successMessage';
@@ -50,7 +50,7 @@ export default function CompaniesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visible, setIsVisible] = useState(false);
 
-  const form = useForm({ mode: 'all' });
+  const form = useForm({ mode: 'all', defaultValues: getDefaultValues(fields) });
 
   useEffect(() => {
     if (userRole) {
@@ -132,6 +132,16 @@ export default function CompaniesPage() {
 
   const onSubmit = async (data: any): Promise<any> => {
     try {
+      if (data.logo instanceof File) {
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(data.logo);
+        });
+        data.logo = await base64Promise;
+      }
+
       if (editMode) {
         await updateCompany(currentCompanyId, data);
       } else {

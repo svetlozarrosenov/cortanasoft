@@ -307,6 +307,26 @@ export default function DynamicForm({ fields, form, onSubmit, backEndError, onCl
                             />
                           </>
                         );
+                      case 'file':
+                        return (
+                          <>
+                            <label 
+                              htmlFor={fields[key].name} 
+                              className={classNames(styles.label, errors[fields[key].name] ? styles.labelError : '')}
+                            >
+                              {fields[key].label}
+                              {fields[key].required && <span className="text-red-500">*</span>}
+                            </label>
+                            <input
+                              type="file"
+                              id={fields[key].name}
+                              onChange={(e) => onChange(e.target.files ? e.target.files[0] : null)}
+                              onBlur={onBlur}
+                              ref={ref}
+                              className={classNames(styles.formField, errors[fields[key].name] ? styles.formFieldError : '')}
+                            />
+                          </>
+                        );
                       default:
                         return <></>;
                     }

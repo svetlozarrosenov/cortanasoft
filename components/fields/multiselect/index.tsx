@@ -6,12 +6,6 @@ import styles from './multiselectFields.module.css';
 import classNames from 'classnames';
 import { formatPrice } from '@/utils/helpers';
 
-const addPercent = (number: number, percentage: number) => {
-  const percent = percentage / 100;
-  const result = number + (number * percent);
-  return result;
-}
-
 const removePercent = (result: number, percentage: number) => {
   const percent = percentage / 100;
   const original = result / (1 + percent);
@@ -23,15 +17,14 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
   const selectedLots = watch(parentName);
   const [currentLots, setcurrentLots] = useState<any>([]);
   const [total, setTotal] = useState(0);
-  console.log('crb+currentLots', currentLots)
-  const productValue = watch(`${parentName}[${index}].lotId`);
+  const lotSelectedValue = watch(`${parentName}[${index}].lotId`);
   const selectedCurrencyId = watch(`${parentName}[${index}].currencyId`);
   const currentPrice = watch(`${parentName}[${index}].salePrice`);
   const currentCurrencyRate = watch(`${parentName}[${index}].currencyRate`);
   const currenetQuantity =  watch(`${parentName}[${index}].quantity`);
   const currenetVat =  watch(`${parentName}[${index}].vatRate`);
   const [selectedCurrency, setSelectedCurrency] = useState(company?.currency)
-
+  console.log('crb_dataOptions', dataOptions)
   const isDifferentCurrency = selectedCurrencyId && selectedCurrencyId !== company.currencyId;
 
   useEffect(() => {
@@ -41,10 +34,13 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
   }, [selectedCurrencyId])
 
   useEffect(() => {
-    const currentProduct = dataOptions.find((product: any) => product._id === productValue)
-    setValue(`${parentName}[${index}].salePrice`, currentProduct?.salePrice);
-    setValue(`${parentName}[${index}].serialNumber`, currentProduct?.serialNumber);
-  }, [productValue]);
+    const currentLot = dataOptions.find((lot: any) => lot._id === lotSelectedValue)
+    setValue(`${parentName}[${index}].salePrice`, currentLot?.salePrice);
+    setValue(`${parentName}[${index}].serialNumber`, currentLot?.serialNumber);
+    setValue(`${parentName}[${index}].name`, currentLot?.name);
+    setValue(`${parentName}[${index}].model`, currentLot?.model);
+    setValue(`${parentName}[${index}].productId`, currentLot?.productId);
+  }, [lotSelectedValue]);
 
   useEffect(() => {
     let price = currentPrice;
@@ -53,10 +49,6 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
     }
 
     price = price * currenetQuantity;
-
-    // if(currenetVat) {
-    //   price = removePercent(price, currenetVat);
-    // }
 
     if (!isNaN(price)) {
       setTotal(price);
@@ -127,7 +119,7 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
               <div>
                 <label>Цена в {selectedCurrency?.code}<span className="text-red-500">*</span></label>
                 <input
-                  disabled={!productValue}
+                  disabled={!lotSelectedValue}
                   type="number"
                   min={0.01}
                   step={0.01}
@@ -152,10 +144,10 @@ export default function MultiSelect({ control, parentName, index, dataOptions, e
             <div>
               <label>Брой</label>
               <input
-                disabled={!productValue}
+                disabled={!lotSelectedValue}
                 value={value ?? ''}
                 onChange={(e) => {
-                  const currentProduct = dataOptions.find((product: any) => product._id === productValue)
+                  const currentProduct = dataOptions.find((product: any) => product._id === lotSelectedValue)
                   const inputValue = e.target.value;
                   if (inputValue === '') {
                     onChange(1);

@@ -1,21 +1,4 @@
-export type FieldType = 'text' | 'email' | 'password' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'number' | 'datetime-local';
-
-export interface Field {
-  name: string;
-  label: string;
-  type: FieldType;
-  placeholder?: string;
-  value?: any;
-  options?: { value: string; label: string }[]; // За select и radio
-  required?: boolean;
-  pattern?: RegExp; // За валидация (напр. email)
-  min?: number; // За number и date
-  max?: number; // За number и date
-  minLength?: number;
-  maxLength?: number;
-}
-
-export type FieldsConfig = Record<string, Field>;
+import { FieldsConfig } from "@/utils/helpers";
 
 export const fields: FieldsConfig = {
     name: {
@@ -128,5 +111,17 @@ export const fields: FieldsConfig = {
         placeholder: 'Роля в системата',
         required: true,
         options: []
+    },
+    iban: {
+        type: 'text',
+        name: 'iban',
+        label: 'IBAN',
+        placeholder: 'IBAN',
+    },
+    logo: {
+        type: 'file',
+        name: 'logo',
+        label: 'Лого',
+        placeholder: 'Лого',
     },
   };

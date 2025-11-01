@@ -27,6 +27,21 @@ export const formatPrice = (price: number, companyCurrencyCode: string) => {
   return Number(price)?.toLocaleString('bg-BG', { style: 'currency', currency: companyCurrencyCode });
 };
 
+export const priceWithoutVat = (price: number, vatRate: number) => {
+  return price / (1 + (vatRate/100));
+}
+
+export function calculateVat(priceWithVat: number, vatRate: number): number {
+  if (priceWithVat <= 0) {
+    throw new Error('Цената трябва да е положителна.');
+  }
+  
+  const priceWithoutVat = priceWithVat / (1 + (vatRate / 100));
+  const vatAmount = priceWithVat - priceWithoutVat;
+  
+  return parseFloat(vatAmount.toFixed(2)); 
+}
+
 export const getDefaultValues = (fields: any) => {
   const defaults: any = {};
   Object.keys(fields).forEach(key => {
@@ -40,7 +55,7 @@ export const getDefaultValues = (fields: any) => {
   return defaults;
 };
 
-export type FieldType = 'text' | 'email' | 'password' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'number' | 'datetime-local';
+export type FieldType = 'file' | 'text' | 'email' | 'password' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'number' | 'datetime-local';
 
 export interface Field {
   name: string;

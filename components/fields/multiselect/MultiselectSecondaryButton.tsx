@@ -31,6 +31,9 @@ export default function MultiSelectButton({ control, name, dataOptions, errors, 
   const handleAdd = () => {
     append({ 
       id: uuidv4(),
+      name: '',
+      model: '',
+      productId: '',
       quantity: 0,
       salePrice: 0,
       totalSalePrice: 0,

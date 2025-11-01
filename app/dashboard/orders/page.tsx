@@ -20,6 +20,8 @@ import { fields } from './const';
 import { useCurrentCompany } from '../hooks';
 import { formatPrice } from '@/utils/helpers'
 import { useCurrency } from '../supplies/hooks';
+import { FaFilePdf } from 'react-icons/fa';
+import { generateAndOpenPdf } from '@/components/invoice/invoicePDF';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -77,6 +79,10 @@ export default function OrdersPage() {
 
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
 
+  const handlePdf = (params: any) => {
+    generateAndOpenPdf(params, company);
+  }
+
   useEffect(() => {
     if (userRole) {
       const table = findTableFields(userRole, 'ordersSection', 'ordersTable');
@@ -128,6 +134,20 @@ export default function OrdersPage() {
             colDef.sort = 'desc';
           }
 
+          if (col.field === 'actions') {
+            colDef.cellRenderer = (params: any) => {
+              console.log('crb_params', params)
+              return (
+              <div title='Виж фактура' className={styles.actions}>
+                <FaFilePdf className={styles.icon} onClick={() => handlePdf(params)} />
+              </div>
+            )};
+            colDef.sortable = false;
+            colDef.filter = false;
+            colDef.width = 150;
+            colDef.pinned = 'right';
+          }
+
           return colDef;
         }),
       ];
@@ -141,9 +161,10 @@ export default function OrdersPage() {
   });
 
   const onSubmit = async (data: any): Promise<any> => {  
+    console.log('crb_data.lots', data.lots)
     const cleanedLots = data.lots.map(({ id, ...rest }: any) => rest);
     const cleanedData = { ...data, lots: cleanedLots }; 
-  
+    console.log('crb_cleanedLots', cleanedLots)
     try {
       if (editMode) {
         await updateOrder(cleanedData);
@@ -152,6 +173,7 @@ export default function OrdersPage() {
       }
       setIsModalOpen(false);
       mutate();
+      form.reset();
     } catch (e: any) {
       setBackEndError(e.message);
     }
@@ -172,6 +194,7 @@ export default function OrdersPage() {
         currencyOptions: currency?.map((cur: any) => ({ value: cur._id, label: `${cur.code}, ${cur.country}`, code: cur.code })) || [],
         company: company,
         dataOptions: lots?.map((lot: any) => {
+          console.log('crb_lot', lot)
           let label = `${lot.name} ${lot.model}`;
           if(lot.quantity) {
             label += `, наличност: ${lot.quantity}`;
@@ -192,6 +215,7 @@ export default function OrdersPage() {
   const handleClose = () => {
     setIsModalOpen(false);
     setBackEndError('');
+    form.reset();
   }
 
   return (
