@@ -19,7 +19,7 @@ const Login: React.FC = () => {
       console.log('User logged in, redirecting...'); 
       router.push('/dashboard');
     }
-  }, [user, router]);
+  }, [user, router, login]);
 
   const onSubmit = async (data: any) => {
     try {
