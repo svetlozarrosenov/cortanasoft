@@ -12,18 +12,20 @@ const Login: React.FC = () => {
   const { login } = useAuth();
   const [backEndError, setBackEndError] = useState('');
   const router = useRouter();
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
   const { control, handleSubmit, formState: { errors } } = useForm({ mode: 'all' });
 
   useEffect(() => {
-    if (user) {
+    if (userLoggedIn) {
       console.log('User logged in, redirecting...'); 
       router.push('/dashboard');
     }
-  }, [user, router, login]);
+  }, [user, router, userLoggedIn]);
 
   const onSubmit = async (data: any) => {
     try {
       await login({ ...data });
+      setUserLoggedIn(true);
     } catch (e: any) {
       setBackEndError(e.message);
     }
