@@ -1,4 +1,4 @@
-import { FaUsers, FaTasks, FaShoppingCart, FaTachometerAlt, FaFileInvoiceDollar, FaBox, FaMapMarkerAlt, FaTruck, FaShippingFast, FaBuilding } from 'react-icons/fa';
+import { FaSitemap, FaLayerGroup, FaUsers, FaTasks, FaShoppingCart, FaBoxOpen, FaTachometerAlt, FaFileInvoiceDollar, FaBox, FaMapMarkerAlt, FaTruck, FaShippingFast, FaBuilding } from 'react-icons/fa';
 
 export const iconMap: { [key: string]: React.ComponentType } = {
   'FaBuilding': FaBuilding,
@@ -11,4 +11,7 @@ export const iconMap: { [key: string]: React.ComponentType } = {
   'FaUsers': FaUsers,
   'FaTasks': FaTasks,
   'FaTachometerAlt': FaTachometerAlt,
+  'FaBoxOpen': FaBoxOpen,
+  'FaLayerGroup': FaLayerGroup,
+  'FaSitemap': FaSitemap,
 };

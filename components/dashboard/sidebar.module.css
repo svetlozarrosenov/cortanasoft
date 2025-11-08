@@ -79,3 +79,45 @@ li.current a {
 .current .icon {
     color: #00AFEF;
 }
+
+.subitems {
+    margin-left: 4px;
+}
+
+.subitems .icon {
+    left: -15px !important;
+}
+
+@media (max-width: 1024px) {
+    .sidebar .title {
+        display: none;
+    }
+    .logo {
+        display: none;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100;
+        height: 100vh;
+        z-index: 999;
+        font-size: 18px;
+        color: #fff;
+        background-color: #00AFEF;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .sidebar li {
+        padding-bottom: 30px;
+    }
+
+    .sidebar li button svg {
+        position: absolute;
+        right: 10px;
+        top: -10px;
+    }
+}
+

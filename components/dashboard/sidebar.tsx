@@ -44,55 +44,61 @@ const Sidebar: React.FC<any> = () => {
       return pathname === href
     }
 
-    const itemWithSubItems = (permission: any) => (<li key={permission.sectionId}>
-      <div className={styles.icon}><FaPaperPlane /></div>
-      
-      <button
-        onClick={toggleProductsMenu}
-      >
-        <div className="flex items-center gap-2">
-          
-          {permission.title}
-        </div>
-        <svg
-          className={`w-4 h-4 transform transition-transform duration-300 ${isProductsOpen ? 'rotate-90' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+    const itemWithSubItems = (permission: any) => {
+      const IconComponent = iconMap[permission.icon];
+      return (
+      <li key={permission.sectionId}>
+        {IconComponent && <div className={styles.icon}><IconComponent /></div>}
+        <button
+          onClick={toggleProductsMenu}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-      </button>
-      <ul className={`${isProductsOpen ? 'block' : 'hidden'}`}>
-      {permission.children.map((childPermission: any) => {
-         return (<li key={childPermission.sectionId} className={classNames(styles.item, isActive(childPermission.url) ? styles.current : '')}>
-         <Link
-           href={childPermission?.url || ''}
-         >
-           {childPermission.title}
-         </Link>
-       </li>)
-      })}
-      </ul>
-    </li>)
+          <div className="flex items-center gap-2">
+            
+          <span className={styles.title}>{permission.title}</span>
+          </div>
+          <svg
+            className={`w-4 h-4 transform transition-transform duration-300 ${isProductsOpen ? 'rotate-90' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+        <ul className={classNames(styles.subitems, `${isProductsOpen ? 'block' : 'hidden'}`)}>
+        {permission.children.map((childPermission: any) => {
+          console.log('crb_childPermission', childPermission)
+          const IconComponent = iconMap[childPermission.icon];
+          return (<li key={childPermission.sectionId} className={classNames(styles.item, isActive(childPermission.url) ? styles.current : '')}>
+          {IconComponent && <div className={styles.icon}><IconComponent /></div>}
+          <Link
+            href={childPermission?.url || ''}
+          >
+            <span className={styles.title}>{childPermission.title}</span>
+          </Link>
+        </li>)
+        })}
+        </ul>
+      </li>)
+    }
     
     const item = (permission: any) => { 
       const IconComponent = iconMap[permission.icon];
       return ( <li className={classNames(styles.item, isActive(permission.url) ? styles.current : '')} key={permission.sectionId}>
-        {IconComponent && <div className={styles.icon}><IconComponent /></div>}
           <Link
             href={permission.url}
-          >
+            >
+            {IconComponent && <div className={styles.icon}><IconComponent /></div>}
             
-            {permission.title}
+            <span className={styles.title}>{permission.title}</span>
           </Link>
         </li>)
     }
   
     return createPortal (
       <nav  className={styles.sidebar}>
-        <div className={styles.logo}>
+          <div className={styles.logo}>
             <Link href="/">
               <Image
                   src="/CortanaSoftLogoWhite.svg"
@@ -112,7 +118,7 @@ const Sidebar: React.FC<any> = () => {
               href="/logout"
             >
               <div className={styles.icon}><FaSignOutAlt /></div>
-              Разлогване
+              <span className={styles.title}>Разлогване</span>
             </Link>
           </li>
         </ul>
