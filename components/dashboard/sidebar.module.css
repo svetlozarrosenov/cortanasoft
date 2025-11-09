@@ -41,6 +41,7 @@
     margin-bottom: 30px;
 }
 
+.closeIcon { display: none; }
 .sidebar li {
     padding: 10px 10px;
     padding-left: 45px;
@@ -121,3 +122,37 @@ li.current a {
     }
 }
 
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        padding: 0;
+    }
+
+    .sidebarMobileVisible {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 999;
+        font-size: 18px;
+        color: #fff;
+        background-color: #00AFEF;
+        padding: 40px;
+        overflow-y: auto;
+        text-align: center;
+    }
+    
+    .sidebarMobileVisible li { padding: 10px; }
+    .sidebarMobileVisible li span { color: #fff; }
+
+    .sidebarMobileVisible .current  span{ color: #00AFEF; }
+
+    .sidebarMobileVisible li button { position: relative; border: none; }
+    .sidebarMobileVisible li button svg { position: absolute; right: 5px; top: 18px; color: #fff; }
+    .sidebarMobileVisible li .icon { display: none; }
+
+    .sidebarMobileVisible li button:hover { background: transparent; box-shadow: none; }
+
+    .closeIcon { font-size: 30px; position: absolute; top: 20px; left: 20px; color: #fff; }
+}

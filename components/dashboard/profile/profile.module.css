@@ -13,3 +13,10 @@
 }
 
 .user { font-size: 18px; color: #000; }
+
+@media (max-width: 768px) {
+    .user { 
+        display: none;
+    }
+    .image { width: 60px; }
+}

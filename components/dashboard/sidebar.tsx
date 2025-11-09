@@ -10,13 +10,15 @@ import Image from 'next/image';
 import classNames from 'classnames';
 import { iconMap } from '../icons';
 import { createPortal } from 'react-dom';
+import { useSidebar } from '../context/SidebarContext';
+import { AiOutlineClose } from 'react-icons/ai';
 
 const Sidebar: React.FC<any> = () => {
     const { company } = useCurrentCompany();
     const { userRole } = useUserRole();
     const pathname = usePathname();
     const [isProductsOpen, setIsProductsOpen] = useState(false);
-
+    const { isSidebarOpen, toggleSidebar } = useSidebar();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -97,7 +99,11 @@ const Sidebar: React.FC<any> = () => {
     }
   
     return createPortal (
-      <nav  className={styles.sidebar}>
+      <nav  className={classNames(isSidebarOpen ? styles.sidebarMobileVisible : styles.sidebar)}>
+            <AiOutlineClose 
+              className={styles.closeIcon} 
+              onClick={toggleSidebar}
+            />
           <div className={styles.logo}>
             <Link href="/">
               <Image
