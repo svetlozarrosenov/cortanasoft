@@ -9,9 +9,9 @@ const Intro: React.FC = () => {
       <Shell>
         <div className={styles.intro}>
           <div className={styles.introInner}>
-            <h1 className={styles.introHeader}>One Business System, Endless Possibilities!</h1>
-            <p className={styles.introContent}>Reliable, fast, and adaptable to your business, Cortana Soft offers intelligent CRM and ERP solutions backed by 24/7 AI support from Cortana.</p>
-            <Link className={styles.button} href={'/'}>Get Started Now</Link>
+            <h1 className={styles.introHeader}>Най-лесната CRM/ERP система на пазара!</h1>
+            <p className={styles.introContent}>Умръзна ли ви от сложни, тромави системи? Запознайте се с CortanaSoft. Най-лесната система на пазара!</p>
+            <Link className={styles.button} href={'/'}>Заяви демо</Link>
           </div>
         </div>
       </Shell>

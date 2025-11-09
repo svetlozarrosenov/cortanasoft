@@ -33,7 +33,7 @@ const Header: React.FC = () => {
 
           <div className={styles.headerInnerSecondary}>
             <LangNav/>
-            <Button>Sign In</Button>
+            <Button>Влез</Button>
           </div>
         </div>
       </Shell>

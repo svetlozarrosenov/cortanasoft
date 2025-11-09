@@ -11,22 +11,22 @@ const Navigation: React.FC = () => {
     <ul className={styles.headerNav}>
       <li className={styles.headerNavLink}>
         <Link href="/dashboard">
-          Dashboard
+          Дашборд
         </Link>
       </li>
       <li className={styles.headerNavLink}>
         <Link href="/">
-          Home
+          Начало
         </Link>
       </li>
        <li className={styles.headerNavLink}>
           <Link href="/about">
-            About Us
+            За Нас
           </Link>
       </li>
        <li className={styles.headerNavLink}>
         <Link href="/contacts">
-          Contact Us
+          Контакти
         </Link>
       </li>
     </ul>
