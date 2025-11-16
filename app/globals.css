@@ -58,38 +58,3 @@ body {
 .bg-primary-dark:hover {
   background-color: var(--primary-dark);
 }
-h1, h2, h3, h4, h5, a, input, label, select, textarea, option { color: var(--text-on-primary-black); }
-
-p { color: var(--text-on-primary-grey); }
-
-.ag-header-row {
-  background-color: rgb(224, 247, 255) !important;
-}
-
-button { 
-  padding: 10px 30px;
-  border-radius: 10px;
-  font-size: 20px;
-  color: var(--text-on-primary-white);
-  background-color: var(--text-on-primary-blue);
-  transition: all 0.5s ease;
-  border: 1px solid var(--text-on-primary-white);
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: var(--text-on-primary-white);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  opacity: 0.9;
-  border: 1px solid var(--text-on-primary-blue);
-  color: var(--text-on-primary-blue);
-}
-
-a {
-  color: var(--text-on-primary-blue);
-  transition: all 0.5s ease;
-}
-
-a:hover {
-  color: var(--text-on-primary-black);
-}

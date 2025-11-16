@@ -1,16 +1,18 @@
+import useSWR from 'swr';
+import { mutate } from 'swr';
 import axios from 'axios';
 
 const urls = {
-    contact: `${process.env.NEXT_PUBLIC_BACK_END_URL}/contact-form/create-message`,
+    fetchAlarms: `${process.env.REACT_APP_BACK_END_URL}/contact-form/create-message`,
 };
 
-export const contact = async (clientData: any) => {
+export async function addContactMessageMutate(messageData: {name: string, subject: string, email: string, phone: string, message: string}) {
     try {
-      const result = await axios.post(urls.contact, clientData);
-      return result.data;
+      await axios.post(urls.fetchAlarms, messageData);
+            
+      return true;
     } catch (error) {
-      console.error('Error registering user:', error);
+      console.error('Error deleting the alarms:', error);
       throw error;
     }
   };
-

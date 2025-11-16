@@ -1,76 +1,50 @@
-'use client';
 import React from 'react';
+import styles from './footer.module.css'; // Импорт на CSS модула
 import Link from 'next/link';
-import styles from './footer.module.css';
-import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram } from 'react-icons/fa';
-import Shell from './shell';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import classNames from 'classnames';
 
 const Footer: React.FC = () => {
-  const pathname = usePathname();
-  const isDashboard = pathname?.startsWith('/dashboard') ?? false;
   return (
-    <footer className={classNames(styles.footer, isDashboard ? styles.footerHidden : '')}>
-      <Shell>
-        <div className={styles.footerInner}>
-          <div className={styles.footerHead}>
-            <div className={styles.logo}><Link href={'/'}><Image
-                  src="/CortanaSoftLogo.svg"
-                  alt="CortanaSoft Logo"
-                  width={282}
-                  height={100}
-                  className={styles.featureImage}
-                /></Link></div>
-
-            <ul className={styles.footerNav}>
-              <li>
-                <Link href="/privacy">
-                  Политика за поверителност
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms">
-                  Условия за ползване
-                </Link>
-              </li>
-              <li>
-                <Link href="/contacts">
-                  Контакти
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div className={styles.footerFoot}>
-            <p>
-              &copy; {new Date().getFullYear()} CortanaSoft. Всички права запазени.
-            </p>
-            <ul className={styles.socials}>
-              <li>
-                  <Link href="https://facebook.com" className={styles.socials__link}>
-                    <FaFacebookF className={styles.socials__icon} />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="https://twitter.com" className={styles.socials__link}>
-                    <FaTwitter className={styles.socials__icon} />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="https://linkedin.com" className={styles.socials__link}>
-                    <FaLinkedinIn className={styles.socials__icon} />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="https://instagram.com" className={styles.socials__link}>
-                    <FaInstagram className={styles.socials__icon} />
-                  </Link>
-                </li>
-            </ul>
+    <footer className={styles.footerContainer}>
+      <div className={styles.footerContent}>
+        <div className={styles.footerSection}>
+          <h3 className={styles.footerTitle}>За нас</h3>
+          <Link href="/about" className={styles.footerLink}>
+            За компанията
+          </Link>
+          <Link href="/contacts" className={styles.footerLink}>
+            Контакти
+          </Link>
+          <div className={styles.contactInfo}>
+            <p>📍 София, България</p>
+            <p>📞 +359 87 664 9967</p>
+            <p>✉️ sentinel@sentinel-bg.info</p>
           </div>
         </div>
-      </Shell>
+        
+        <div className={styles.footerSection}>
+          <h3 className={styles.footerTitle}>Услуги</h3>
+          <Link href="/services" className={styles.footerLink}>
+            Нашите услуги
+          </Link>
+          <Link href="/products" className={styles.footerLink}>
+            Цени
+          </Link>
+        </div>
+        
+        <div className={styles.footerSection}>
+          <h3 className={styles.footerTitle}>Поддръжка</h3>
+          <Link href="/faq" className={styles.footerLink}>
+            Често задавани въпроси
+          </Link>
+          <Link href="/terms" className={styles.footerLink}>
+            Общи условия
+          </Link>
+        </div>
+      </div>
+      
+      <div className={styles.copyright}>
+        © {new Date().getFullYear()} Sentinel. Всички права запазени.
+      </div>
     </footer>
   );
 };

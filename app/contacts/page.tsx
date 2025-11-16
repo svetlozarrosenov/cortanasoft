@@ -1,154 +1,115 @@
-'use client';
-import React, { useState } from 'react';
-import styles from './contacts.module.css';
-import { fields } from './const';
-import { Controller, useForm } from 'react-hook-form';
-import IntroSecondary from '@/components/common/introSecondary';
-import { contact } from './hooks';
-import Shell from '@/components/shell';
-import { FaEnvelope, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
+'use client'; // За клиентски състояния като useState
+
+import React, { useState, FormEvent } from 'react';
+import styles from './contacts.module.css'; // Импорт на CSS модула
+import Intro from '@/components/Intro';
+import { addContactMessageMutate } from './hooks';
 
 const Contacts: React.FC = () => {
-  const [backEndError, setBackEndError] = useState('');
-  const { control, handleSubmit, formState: { errors } } = useForm({ mode: 'all' });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const onSubmit = async (data: any) => {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
     try {
-      await contact(data);
-    } catch (e: any) {
-      setBackEndError(e.message);
+      await addContactMessageMutate({ name, email, phone, subject, message });
+      setIsSubmitted(true);
+      setName('');
+      setEmail('');
+      setPhone('');
+      setSubject('');
+      setMessage('');
+    } catch (error) {
+      setError('Грешка при изпращане на съобщението. Моля, опитайте отново.');
+      console.error('Error:', error);
     }
   };
 
   return (
-    <>
-      <IntroSecondary data={{ title: 'Contact Us', content: 'Do you have questions or want to learn more about our CRM and ERP solutions? Our team and the AI ​​assistant Cortana are here to help you!' }} /> 
-
-      <div className={styles.contact}>
-        <Shell>
-          {backEndError && <div className={styles.backEndError}>
-              {backEndError}
-          </div>}
-
-          <div className={styles.head}>
-          <div className={styles.summary}>
-              <h4 className={styles.loginHead}>
-                Our Contacts
-              </h4>
-
-              <p className={styles.loginText}>
-                Fill up the form and our Team will get back to you within 24 hours.
-              </p>
-
-              <ul className={styles.features}>
-                <li className={styles.feature}>
-                  <FaEnvelope className={styles.featureIcon} />
-                  <span>support@cortanasoft.com</span>
-                </li>
-                <li className={styles.feature}>
-                  <FaPhone className={styles.featureIcon} />
-                  <span>+359 87 664 9967</span>
-                </li>
-                <li className={styles.feature}>
-                  <FaMapMarkerAlt className={styles.featureIcon} />
-                  <span>10 Business Center Street, Sofia, Bulgaria</span>
-                </li>
-              </ul>
+    <div className={styles.pageWrapper}>
+      <Intro />
+      <div className={styles.pageContainer}>
+        <section className={styles.contentSection}>
+          <h1 className={styles.title}>Контакти</h1>
+          <div className={styles.contentContainer}>
+            <div className={styles.contactInfo}>
+              <h2 className={styles.contactTitle}>Свържете се с нас</h2>
+              <p className={styles.contactDetail}>Телефон: +359 87 664 9967</p>
+              <p className={styles.contactDetail}>Email: sentinel@sentinel-bg.info</p>
             </div>
-      
-            <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-              {Object.keys(fields).map((key) => (
-                <div key={fields[key].name}>
-                  <label htmlFor={fields[key].name}>
-                    {fields[key].label}
-                    {fields[key].required && <span>*</span>}
-                  </label>
 
-                  <Controller
-                    name={fields[key].name}
-                    control={control}
-                    rules={{
-                      required: fields[key].required ? `${fields[key].label} е задължително` : false,
-                      pattern: fields[key].pattern
-                        ? { value: fields[key].pattern, message: `Невалиден формат за ${fields[key].label}` }
-                        : undefined,
-                      min: fields[key].min !== undefined
-                        ? { value: fields[key].min, message: `Минимална стойност е ${fields[key].min}` }
-                        : undefined,
-                      max: fields[key].max !== undefined
-                        ? { value: fields[key].max, message: `Максимална стойност е ${fields[key].max}` }
-                        : undefined,
-                      minLength: fields[key].minLength
-                        ? { value: fields[key].minLength, message: `Минимум ${fields[key].minLength} символа` }
-                        : undefined,
-                      maxLength: fields[key].maxLength
-                        ? { value: fields[key].maxLength, message: `Максимум ${fields[key].maxLength} символа` }
-                        : undefined,
-                    }}
-                    render={({ field: { onChange, onBlur, value, ref } }) => {
-                      switch (fields[key].type) {
-                        case 'email':
-                          return (
-                            <input
-                              type="email"
-                              id={fields[key].name}
-                              placeholder={fields[key].placeholder}
-                              onChange={onChange}
-                              onBlur={onBlur}
-                              value={value || ''}
-                              ref={ref}
-                              className={styles.input}
-                            />
-                          );
-                        case 'text':
-                            return (
-                              <input
-                                type="text"
-                                id={fields[key].name}
-                                placeholder={fields[key].placeholder}
-                                onChange={onChange}
-                                onBlur={onBlur}
-                                value={value || ''}
-                                ref={ref}
-                                className={styles.input}
-                              />
-                            );
-                          case 'textarea':
-                              return (
-                                <textarea
-                                  id={fields[key].name}
-                                  placeholder={fields[key].placeholder}
-                                  onChange={onChange}
-                                  onBlur={onBlur}
-                                  value={value || ''}
-                                  ref={ref}
-                                  className={styles.textarea}
-                                  rows={5}
-                                />
-                              );
-                        default:
-                          return <></>;
-                      }
-                    }}
-                  />
+            <div className={styles.contactInfo}>
+              <h2 className={styles.contactTitle}>Работно време</h2>
+              <p className={styles.contactDetail}>Понеделник - Петък: 9:00 - 18:00</p>
+              <p className={styles.contactDetail}>Събота: 10:00 - 14:00</p>
+              <p className={`${styles.contactDetail} ${styles.contactDetailLast}`}>Неделя: Почивен ден</p>
+            </div>
 
-                  {errors[fields[key].name] && (
-                    <p>{errors[fields[key].name]?.message as any}</p>
-                  )}
-                </div>
-              ))}
-
-              <button
-                className={styles.button}
-                type="submit"
-              >
-                Send Message
-              </button>
-            </form>
+            {!isSubmitted ? (
+              <form className={styles.contactForm} onSubmit={handleSubmit}>
+                <h2 className={styles.contactTitle}>Изпратете ни съобщение</h2>
+                <input
+                  type="text"
+                  placeholder="Вашето име"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={styles.input}
+                />
+                <input
+                  type="email"
+                  placeholder="Вашият имейл"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={styles.input}
+                />
+                <input
+                  type="text"
+                  placeholder="Телефон"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className={styles.input}
+                />
+                <input
+                  type="text"
+                  placeholder="Тема"
+                  required
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  className={styles.input}
+                />
+                <textarea
+                  placeholder="Вашето съобщение"
+                  required
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className={styles.textarea}
+                />
+                <button
+                  type="submit"
+                  className={styles.button}
+                >
+                  Изпрати
+                </button>
+                {error && <p className={styles.errorMessage}>{error}</p>}
+              </form>
+            ) : (
+              <div className={styles.successMessage}>
+                Вашето съобщение беше изпратено успешно! Благодарим ви, че се свързахте с нас. Ще ви отговорим възможно най-скоро на посочения имейл или телефон.
+              </div>
+            )}
           </div>
-        </Shell>
+        </section>
       </div>
-    </>
+    </div>
   );
 };
 

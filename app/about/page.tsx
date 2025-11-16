@@ -1,21 +1,76 @@
-import Info from '@/components/aboutPage/info';
-import Story from '@/components/aboutPage/story';
-import IntroSecondary from '@/components/common/introSecondary';
-import Demo from '@/components/demo';
-import Additional from '@/components/homepage/additional';
 import React from 'react';
+import styles from './about.module.css';
 
-export default function About() {
-  const data = {title: 'For Cortana Soft', content: "We are a team of passionate professionals who create innovative CRM and ERP solutions to help businesses in Bulgaria thrive."};
-
+const About: React.FC = () => {
   return (
-    <>
-    <IntroSecondary data={data} />
-    <Story image={'/images/about-1.png'} />
-    <Info />
-    <Story image={'/images/about-2.png'} reversed />
-    <Additional />
-    <Demo />
-    </>
+    <div className={styles.pageContainer}>
+      <section className={styles.contentSection}>
+        <h1 className={styles.title}>За Sentinel</h1>
+        <div className={styles.textContainer}>
+          <p className={styles.paragraph}>
+            Sentinel въвежда иновативен подход в сферата на сигурността, предлагайки 
+            интелигентна алармена система от ново поколение. <span className={styles.highlightText}>
+            Нашето решение елиминира нуждата от SIM карти в сензорите, което означава 
+            никакви месечни такси за нашите потребители.</span>
+          </p>
+
+          <h2 className={styles.subTitle}>Иновативна защита за вашата собственост</h2>
+          <p className={styles.paragraph}>
+            При засичане на нарушител, системата моментално изпраща сигнал до вашия телефон, 
+            позволявайки незабавна реакция. Това означава, че крадецът може да бъде заловен 
+            на място - преди да е успял да се отдалечи с вашата собственост.
+          </p>
+
+          <h3 className={styles.featureTitle}>Удобство на батерията</h3>
+          <p className={styles.paragraph}>
+            Нашите устройства са оборудвани с ефективни батерии, осигуряващи до 6 дни работа 
+            с едно зареждане. Това означава много по-малко грижи около поддръжката - не е нужно 
+            да мислите постоянно за презареждане, а можете просто да се наслаждавате на 
+            спокойствието, което системата ви предоставя.
+          </p>
+
+          <h3 className={styles.featureTitle}>Универсално приложение</h3>
+          <p className={styles.paragraph}>
+            Независимо дали става въпрос за автомобил, мотоциклет или скъп велосипед, 
+            Sentinel предлага надеждна защита. Собствениците на автомобили вече могат да 
+            паркират спокойно пред блока, знаейки че колата им е под постоянно наблюдение.
+          </p>
+          <p className={styles.paragraph}>
+            За велосипедистите и мотористите, системата предлага безпрецедентно ниво на 
+            сигурност - вече можете да оставите своя велосипед или мотор, без да се 
+            притеснявате за тяхната безопасност.
+          </p>
+
+          <h2 className={styles.subTitle}>Част от нещо по-голямо</h2>
+          <p className={styles.paragraph}>
+            Sentinel се отличава с уникален подход към разрастването на мрежата си. 
+            Всеки нов клиент автоматично става част от нашата разширяваща се мрежа, 
+            като устройствата му допринасят за общото покритие. Това създава непрекъснато 
+            растяща безплатна интернет инфраструктура, от която всички потребители се 
+            възползват.
+          </p>
+          <p className={styles.paragraph}>
+            Чрез своето мобилно приложение, Sentinel осигурява незабавни известия директно 
+            на вашия телефон, давайки ви пълен контрол и спокойствие за защитата на 
+            вашата собственост, без допълнителни разходи и усложнения.
+          </p>
+
+          <div className={styles.callToAction}>
+            <p className={styles.ctaText}>
+              Sentinel е повече от алармена система - това е вашият надежден партньор в 
+              сигурността. Без месечни такси, без сложни инсталации, без компромиси с 
+              качеството. Изберете спокойствието, изберете иновацията, изберете Sentinel.
+            </p>
+            <p className={styles.ctaText}>
+              <span className={styles.highlightText}>
+                Присъединете се към мрежата на бъдещето и защитете това, което е важно за вас.
+              </span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
   );
-}
+};
+
+export default About;

@@ -1,40 +1,104 @@
-.footer {
-  background-color: #F2FBFE;
+.footerContainer {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  padding: 60px 20px 40px;
 }
 
-.footerHead {
+.footerContent {
   display: flex;
-  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
-  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
-  align-items: center;
-  gap: 20px; /* Разстояние между елементите */
-  border-bottom: 2px solid #EDEDED;
-  padding: 30px 0;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.footerFoot {
+@media (max-width: 768px) {
+  .footerContent {
+    flex-direction: column;
+    gap: 40px;
+  }
+}
+
+.footerSection {
+  flex: 1;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .footerSection {
+    text-align: center;
+    padding: 0;
+  }
+}
+
+.footerTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: white;
+  position: relative;
+}
+
+.footerTitle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .footerTitle::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.footerLink {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  font-weight: 400;
+}
+
+.footerLink:hover {
+  color: white;
+  transform: translateX(5px);
+}
+
+@media (max-width: 768px) {
+  .footerLink:hover {
+    transform: none;
+  }
+}
+
+.contactInfo {
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+.contactInfo p {
+  margin-bottom: 8px;
   display: flex;
-  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
-  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
   align-items: center;
-  gap: 20px; /* Разстояние между елементите */
-  padding: 30px 0;
+  gap: 8px;
 }
 
-.footerNav {
-  display: flex;
-  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
-  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
-  align-items: center;
-  gap: 20px; /* Разстояние между елементите */
+@media (max-width: 768px) {
+  .contactInfo p {
+    justify-content: center;
+  }
 }
 
-.socials {
-  display: flex;
-  flex-wrap: wrap; /* Позволява елементите да преминават на нов ред */
-  justify-content: space-between; /* Разпределя елементите с максимално разстояние */
-  align-items: center;
-  gap: 20px; /* Разстояние между елементите */
+.copyright {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
 }
-
-.footerHidden { display: none; }

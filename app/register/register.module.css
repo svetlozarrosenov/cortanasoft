@@ -1,0 +1,115 @@
+.pageContainer {
+    background: linear-gradient(135deg, #6e8efb08, #a777e308);
+    min-height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+  }
+  
+  .registerContainer {
+    max-width: 500px;
+    width: 100%;
+    padding: 40px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(110, 142, 251, 0.1);
+  }
+  
+  @media (max-width: 768px) {
+    .registerContainer {
+      padding: 24px;
+    }
+  }
+  
+  .title {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2d3748;
+  }
+  
+  .title span {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .label {
+    color: #4a5568;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .input {
+    padding: 14px 16px;
+    border: 1.5px solid #e3e8ef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: #6e8efb;
+    box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.1);
+  }
+  
+  .input::placeholder {
+    color: #a0aec0;
+  }
+  
+  .button {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    border: none;
+    padding: 16px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+  
+  .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(110, 142, 251, 0.2);
+  }
+  
+  .button:active {
+    transform: translateY(0);
+  }
+  
+  @media (max-width: 768px) {
+    .button:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  .loginLink {
+    text-align: center;
+    color: #6e8efb;
+    text-decoration: none;
+    margin-top: 24px;
+    font-size: 0.95rem;
+    display: block;
+    font-weight: 500;
+  }
+  
+  .loginLink:hover {
+    color: #a777e3;
+  }

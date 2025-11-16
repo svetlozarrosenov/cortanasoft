@@ -1,19 +1,297 @@
-.header {
-  padding-top: 25px;
-  padding-bottom: 25px;
+@keyframes blink {
+  0% { color: #6e8efb; }
+  50% { color: #ffffff; }
+  100% { color: #6e8efb; }
 }
-.headerInner {
+
+.headerContainer {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.headerInnerSecondary {
+@media (max-width: 768px) {
+  .headerContainer {
+    padding: 0 15px;
+    height: 70px;
+  }
+}
+
+.logoLink {
+  text-decoration: none;
+  color: white;
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 
-.headerDashboard {
+@media (max-width: 768px) {
+  .logoLink {
+    flex-shrink: 0;
+  }
+}
+
+.logoImage {
+  width: 120px;
+  height: 120px;
+  padding: 10px 0;
+}
+
+@media (max-width: 768px) {
+  .logoImage {
+    width: 50px;
+    height: 50px;
+    padding: 5px 0;
+  }
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navOpen {
+  /* За isOpen=true в мобилни – преместих в JSX като допълнителен клас */
+}
+
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    position: fixed;
+    top: 70px;
+    left: -112%; /* По подразбиране скрито */
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    width: 100%;
+    height: calc(100vh - 70px);
+    padding: 20px;
+    transition: all 0.3s ease-in-out;
+    z-index: 999;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .navOpen {
+    left: -5%; /* За isOpen=true */
+  }
+}
+
+.navLink {
+  color: white; /* По подразбиране, active ще override */
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  padding: 5px 0;
+}
+
+.navLink:hover {
+  opacity: 0.8;
+}
+
+.active {
+  color: #ffffff;
+}
+
+.active:after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #ffffff;
+}
+
+.alarmLink {
+  animation: blink 3s infinite;
+  font-weight: bold;
+}
+
+.alarmLink:hover {
+  animation: none;
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .navLink {
+    padding: 15px 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .navLink:last-child {
+    border-bottom: none;
+  }
+}
+
+.subMenuContainer {
+  position: relative;
+}
+
+.subMenuContainer:hover > .subMenu {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .subMenuContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.subMenu {
   display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 10px 0;
+  z-index: 1000;
+  min-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .subMenu {
+    display: block;
+    position: static;
+    box-shadow: none;
+    background: none;
+    padding: 0;
+    width: 100%;
+  }
+}
+
+.subMenuLink {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: block;
+  transition: opacity 0.3s ease;
+  font-weight: 400;
+}
+
+.subMenuLink:hover {
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.subMenuLink.active {
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .subMenuLink {
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.logoutButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 5px 0;
+  transition: opacity 0.3s ease;
+}
+
+.logoutButton:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .logoutButton {
+    padding: 15px 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.cartIcon {
+  position: relative;
+  cursor: pointer;
+  color: white;
+  margin-left: 15px;
+}
+
+@media (max-width: 768px) {
+  .cartIcon {
+    margin-left: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.cartCount {
+  position: absolute;
+  top: -22px;
+  right: -6px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+@media (max-width: 768px) {
+  .cartCount {
+    top: 0;
+    right: 0;
+  }
+}
+
+.userInfo {
+  margin-left: 20px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .userInfo {
+    display: none;
+  }
+}
+
+.burgerIcon {
+  display: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  padding: 10px;
+}
+
+.burgerIcon:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .burgerIcon {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+  }
 }

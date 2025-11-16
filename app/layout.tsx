@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CortanaSoft",
-  description: "CortanaSoft ERP и CRM система",
+  title: "Sentinel",
+  description: "Алармена система Sentinel",
 };
 
 export default function RootLayout({

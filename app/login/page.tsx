@@ -1,131 +1,108 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import { useAuth } from './hooks';
-import { useRouter } from 'next/navigation';
-import styles from './login.module.css';
-import { fields } from './const';
-import { Controller, useForm } from 'react-hook-form';
-import IntroSecondary from '@/components/common/introSecondary';
+'use client'; // За клиентски състояния като useState
+
+import React, { useState, FormEvent, ChangeEvent } from 'react';
+import styles from './login.module.css'; // Импорт на CSS модула
+import { useRouter } from 'next/navigation'; // За навигация в Next.js
+import { useAuth } from '../hooks';
+import { requestNotificationPermission } from '@/notifications';
 
 const Login: React.FC = () => {
-  const { user } = useAuth();
   const { login } = useAuth();
-  const [backEndError, setBackEndError] = useState('');
-  const router = useRouter();
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
-  const { control, handleSubmit, formState: { errors } } = useForm({ mode: 'all' });
+  const router = useRouter(); // Замества useNavigate
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (userLoggedIn) {
-      console.log('User logged in, redirecting...'); 
-      router.push('/dashboard');
-    }
-  }, [user, router, userLoggedIn]);
-
-  const onSubmit = async (data: any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    
     try {
-      await login({ ...data });
-      setUserLoggedIn(true);
-    } catch (e: any) {
-      setBackEndError(e.message);
+      const token = await requestNotificationPermission();
+      await login({ email, password, firebaseId: token });
+      router.push('/products');
+    } catch (err) {
+      setError('Неуспешен опит за вход. Моля, проверете вашите данни.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>, setter: (value: string) => void) => {
+    setter(e.target.value);
+  };
+
   return (
-    <>
-      <IntroSecondary data={{ title: 'Login Page', content: '' }} /> 
-
-      <div className={styles.login}>
-        <h4 className={styles.loginHead}>
-          Hi, Welcome back!
-        </h4>
-
-        <p className={styles.loginText}>
-          Login to your account to enjoy
-        </p>
-
-        {backEndError && <div className={styles.backEndError}>
-          {backEndError}
-        </div>}
-  
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-          {Object.keys(fields).map((key) => (
-            <div key={fields[key].name}>
-              <label htmlFor={fields[key].name}>
-                {fields[key].label}
-                {fields[key].required && <span>*</span>}
+    <div className={styles.appContainer}>
+      <div className={styles.pageContainer}>
+        <div className={styles.loginContainer}>
+          <div className={styles.logoContainer}>
+            <img src="/logo.svg" alt="Sentinel Logo" className={styles.logo} />
+          </div>
+          
+          <h2 className={styles.title}>
+            Вход в <span className={styles.titleGradient}>Sentinel</span>
+          </h2>
+          
+          <form onSubmit={handleSubmit} className={styles.loginForm}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="email" className={styles.inputLabel}>
+                Имейл адрес
               </label>
-
-              <Controller
-                name={fields[key].name}
-                control={control}
-                rules={{
-                  required: fields[key].required ? `${fields[key].label} е задължително` : false,
-                  pattern: fields[key].pattern
-                    ? { value: fields[key].pattern, message: `Невалиден формат за ${fields[key].label}` }
-                    : undefined,
-                  min: fields[key].min !== undefined
-                    ? { value: fields[key].min, message: `Минимална стойност е ${fields[key].min}` }
-                    : undefined,
-                  max: fields[key].max !== undefined
-                    ? { value: fields[key].max, message: `Максимална стойност е ${fields[key].max}` }
-                    : undefined,
-                  minLength: fields[key].minLength
-                    ? { value: fields[key].minLength, message: `Минимум ${fields[key].minLength} символа` }
-                    : undefined,
-                  maxLength: fields[key].maxLength
-                    ? { value: fields[key].maxLength, message: `Максимум ${fields[key].maxLength} символа` }
-                    : undefined,
-                }}
-                render={({ field: { onChange, onBlur, value, ref } }) => {
-                  switch (fields[key].type) {
-                    case 'password':
-                      return (
-                        <input
-                          type="password"
-                          id={fields[key].name}
-                          placeholder={fields[key].placeholder}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          value={value || ''}
-                          ref={ref}
-                          className={styles.input}
-                        />
-                      );
-                    case 'email':
-                      return (
-                        <input
-                          type="email"
-                          id={fields[key].name}
-                          placeholder={fields[key].placeholder}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          value={value || ''}
-                          ref={ref}
-                          className={styles.input}
-                        />
-                      );
-                    default:
-                      return <></>;
-                  }
-                }}
+              <input
+                id="email"
+                type="email"
+                className={styles.inputField}
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => handleInputChange(e, setEmail)}
+                required
               />
-
-              {errors[fields[key].name] && (
-                <p>{errors[fields[key].name]?.message as any}</p>
-              )}
             </div>
-          ))}
 
-          <button
-            className={styles.button}
-            type="submit"
+            <div className={styles.inputGroup}>
+              <label htmlFor="password" className={styles.inputLabel}>
+                Парола
+              </label>
+              <input
+                id="password"
+                type="password"
+                className={styles.inputField}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => handleInputChange(e, setPassword)}
+                required
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className={`${styles.submitButton} ${isLoading ? styles.submitButtonDisabled : ''}`}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Влизане...' : 'Влез'}
+            </button>
+          </form>
+
+          {error && <div className={styles.errorMessage}>{error}</div>}
+          
+          <a 
+            href="/forgot-password" 
+            className={styles.forgotPassword}
+            onTouchStart={(e) => {
+              (e.currentTarget as HTMLAnchorElement).classList.add(styles.forgotPasswordActive);
+            }}
+            onTouchEnd={(e) => {
+              (e.currentTarget as HTMLAnchorElement).classList.remove(styles.forgotPasswordActive);
+            }}
           >
-            Log In
-          </button>
-        </form>
+            Забравена парола?
+          </a>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

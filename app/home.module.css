@@ -1,0 +1,460 @@
+.homeContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+  
+  @media (max-width: 768px) {
+    .homeContainer {
+      padding: 10px;
+    }
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2d3748;
+    padding: 0 16px;
+  }
+  
+  .title span {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  @media (max-width: 768px) {
+    .title {
+      font-size: 1.8rem;
+      line-height: 1.3;
+      margin: 16px 0;
+    }
+  }
+  
+  .subtitle {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #4a5568;
+    padding: 0 16px;
+    line-height: 1.4;
+  }
+  
+  @media (max-width: 768px) {
+    .subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 24px;
+      padding: 0 16px;
+    }
+  }
+  
+  .featureList {
+    list-style-type: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin: 32px 0;
+  }
+  
+  @media (max-width: 768px) {
+    .featureList {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 20px 0;
+    }
+  }
+  
+  .featureItem {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(110, 142, 251, 0.1);
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  @media (max-width: 768px) {
+    .featureItem {
+      padding: 16px;
+      min-height: auto;
+      border-radius: 12px;
+    }
+  
+    .featureItem:active {
+      transform: scale(0.98);
+      background: rgba(110, 142, 251, 0.02);
+    }
+  }
+  
+  .featureTitle {
+    color: #2d3748;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+  
+  @media (max-width: 768px) {
+    .featureTitle {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+  }
+  
+  .featureDescription {
+    color: #4a5568;
+    line-height: 1.6;
+  }
+  
+  @media (max-width: 768px) {
+    .featureDescription {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  }
+  
+  .ctaButton {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    border: none;
+    padding: 16px 48px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 40px auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  @media (max-width: 768px) {
+    .ctaButton {
+      width: 100%;
+      margin: 24px 0;
+      padding: 16px;
+      font-size: 1rem;
+      border-radius: 8px;
+    }
+  }
+  
+  .infoSection {
+    margin: 80px 0;
+  }
+  
+  @media (max-width: 768px) {
+    .infoSection {
+      margin: 40px -10px;
+    }
+  }
+  
+  .infoBlock {
+    background: linear-gradient(135deg, #6e8efb08, #a777e308);
+    border-radius: 20px;
+    padding: 48px;
+    margin-bottom: 40px;
+  }
+  
+  @media (max-width: 768px) {
+    .infoBlock {
+      padding: 24px 16px;
+      border-radius: 0;
+      margin-bottom: 24px;
+    }
+  }
+  
+  .infoTitle {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #2d3748;
+  }
+  
+  .infoTitle span {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  @media (max-width: 768px) {
+    .infoTitle {
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+    }
+  }
+  
+  .infoContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  
+  @media (max-width: 768px) {
+    .infoContent {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+  
+  .infoText {
+    color: #4a5568;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .infoText p {
+    margin-bottom: 20px;
+  }
+  
+  .infoText ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .infoText li {
+    margin-bottom: 16px;
+    padding-left: 28px;
+    position: relative;
+  }
+  
+  .infoText li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #6e8efb;
+    font-weight: bold;
+  }
+  
+  @media (max-width: 768px) {
+    .infoText {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  
+    .infoText p {
+      margin-bottom: 16px;
+    }
+  
+    .infoText li {
+      margin-bottom: 12px;
+      padding-left: 24px;
+    }
+  }
+  
+  .infoImage {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(110, 142, 251, 0.1);
+  }
+  
+  .infoImage img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  @media (max-width: 768px) {
+    .infoImage {
+      padding: 16px;
+    }
+  }
+  
+  .testimonialsSection {
+    margin: 60px 0;
+    padding: 48px 0;
+    background: linear-gradient(135deg, #6e8efb08, #a777e308);
+    border-radius: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .testimonialsSection {
+      margin: 24px -10px;
+      padding: 24px 0;
+      border-radius: 0;
+    }
+  }
+  
+  .testimonialsTitle {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #2d3748;
+    padding: 0 16px;
+  }
+  
+  .testimonialsTitle span {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  @media (max-width: 768px) {
+    .testimonialsTitle {
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+    }
+  }
+  
+  .testimonialsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    padding: 0 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .testimonialsList {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 0 10px;
+    }
+  }
+  
+  .testimonialCard {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(110, 142, 251, 0.1);
+    height: 100%;
+  }
+  
+  @media (max-width: 768px) {
+    .testimonialCard {
+      padding: 16px;
+      border-radius: 12px;
+    }
+  }
+  
+  .testimonialText {
+    color: #4a5568;
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .testimonialText {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+  }
+  
+  .testimonialAuthor {
+    color: #6e8efb;
+    font-weight: 600;
+  }
+  
+  @media (max-width: 768px) {
+    .testimonialAuthor {
+      font-size: 0.9rem;
+    }
+  }
+  
+  .subscriptionSection {
+    margin: 48px -16px;
+    padding: 48px 32px;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    text-align: center;
+  }
+  
+  @media (max-width: 768px) {
+    .subscriptionSection {
+      margin: 24px -10px;
+      padding: 24px 16px;
+    }
+  }
+  
+  .subscriptionTitle {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .subscriptionTitle {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      padding: 0;
+    }
+  }
+  
+  .subscriptionForm {
+    display: flex;
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 768px) {
+    .subscriptionForm {
+      flex-direction: column;
+      gap: 10px;
+      padding: 0;
+    }
+  }
+  
+  .subscriptionInput {
+    flex: 1;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+  }
+  
+  .subscriptionInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  }
+  
+  @media (max-width: 768px) {
+    .subscriptionInput {
+      padding: 14px 16px;
+      border-radius: 8px;
+    }
+  }
+  
+  .subscriptionButton {
+    background: white;
+    color: #6e8efb;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  @media (max-width: 768px) {
+    .subscriptionButton {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+  }
+  
+  .successMessage {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 16px;
+    backdrop-filter: blur(10px);
+  }
+  
+  @media (max-width: 768px) {
+    .successMessage {
+      padding: 14px;
+      margin: 16px 0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+  }
