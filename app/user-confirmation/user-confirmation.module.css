@@ -1,0 +1,103 @@
+.pageContainer {
+    background-color: #f0f8ff;
+    min-height: calc(100vh - 160px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .confirmationContainer {
+    max-width: 500px;
+    width: 100%;
+    padding: 40px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  @media (max-width: 768px) {
+    .confirmationContainer {
+      padding: 30px 20px;
+      border-radius: 10px;
+    }
+  }
+  
+  .title {
+    color: #003366;
+    font-size: 2rem;
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  
+  @media (max-width: 768px) {
+    .title {
+      font-size: 1.7rem;
+    }
+  }
+  
+  .message {
+    font-size: 1.1rem;
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  
+  @media (max-width: 768px) {
+    .message {
+      font-size: 1rem;
+      margin-bottom: 24px;
+    }
+  }
+  
+  .spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #0066cc;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 40px auto;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .button {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 16px;
+  }
+  
+  .button:hover {
+    background-color: #004c99;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 102, 204, 0.25);
+  }
+  
+  .button:active {
+    transform: translateY(0);
+  }
+  
+  @media (max-width: 768px) {
+    .button {
+      padding: 14px;
+      font-size: 1rem;
+    }
+  }

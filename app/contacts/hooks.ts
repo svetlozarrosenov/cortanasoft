@@ -3,7 +3,7 @@ import { mutate } from 'swr';
 import axios from 'axios';
 
 const urls = {
-    fetchAlarms: `${process.env.REACT_APP_BACK_END_URL}/contact-form/create-message`,
+    fetchAlarms: `${process.env.NEXT_PUBLIC_BACK_END_URL}/contact-form/create-message`,
 };
 
 export async function addContactMessageMutate(messageData: {name: string, subject: string, email: string, phone: string, message: string}) {

@@ -52,7 +52,7 @@ export function useAuth() {
   });
 
   const login = async (credentials: any) => {
-    console.log('crb_process.env.REACT_APP_BACK_END_URL', process.env.REACT_APP_BACK_END_URL);
+    console.log('crb_process.env.NEXT_PUBLIC_BACK_END_URL', process.env.NEXT_PUBLIC_BACK_END_URL);
     const res = await axios.post(urls.login, credentials, { withCredentials: true });
     mutate(res.data.user);
   };
