@@ -27,8 +27,7 @@ const SubscribersModal: React.FC<SubscribersModalProps> = ({
   onClose,
   onRemoveSubscriber,
 }) => {
-  const { data } = useDeviceSubscribers(device._id);
-  const subscribers = data?.subscribers || [];
+  const { subscribers } = useDeviceSubscribers(device._id);
 
   return (
     <div className={styles.subscribersModalOverlay} onClick={onClose}>
