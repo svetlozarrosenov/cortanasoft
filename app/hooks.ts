@@ -2,11 +2,11 @@ import useSWR from 'swr';
 import axios from 'axios';
 
 const urls = {
-    subscribe: `${process.env.REACT_APP_BACK_END_URL}/subscribe`,
-    register: `${process.env.REACT_APP_BACK_END_URL}/user/register`,
-    currentUser: `${process.env.REACT_APP_BACK_END_URL}/user/current`,
-    login: `${process.env.REACT_APP_BACK_END_URL}/auth/login`,
-    logout: `${process.env.REACT_APP_BACK_END_URL}/auth/logout`,
+  register: `${process.env.NEXT_PUBLIC_BACK_END_URL}/user/register`,
+  currentUser: `${process.env.NEXT_PUBLIC_BACK_END_URL}/user/current`,
+  login: `${process.env.NEXT_PUBLIC_BACK_END_URL}/auth/login`,
+  logout: `${process.env.NEXT_PUBLIC_BACK_END_URL}/auth/logout`,
+  subscribe: `${process.env.NEXT_PUBLIC_BACK_END_URL}/subscribe`,
 };
 
 interface UserData {
@@ -52,6 +52,7 @@ export function useAuth() {
   });
 
   const login = async (credentials: any) => {
+    console.log('crb_process.env.REACT_APP_BACK_END_URL', process.env.REACT_APP_BACK_END_URL);
     const res = await axios.post(urls.login, credentials, { withCredentials: true });
     mutate(res.data.user);
   };

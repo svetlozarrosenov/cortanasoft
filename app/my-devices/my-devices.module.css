@@ -1,0 +1,290 @@
+/* Основни контейнери */
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .pageContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    width: 100%;
+  }
+  @media (max-width: 768px) {
+    .pageContainer { padding: 20px 10px; }
+  }
+  
+  .pageTitle {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 40px;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  @media (max-width: 768px) {
+    .pageTitle { font-size: 1.8rem; margin-bottom: 24px; }
+  }
+  
+  /* Картичка на устройство */
+  .deviceCard {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(110, 142, 251, 0.3);
+    margin-bottom: 24px;
+    color: white;
+  }
+  @media (max-width: 768px) {
+    .deviceCard {
+      padding: 18px;
+      margin: 0 auto 20px;
+      max-width: 90%;
+      border-radius: 10px;
+    }
+  }
+  
+  .deviceHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+  @media (max-width: 768px) {
+    .deviceHeader { flex-direction: column; align-items: stretch; gap: 10px; }
+  }
+  
+  .deviceName {
+    font-size: 1.5rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  @media (max-width: 768px) { .deviceName { font-size: 1.3rem; } }
+  
+  /* Бутони */
+  .cameraButton {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto 30px;
+    transition:hover { opacity: 0.92; }
+  }
+  @media (max-width: 768px) {
+    .cameraButton { width: 95%; padding: 16px; font-size: 1rem; }
+  }
+  
+  .editButton {
+    background: white;
+    color: #6e8efb;
+    border: 2px solid #6e8efb;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  .editButton:hover {
+    background: rgba(110, 142, 251, 0.1);
+    color: #a777e3;
+  }
+  @media (max-width: 768px) { .editButton { width: 100%; padding: 14px; } }
+  
+  .subscribersButton {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .subscribersButton:hover {
+    background: linear-gradient(135deg, #38a169, #2f855a);
+  }
+  @media (max-width: 768px) { .subscribersButton { width: 100%; padding: 14px; } }
+  
+  .buttonFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  @media (max-width: 768px) {
+    .buttonFooter { flex-direction: column; gap: 10px; }
+  }
+  
+  /* Детайли */
+  .deviceDetails {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .deviceDetails p {
+    margin: 10px 0;
+    color: rgba(255,255,255,0.95);
+    line-height: 1.6;
+  }
+  .deviceDetails strong { color: white; }
+  @media (max-width: 768px) {
+    .deviceDetails { grid-template-columns: 1fr; gap: 14px; }
+    .deviceDetails p { font-size: 0.95rem; }
+  }
+  
+  .batteryDisplay {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0;
+    color: rgba(255,255,255,0.9);
+  }
+  .batteryDisplay strong { color: white; }
+  
+  /* Статус бадж */
+  .statusBadge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+  }
+  .statusBadge[data-status="active"] { background: rgba(80, 200, 120, 0.4); }
+  .statusBadge[data-status="inactive"] { background: rgba(239, 68, 68, 0.4); }
+  .statusBadge[data-status="pending"] { background: rgba(251, 191, 36, 0.4); }
+  
+  /* Модали */
+  .modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+  }
+  @media (max-width: 768px) { .modalOverlay { padding: 10px; } }
+  
+  .modalContent {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 142, 251, 0.15);
+  }
+  @media (max-width: 768px) {
+    .modalContent { padding: 20px; border-radius: 10px; }
+  }
+  
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .modalTitle {
+    margin: 0;
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  @media (max-width: 768px) { .modalTitle { font-size: 1.4rem; } }
+  
+  .closeButton {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+  }
+  .closeButton:hover { color: #333; }
+  
+  .infoText {
+    background: rgba(110, 142, 251, 0.05);
+    border-left: 4px solid #6e8efb;
+    padding: 14px 18px;
+    border-radius: 8px;
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid rgba(110, 142, 251, 0.2);
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  .input:focus {
+    outline: none;
+    border-color: #6e8efb;
+    box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.1);
+  }
+  
+  .label {
+    display: block;
+    margin: 16px 0 8px;
+    font-weight: 600;
+    color: #4a5568;
+  }
+  
+  .qrContainer, .videoContainer {
+    display: flex;
+    justify-content: center;
+    margin: 24px 0;
+  }
+  
+  .video {
+    max-width: 100%;
+    border-radius: 10px;
+    border: 3px solid #6e8efb;
+  }
+  
+  .buttonContainer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  @media (max-width: 768px) {
+    .buttonContainer { flex-direction: column; gap: 10px; }
+  }
+  
+  .cancelButton {
+    background: white;
+    color: #6e8efb;
+    border: 2px solid rgba(110, 142, 251, 0.3);
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    min-width: 120px;
+  }
+  .cancelButton:hover { background: rgba(110, 142, 251, 0.08); }
+  
+  .saveButton {
+    composes: editButton;
+    background: #6e8efb;
+    color: white;
+  }
+  .saveButton:hover {
+    background: #5a67d8;
+  }

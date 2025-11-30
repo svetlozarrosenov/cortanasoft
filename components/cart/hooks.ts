@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 
 interface CartItem {
@@ -15,75 +17,73 @@ interface Cart {
 }
 
 export const useCart = () => {
-  const [cart, setCart] = useState<Cart>(() => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : { items: [], total: 0 };
-  });
+  const [cart, setCart] = useState<Cart>({ items: [], total: 0 });
+  const [hydrated, setHydrated] = useState(false);
 
+  // Зареждаме от localStorage само на клиента
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-    // Опционално: Sync с NestJS API (MongoDB) в useEffect за всяка промяна
-    // axios.post('/api/cart/sync', cart).catch(err => console.error('Sync error:', err));
-  }, [cart]);
-
-  const addToCart = (product: CartItem) => {
-    setCart(prevCart => {
-      const existingItem = prevCart.items.find(item => item.id === product.id);
-      let newItems: CartItem[];
-      let newTotal: number;
-
-      if (existingItem) {
-        // Увеличи quantity, ако item вече съществува (избягва дубликати)
-        newItems = prevCart.items.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-        newTotal = prevCart.total + product.price;
-      } else {
-        // Добави нов item
-        newItems = [...prevCart.items, { ...product, quantity: 1 }];
-        newTotal = prevCart.total + product.price;
+    setHydrated(true);
+    try {
+      const saved = localStorage.getItem('cart');
+      if (saved) {
+        setCart(JSON.parse(saved));
       }
+    } catch (e) {
+      console.error('Грешка при четене на количката', e);
+    }
+  }, []);
 
-      // Пуш нотификация: Изпрати към Firebase или NestJS
-      // navigator.serviceWorker.ready.then(reg => reg.pushManager.getSubscription().then(sub => {
-      //   axios.post('/api/notifications/push', { message: `Добавено: ${product.name}`, subscription: sub });
-      // }));
+  // Записваме само на клиента
+  useEffect(() => {
+    if (hydrated) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+  }, [cart, hydrated]);
 
-      return { items: newItems, total: newTotal };
+  const addToCart = (product: Omit<CartItem, 'quantity'>) => {
+    setCart(prev => {
+      const existing = prev.items.find(i => i.id === product.id);
+      if (existing) {
+        return {
+          items: prev.items.map(i =>
+            i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+          ),
+          total: prev.total + product.price
+        };
+      }
+      return {
+        items: [...prev.items, { ...product, quantity: 1 }],
+        total: prev.total + product.price
+      };
     });
   };
 
   const removeFromCart = (productId: string) => {
-    setCart(prevCart => {
-      const itemToRemove = prevCart.items.find(item => item.id === productId);
-      if (!itemToRemove) return prevCart;
+    setCart(prev => {
+      const item = prev.items.find(i => i.id === productId);
+      if (!item) return prev;
 
-      let newItems: CartItem[];
-      let newTotal: number;
-
-      if (itemToRemove.quantity > 1) {
-        // Намали quantity, ако >1
-        newItems = prevCart.items.map(item =>
-          item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
-        );
-        newTotal = prevCart.total - itemToRemove.price;
-      } else {
-        // Премахни, ако quantity ==1
-        newItems = prevCart.items.filter(item => item.id !== productId);
-        newTotal = prevCart.total - itemToRemove.price;
+      if (item.quantity > 1) {
+        return {
+          items: prev.items.map(i =>
+            i.id === productId ? { ...i, quantity: i.quantity - 1 } : i
+          ),
+          total: prev.total - item.price
+        };
       }
-
-      // Пуш нотификация: "Премахнато от количка"
-      // ...
-
-      return { items: newItems, total: newTotal };
+      return {
+        items: prev.items.filter(i => i.id !== productId),
+        total: prev.total - item.price
+      };
     });
   };
 
-  const clearCart = () => {
-    setCart({ items: [], total: 0 });
-    // Sync с NestJS: axios.post('/api/cart/clear');
-  };
+  const clearCart = () => setCart({ items: [], total: 0 });
 
-  return { cart, addToCart, removeFromCart, clearCart };
+  return {
+    cart: hydrated ? cart : { items: [], total: 0 }, // важно!
+    addToCart,
+    removeFromCart,
+    clearCart,
+  };
 };

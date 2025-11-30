@@ -1,0 +1,321 @@
+/* app/admin/components/DevicesList.module.css */
+.pageContainer {
+  background: linear-gradient(135deg, #6e8efb08, #a777e308);
+  min-height: calc(100vh - 100px);
+  padding: 40px 20px;
+}
+
+@media (max-width: 768px) {
+  .pageContainer { padding: 20px; }
+}
+
+.contentContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(110, 142, 251, 0.1);
+}
+
+@media (max-width: 768px) {
+  .contentContainer { padding: 20px; }
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 2.5rem;
+  text-align: center;
+  color: #2d3748;
+  margin: 0;
+}
+
+.title span {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .title { font-size: 1.8rem; }
+}
+
+.createButton {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.createButton:hover {
+  background: linear-gradient(135deg, #38a169, #2f855a);
+}
+
+.filterContainer {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.filterField label {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.filterField input,
+.filterField select {
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+}
+
+.filterField input:focus,
+.filterField select:focus {
+  outline: none;
+  border-color: #6e8efb;
+  box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.1);
+}
+
+.tableContainer {
+  overflow-x: auto;
+  border-radius: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #6e8efb #e2e8f0;
+}
+
+.tableContainer::-webkit-scrollbar { height: 8px; }
+.tableContainer::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  border-radius: 8px;
+}
+.tableContainer::-webkit-scrollbar-track {
+  background: #e2e8f0;
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  min-width: 1300px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  text-align: left;
+  padding: 16px;
+  font-weight: 500;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.table th:first-child { border-top-left-radius: 12px; }
+.table th:last-child { border-top-right-radius: 12px; }
+
+.table tr {
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.table tr:nth-child(even) {
+  background-color: rgba(110, 142, 251, 0.02);
+}
+
+.table tr:hover {
+  background-color: rgba(110, 142, 251, 0.05);
+}
+
+.table td {
+  padding: 16px;
+  vertical-align: middle;
+  color: #4a5568;
+  border-bottom: 1px solid rgba(110, 142, 251, 0.1);
+}
+
+.serialNumber {
+  font-family: monospace;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: white;
+}
+
+.active { background-color: #4caf50; }
+.inactive { background-color: #e53e3e; }
+.pending { background-color: #ff9800; }
+
+.actionButton, .actionButtonSmall {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.actionButtonSmall {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.actionButton:hover, .actionButtonSmall:hover {
+  background: linear-gradient(135deg, #5a75e0, #8f5ed0);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.idContainer { display: flex; flex-direction: column; gap: 8px; }
+.idActions { display: flex; gap: 8px; }
+.idDisplay {
+  word-break: break-all;
+  font-family: monospace;
+  background-color: rgba(110, 142, 251, 0.05);
+  padding: 8px;
+  border-radius: 8px;
+  color: #4a5568;
+}
+.hiddenId {
+  font-family: monospace;
+  letter-spacing: 2px;
+  color: #6e8efb;
+}
+
+.qrContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.qrCode {
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.downloadButton {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.downloadButton:hover {
+  background: linear-gradient(135deg, #38a169, #2f855a);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background-color: white;
+  border-radius: 16px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.dialog h3 {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  color: #2d3748;
+}
+
+.dialog p {
+  color: #4a5568;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.cancelButton {
+  background-color: #edf2f7;
+  color: #4a5568;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  background-color: #e2e8f0;
+}
+
+.confirmButton {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.confirmButton:hover {
+  background: linear-gradient(135deg, #5a75e0, #8f5ed0);
+}

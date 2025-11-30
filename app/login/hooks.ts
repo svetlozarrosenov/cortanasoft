@@ -41,6 +41,7 @@ export function useAuth() {
   });
 
   const login = async (credentials: any) => {
+    console.log('crb_process.env', process.env)
     const res = await axios.post(urls.login, credentials, { withCredentials: true });
     mutate(res.data.user);
   };

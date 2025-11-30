@@ -1,4 +1,4 @@
-'use client'; // За клиентски хукове като useState, useEffect, useCart
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { FaShoppingCart, FaBars, FaTimes } from 'react-icons/fa';

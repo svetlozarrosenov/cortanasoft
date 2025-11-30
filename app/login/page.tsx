@@ -1,14 +1,14 @@
-'use client'; // За клиентски състояния като useState
+'use client';
 
-import React, { useState, FormEvent, ChangeEvent } from 'react';
-import styles from './login.module.css'; // Импорт на CSS модула
-import { useRouter } from 'next/navigation'; // За навигация в Next.js
+import React, { useState, type FormEvent, type ChangeEvent } from 'react';
+import { useRouter } from 'next/navigation'; 
+import styles from './login.module.css';
 import { useAuth } from '../hooks';
-import { requestNotificationPermission } from '@/notifications';
+import { requestNotificationPermission } from '../../notifications';
 
 const Login: React.FC = () => {
   const { login } = useAuth();
-  const router = useRouter(); // Замества useNavigate
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -91,12 +91,6 @@ const Login: React.FC = () => {
           <a 
             href="/forgot-password" 
             className={styles.forgotPassword}
-            onTouchStart={(e) => {
-              (e.currentTarget as HTMLAnchorElement).classList.add(styles.forgotPasswordActive);
-            }}
-            onTouchEnd={(e) => {
-              (e.currentTarget as HTMLAnchorElement).classList.remove(styles.forgotPasswordActive);
-            }}
           >
             Забравена парола?
           </a>

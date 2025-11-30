@@ -1,0 +1,304 @@
+/* Анимация за флашване на новата аларма */
+@keyframes flash {
+    0% { background-color: rgba(90, 103, 216, 0.1); }
+    50% { background-color: rgba(90, 103, 216, 0.25); }
+    100% { background-color: rgba(90, 103, 216, 0.1); }
+  }
+  
+  .pageContainer {
+    background: linear-gradient(135deg, #e6e9ff, #f3e8ff);
+    min-height: calc(100vh - 60px);
+    padding: 16px 8px;
+  }
+  @media (min-width: 768px) { .pageContainer { padding: 24px 16px; } }
+  @media (min-width: 1024px) { .pageContainer { padding: 32px 24px; } }
+  
+  .contentContainer {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+  }
+  @media (min-width: 768px) { .contentContainer { padding: 20px; } }
+  @media (min-width: 1024px) { .contentContainer { padding: 24px; } }
+  
+  .title {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 16px;
+    color: #1f2a44;
+    font-weight: 700;
+  }
+  .title span {
+    background: linear-gradient(135deg, #5a67d8, #b794f4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  @media (min-width: 768px) {
+    .title { font-size: 2rem; margin-bottom: 24px; }
+  }
+  
+  .subTitle {
+    text-align: center;
+    font-size: 0.75rem;
+    margin-bottom: 12px;
+    color: #5a67d8;
+    font-weight: 500;
+  }
+  @media (min-width: 768px) {
+    .subTitle { font-size: 0.875rem; margin-bottom: 16px; }
+  }
+  
+  .actionBar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 767px) {
+    .actionBar { justify-content: center; }
+  }
+  
+  .bulkDeleteButton {
+    background: linear-gradient(135deg, #f56565, #c53030);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+  }
+  .bulkDeleteButton:hover {
+    background: linear-gradient(135deg, #c53030, #9b2c2c);
+    transform: translateY(-1px);
+  }
+  .bulkDeleteButton:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+  }
+  @media (min-width: 768px) {
+    .bulkDeleteButton { padding: 8px 16px; font-size: 0.875rem; }
+  }
+  
+  .tableContainer {
+    overflow-x: auto;
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 12px;
+  }
+  @media (max-width: 767px) { .table { display: block; } }
+  
+  .tableHead {
+    @media (max-width: 767px) { display: none; }
+  }
+  
+  .tableBody {
+    @media (max-width: 767px) { display: block; }
+  }
+  
+  .th {
+    background: linear-gradient(135deg, #5a67d8, #b794f4);
+    color: white;
+    text-align: left;
+    padding: 8px 10px;
+    font-weight: 500;
+    font-size: 0.75rem;
+  }
+  .th:first-child { border-top-left-radius: 8px; }
+  .th:last-child { border-top-right-radius: 8px; }
+  @media (min-width: 768px) {
+    .th { padding: 10px 12px; font-size: 0.875rem; }
+  }
+  
+  .tr {
+    background: #fff;
+    transition: all 0.2s ease;
+  }
+  .tr:nth-child(even) { background: rgba(90, 103, 216, 0.03); }
+  .tr:hover { background: rgba(90, 103, 216, 0.08); }
+  .tr.flash { animation: flash 0.4s ease-in-out 2; }
+  
+  @media (max-width: 767px) {
+    .tr {
+      display: block;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      padding: 6px;
+    }
+    .tr:nth-child(even) { background: rgba(90, 103, 216, 0.1); }
+    .tr:nth-child(odd) { background: #fff; }
+  }
+  
+  .td {
+    border-bottom: 1px solid rgba(90, 103, 216, 0.1);
+    padding: 6px 10px;
+    vertical-align: middle;
+    font-size: 0.875rem;
+    color: #2d3748;
+    text-align: left;
+  }
+  @media (max-width: 767px) {
+    .td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+      border: none;
+    }
+    .td:not(:last-child) { border-bottom: 1px solid rgba(90, 103, 216, 0.15); }
+    .td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: #5a67d8;
+      flex: 0 0 35%;
+      font-size: 0.8rem;
+    }
+  }
+  @media (min-width: 768px) {
+    .td { padding: 8px 12px; font-size: 0.875rem; }
+  }
+  
+  .deleteButton {
+    background: linear-gradient(135deg, #f56565, #c53030);
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transition: all 0.2s ease;
+  }
+  .deleteButton:hover {
+    background: linear-gradient(135deg, #c53030, #9b2c2c);
+  }
+  @media (min-width: 768px) {
+    .deleteButton { padding: 6px 12px; font-size: 0.75rem; }
+  }
+  
+  .loadingMessage {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #4a5568;
+    margin: 16px 0;
+    padding: 8px;
+    background: rgba(90, 103, 216, 0.05);
+    border-radius: 6px;
+  }
+  @media (min-width: 768px) {
+    .loadingMessage { font-size: 0.875rem; padding: 12px; }
+  }
+  
+  .errorMessage {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #e53e3e;
+    margin: 16px 0;
+    padding: 8px;
+    background: #fff5f5;
+    border-radius: 6px;
+    border: 1px solid #feb2b2;
+  }
+  @media (min-width: 768px) {
+    .errorMessage { font-size: 0.875rem; padding: 12px; }
+  }
+  
+  .confirmationOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 8px;
+  }
+  
+  .confirmationDialog {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  @media (min-width: 768px) {
+    .confirmationDialog { padding: 16px; max-width: 420px; }
+  }
+  
+  .dialogTitle {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: #1f2a44;
+    text-align: center;
+    font-weight: 600;
+  }
+  @media (min-width: 768px) { .dialogTitle { font-size: 1.25rem; } }
+  
+  .dialogContent {
+    color: #4a5568;
+    margin-bottom: 16px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    text-align: center;
+  }
+  @media (min-width: 768px) { .dialogContent { font-size: 0.875rem; } }
+  
+  .dialogActions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  @media (max-width: 767px) { .dialogActions { flex-direction: column; } }
+  
+  .cancelButton {
+    background: #edf2f7;
+    color: #4a5568;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .cancelButton:hover { background: #e2e8f0; }
+  @media (min-width: 768px) {
+    .cancelButton { padding: 8px 20px; font-size: 0.875rem; }
+  }
+  
+  .confirmButton {
+    background: linear-gradient(135deg, #f56565, #c53030);
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .confirmButton:hover {
+    background: linear-gradient(135deg, #c53030, #9b2c2c);
+  }
+  @media (min-width: 768px) {
+    .confirmButton { padding: 8px 20px; font-size: 0.875rem; }
+  }
