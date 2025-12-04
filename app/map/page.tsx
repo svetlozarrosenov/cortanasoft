@@ -3,37 +3,28 @@
 import React, { useEffect, useState } from 'react';
 import styles from './map.module.css';
 import Intro from '@/components/Intro';
-import { MapContainer, TileLayer, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
+import { LatLngExpression } from 'leaflet';
 import { useDevicesLocations } from '@/app/map/hooks';
+import dynamic from 'next/dynamic';
 
-const AutoZoom: React.FC<{ locations: { lat: number; lng: number }[] }> = ({ locations }) => {
-  const map = useMap();
+const MapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+const TileLayer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+const Circle = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Circle),
+  { ssr: false }
+);
 
-  useEffect(() => {
-    if (!map || locations.length === 0) {
-      map.setView([0, 0], 2);
-      return;
-    }
-
-    if (locations.length === 1) {
-      const singleLocation = locations[0];
-      if(!singleLocation.lat || !singleLocation.lng) {
-        return;
-      }
-      map.setView([singleLocation.lat, singleLocation.lng], 14);
-    } else {
-      const bounds: LatLngBoundsExpression = [
-        [Math.min(...locations.map(loc => loc.lat)), Math.min(...locations.map(loc => loc.lng))],
-        [Math.max(...locations.map(loc => loc.lat)), Math.max(...locations.map(loc => loc.lng))],
-      ];
-      map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [map, locations]);
-
-  return null;
-};
+const AutoZoom = dynamic(
+  () => import('./AutoZoom').then(mod => mod.default),
+  { ssr: false }
+);
 
 const CoverageMap: React.FC = () => {
   const { locations } = useDevicesLocations();
@@ -65,7 +56,7 @@ const CoverageMap: React.FC = () => {
 
         <section className={styles.mapSection}>
           <div className={styles.mapWrapper}>
-            <MapContainer
+            {locations?.length > 0 && <MapContainer
               center={defaultCenter}
               zoom={2}
               style={{ height: '100%', width: '100%' }}
@@ -89,7 +80,7 @@ const CoverageMap: React.FC = () => {
                   />
                 ))}
               <AutoZoom locations={deviceLocations} />
-            </MapContainer>
+            </MapContainer>}
           </div>
           {deviceLocations.length === 0 ? (
             <div className={styles.noDevicesMessage}>

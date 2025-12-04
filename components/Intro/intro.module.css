@@ -1,74 +1,72 @@
 .introContainer {
-  background-image: url('/images/intro.webp');
-  background-size: cover;
-  background-position: center;
+  position: relative;
+  width: 100%;
+  min-height: 600px;
   padding: 80px 20px;
   text-align: center;
-  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Фоновото видео */
+.introVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;           /* точно като background-size: cover */
+  z-index: 0;
+}
+
+/* Тъмният оверлей – същият като твоя ::before */
 .introContainer::before {
   content: '';
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 
-@media (max-width: 768px) {
-  .introContainer {
-    padding: 40px 16px;
-    background-position: center center;
-    min-height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
+/* Текстът отгоре */
 .introContent {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 800px;
   margin: 0 auto;
-}
-
-@media (max-width: 768px) {
-  .introContent {
-    max-width: 100%;
-    padding: 0;
-  }
+  color: white;
 }
 
 .introTitle {
-  color: #ffffff;
   font-size: 2.5rem;
   margin-bottom: 20px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-@media (max-width: 768px) {
-  .introTitle {
-    font-size: 1.8rem;
-    margin-bottom: 12px;
-    line-height: 1.3;
-    padding: 0 10px;
-  }
+  font-weight: 700;
 }
 
 .introText {
-  color: #ffffff;
   font-size: 1.2rem;
   line-height: 1.6;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
+/* Мобилни екрани – точно както имаше преди */
 @media (max-width: 768px) {
+  .introContainer {
+    padding: 40px 16px;
+    min-height: 400px;
+  }
+
+  .introTitle {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
   .introText {
     font-size: 1rem;
     line-height: 1.5;
-    padding: 0 10px;
   }
 }

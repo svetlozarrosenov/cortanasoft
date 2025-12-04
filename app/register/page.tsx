@@ -1,9 +1,9 @@
-'use client'; // За клиентски състояния като useState
+'use client';
 
 import React, { useState } from 'react';
-import styles from './register.module.css'; // Импорт на CSS модула
+import styles from './register.module.css';
 import { useRegisterMutate } from '@/app/hooks';
-import { useRouter } from 'next/navigation'; // За навигация в Next.js
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const Register: React.FC = () => {
@@ -17,15 +17,14 @@ const Register: React.FC = () => {
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const router = useRouter(); // Замества useNavigate
-  const register = useRegisterMutate(); // Предполагам, че е mutation хук; коригирай ако е нужно
+  const router = useRouter();
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if(password !== confirmPassword) {
       throw new Error('passwords must match')
     }
-    register({
+    await useRegisterMutate({
       firstName,
       middleName,
       lastName,

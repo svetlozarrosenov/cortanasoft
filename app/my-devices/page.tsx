@@ -199,7 +199,7 @@ export default function MyDevices() {
         {ownedDevices.length === 0 ? (
           <p className={styles.infoText}>Нямате регистрирани собствени устройства</p>
         ) : (
-          ownedDevices.map((device) => (
+          ownedDevices.map((device: any) => (
             <div key={device._id} className={styles.deviceCard}>
               <div className={styles.deviceHeader}>
                 <h2 className={styles.deviceName}>{device.name}</h2>

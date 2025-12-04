@@ -1,81 +1,82 @@
-'use client'; // За клиентски състояния като useState и useRouter
-
-import React, { useState } from 'react';
-import styles from './home.module.css'; // Импорт на CSS модула
 import Intro from '@/components/Intro';
-import { subscribeMutate } from './hooks';
-import { useRouter } from 'next/navigation'; // За навигация в Next.js
+import SubscribeForm from '@/components/homepage/SubscribeForm';
+import Link from 'next/link';
+import styles from './home.module.css';
+import Image from 'next/image';
 
-const Home: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const router = useRouter(); // Замества useNavigate
+export const metadata = {
+  title: 'Sentinel Алармени Системи – Защита за велосипед, мотор и кола без SIM и абонамент',
+  description:
+    'Иновативна алармена система без SIM карта и месечни такси. Мигновени push известия на телефона при опит за кражба. До 6 дни батерия, лесна инсталация.',
+  keywords:
+    'алармена система, sentinel, защита велосипед, антикражба мотор, аларма без sim карта, lora аларма, аларма без абонамент',
+  openGraph: {
+    title: 'Sentinel – Иновативна алармена система без SIM и такси',
+    description: 'Мигновени известия при опит за кражба. Без SIM, без абонамент, до 6 дни с едно зареждане.',
+    images: ['/og-image.jpg'],
+    url: 'https://yoursite.com',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://yoursite.com',
+  },
+};
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    subscribeMutate(email);
-    setIsSubscribed(true);
-    setEmail('');
-  };
-
+export default function HomePage() {
   return (
     <>
       <Intro />
+
       <div className={styles.homeContainer}>
         <h1 className={styles.title}>
           <span>Sentinel</span> Алармени Системи
         </h1>
-        <h2 className={styles.subtitle}>Иновативна защита за вашите велосипеди, мотори и коли!</h2>
-        
+        <h2 className={styles.subtitle}>
+          Иновативна защита за вашите велосипеди, мотори и коли!
+        </h2>
+
         <ul className={styles.featureList}>
           <li className={styles.featureItem}>
             <h3 className={styles.featureTitle}>Без SIM карта</h3>
             <p className={styles.featureDescription}>
-              Сентинел не използва SIM карта за да изпраща известия към телефона Ви, 
-              което означава, че няма нужда да плащате месечни абонаменти.
+              Сентинел не използва SIM карта за да изпраща известия към телефона Ви, което означава, че няма нужда да плащате месечни абонаменти.
             </p>
           </li>
           <li className={styles.featureItem}>
             <h3 className={styles.featureTitle}>Широк обхват</h3>
             <p className={styles.featureDescription}>
-              Нашата система осигурява надеждна защита. Обхвата на Сентинел се разраства с всеки клиент. 
-              Ако няма клиенти във вашия район, то обхвата ще е между 1 и 5км в зависимост от това 
-              каква е гъстотата на сградите около вас.
+              Нашата система осигурява надеждна защита. Обхвата на Сентинел се разраства с всеки клиент. Ако няма клиенти във вашия район, обхватът ще е между 1 и 5 км в зависимост от гъстотата на сградите.
             </p>
           </li>
           <li className={styles.featureItem}>
             <h3 className={styles.featureTitle}>Мобилно приложение</h3>
             <p className={styles.featureDescription}>
-              Нашият сайт е създаден като Progressive Web App, което означава, че само с два клика 
-              се сваля като мобилно приложение на телефона Ви. По този начин може да получавате 
-              известия в реално време, когато някой опитва да открадне имуществото Ви.
+              Нашият сайт е Progressive Web App – сваля се като приложение с 2 клика. Получавате мигновени push известия при опит за кражба.
             </p>
           </li>
           <li className={styles.featureItem}>
             <h3 className={styles.featureTitle}>Бърза реакция</h3>
             <p className={styles.featureDescription}>
-              Моментално известяване при активиране на алармата. Когато свалите сайта ни като мобилно 
-              приложение, ще получавате мигновени известия при опит да бъде откраднато имуществото Ви.
+              Моментално известяване при активиране на алармата – без шум, само директно на вашия телефон.
             </p>
           </li>
           <li className={styles.featureItem}>
             <h3 className={styles.featureTitle}>Енергийно ефективна</h3>
             <p className={styles.featureDescription}>
-              Нашата система използва иновативна технология за ниска консумация на енергия. 
-              До 6 дни с едно зареждане!
+              До 6 дни с едно зареждане благодарение на иновативна LoRa технология с ниска консумация.
             </p>
           </li>
           <li className={styles.featureItem}>
             <h3 className={styles.featureTitle}>Лесна инсталация</h3>
             <p className={styles.featureDescription}>
-              Бърз и опростен процес на инсталиране.
+              Бърз и опростен процес – включвате приемника, слагате сензора и сте готови.
             </p>
           </li>
         </ul>
-        
-        <button className={styles.ctaButton} onClick={() => router.push('/products')}>
+
+        <Link href="/products" className={styles.ctaButton}>
           Виж нашите продукти
-        </button>
+        </Link>
 
         <section className={styles.infoSection}>
           <div className={styles.infoBlock}>
@@ -91,7 +92,7 @@ const Home: React.FC = () => {
                 </p>
                 <p>
                   Това ви дава уникалното предимство да хванете крадеца на място, вместо просто да го подплашите.
-                  Чрез нашата иновативна технология, получавате моментално известие на телефона си:
+                  Чрез нашата иновативна технология получавате моментално известие на телефона си:
                 </p>
                 <ul>
                   <li>Без нужда от SIM карта</li>
@@ -101,7 +102,13 @@ const Home: React.FC = () => {
                 </ul>
               </div>
               <div className={styles.infoImage}>
-                <img src="images/home-alarm.webp" alt="Sentinel Алармена Система в действие" />
+                <Image
+                  src="/images/home-alarm.webp"
+                  alt="Sentinel алармена система в действие"
+                  width={600}
+                  height={400}
+                  priority
+                />
               </div>
             </div>
           </div>
@@ -112,81 +119,84 @@ const Home: React.FC = () => {
             </h2>
             <div className={styles.infoContent}>
               <div className={styles.infoImage}>
-                <img src="images/home-alarm-town.webp" alt="Как работи Sentinel" />
+                <Image
+                  src="/images/home-alarm-town.webp"
+                  alt="Мрежа от приемници на Sentinel"
+                  width={600}
+                  height={400}
+                />
               </div>
               <div className={styles.infoText}>
                 <p>
                   Sentinel използва мрежа от приемници, стратегически разположени в града, които
-                  препредават сигнала от вашата аларма до нашите сървъри, а оттам - директно до
-                  вашия телефон.
+                  препредават сигнала от вашата аларма до нашите сървъри, а оттам – директно до телефона ви.
                 </p>
                 <p>
-                  Това означава, че получавате известие моментално, където и да се намирате, стига
-                  да имате интернет връзка. Нашата система е проектирана да работи надеждно дори
-                  в градски условия с много пречки и смущения.
+                  Получавате известие моментално, където и да сте, стига да имате интернет. Системата работи надеждно дори в гъсто застроени райони.
                 </p>
                 <ul>
-                  <li>Мрежа от приемници с постоянно разрастващ се обхват</li>
-                  <li>Надеждна комуникация дори в градска среда</li>
-                  <li>Мигновено известяване на вашия телефон</li>
-                  <li>Автоматично свързване с най-близките приемници</li>
+                  <li>Постоянно разрастваща се мрежа от приемници</li>
+                  <li>Надеждна комуникация в градски условия</li>
+                  <li>Мигновено известяване</li>
+                  <li>Автоматично свързване с най-близкия приемник</li>
                 </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.infoBlock}>
+            <h2 className={styles.infoTitle}>
+              Как да започнете със <span>Sentinel</span>?
+            </h2>
+            <div className={styles.infoContent}>
+              <div className={styles.infoText}>
+                <p>Само няколко прости стъпки:</p>
+                <ol>
+                  <li>Регистрирайте се и поръчайте сензор + приемник</li>
+                  <li>Получавате устройства с предварително конфигуриран софтуер</li>
+                  <li>Инсталирайте PWA приложението на телефона си</li>
+                  <li>Свържете приемника към домашния Wi-Fi</li>
+                  <li>Поставете сензора на превозното средство – готово!</li>
+                </ol>
+
+                <p><strong>Инсталиране на приложението:</strong> Отворете сайта в Chrome/Safari → "Добави към начален екран". Push известията работят на Android и iOS 16.4+.</p>
+                <p><strong>Настройка на приемника:</strong></p>
+                <ol>
+                  <li>Включете в контакта</li>
+                  <li>Свържете се към WiFi "sentinel_config"</li>
+                  <li>Отворете браузър → автоматично отваряне на конфигурационния панел</li>
+                  <li>Изберете вашата WiFi мрежа и въведете парола</li>
+                </ol>
+
+                <p><strong>Гаранция и поддръжка:</strong></p>
+                <ul>
+                  <li>До 6 дни с едно зареждане</li>
+                  <li>Зареждане през Type-C (5V)</li>
+                  <li>2 години гаранция</li>
+                  <li>Денонощна телефонна поддръжка</li>
+                  <li>Безплатно посещение в София при проблем</li>
+                </ul>
+              </div>
+              <div className={styles.infoImage}>
+                <Image
+                  src="/images/home-alarm-town.webp"
+                  alt="Настройка на Sentinel система"
+                  width={600}
+                  height={400}
+                />
               </div>
             </div>
           </div>
         </section>
 
-        <div className={styles.infoBlock}>
-          <h2 className={styles.infoTitle}>
-            Как да започнете със <span>Sentinel</span>?
-          </h2>
-          <div className={styles.infoContent}>
-            <div className={styles.infoText}>
-              <p>
-                За да започнете да използвате Sentinel, следвайте тези прости стъпки:
-              </p>
-              <ul>
-                <li>Регистрирайте се в нашия сайт и направете поръчка на сензор и приемник</li>
-                <li>След поръчката ще получите устройства със специално конфигуриран софтуер за вас</li>
-                <li>Свалете нашето приложение на телефона си за известия в реално време</li>
-                <li>Настройте приемника към домашната си WiFi мрежа</li>
-                <li>Поставете сензора на вашето превозно средство и сте защитени!</li>
-              </ul>
-              <p>
-                <strong>Инсталиране на мобилното приложение:</strong><br/>
-                Нашият сайт е Progressive Web App, което означава че можете да го инсталирате директно 
-                на вашия телефон. При посещение на сайта, браузърът ще ви предложи опция "Добави към 
-                начален екран". Push известията работят на Android 5.0+ и iOS 16.4+.
-              </p>
-              <p>
-                <strong>Настройка на приемника:</strong><br/>
-                1. Включете приемника в контакта<br/>
-                2. Свържете се към WiFi мрежата "sentinel_config"<br/>
-                3. Отворете който и да е сайт - ще бъдете пренасочени към конфигурационния панел<br/>
-                4. Изберете вашата домашна WiFi мрежа от списъка и въведете паролата
-              </p>
-              <p>
-                <strong>За вашето спокойствие:</strong><br/>
-                • Сензорът работи до 6 дни с едно зареждане<br/>
-                • Зарежда се с Type-C кабел (5V)<br/>
-                • 2 години гаранция на всички устройства<br/>
-                • Денонощна телефонна поддръжка<br/>
-                • Безплатно посещение на адрес при проблеми в София
-              </p>
-            </div>
-            <div className={styles.infoImage}>
-              <img src="images/home-alarm-town.webp" alt="Как да настроите вашата Sentinel система" />
-            </div>
-          </div>
-        </div>
         <section className={styles.testimonialsSection}>
           <h2 className={styles.testimonialsTitle}>
-            Какво споделят нашите <span>клиенти</span>
+            Какво казват нашите <span>клиенти</span>
           </h2>
           <div className={styles.testimonialsList}>
             <div className={styles.testimonialCard}>
               <p className={styles.testimonialText}>
-                "Използвам го за велосипеда си и вече не се притеснявам, че ще го откраднат. Приложението веднага ме уведомява, ако нещо се случи."
+                "Използвам го за велосипеда си и вече не се притеснявам, че ще го откраднат. Приложението веднага ме уведомява."
               </p>
               <p className={styles.testimonialAuthor}>- Николай Стоянов, София</p>
             </div>
@@ -198,37 +208,20 @@ const Home: React.FC = () => {
             </div>
             <div className={styles.testimonialCard}>
               <p className={styles.testimonialText}>
-                "Ползвам Sentinel за колата си и ми харесва, че мога да следя всичко от телефона си. Уведомленията работят перфектно, а батерията държи дълго."
+                "Ползвам Sentinel за колата си и ми харесва, че мога да следя всичко от телефона си. Уведомленията работят перфектно."
               </p>
               <p className={styles.testimonialAuthor}>- Десислава Петрова, Пловдив</p>
             </div>
           </div>
         </section>
+
         <section className={styles.subscriptionSection}>
-          <h2 className={styles.subscriptionTitle}>Абонирайте се за нашия бюлетин</h2>
-          {isSubscribed ? (
-            <div className={styles.successMessage}>
-              Благодарим ви за абонирането! Очаквайте скоро нашия бюлетин.
-            </div>
-          ) : (
-            <form className={styles.subscriptionForm} onSubmit={handleSubscribe}>
-              <input
-                type="email"
-                placeholder="Въведете вашия имейл"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className={styles.subscriptionInput}
-              />
-              <button type="submit" className={styles.subscriptionButton}>
-                Абонирай се
-              </button>
-            </form>
-          )}
+          <h2 className={styles.subscriptionTitle}>
+            Абонирайте се за нашия бюлетин
+          </h2>
+          <SubscribeForm />
         </section>
       </div>
     </>
   );
-};
-
-export default Home;
+}

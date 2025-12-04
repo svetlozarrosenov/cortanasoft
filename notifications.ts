@@ -1,3 +1,5 @@
+'use client';
+
 import { getToken } from "firebase/messaging";
 import { messaging } from './firebase'; 
 

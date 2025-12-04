@@ -57,6 +57,7 @@
   .input {
     padding: 14px 16px;
     border: 1.5px solid #e3e8ef;
+    color: #000000;
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.2s ease;
